@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ttis
+      POSTGRES_USER: ttis
+      POSTGRES_PASSWORD: test
+    volumes:
+      - postgresql-vol:/var/lib/postgresql/data
+      - /tmp:/var/run/postgresql
+    ports:
+      - 5432:5432
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-vol:/data
+volumes:
+  postgresql-vol:
+  redis-vol:
+networks:
+  common_network:
+    external: true

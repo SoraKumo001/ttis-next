@@ -12,8 +12,8 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const port_number = 3001;
-const sock_path = "/tmp/node.sock";
-const redis_path = "/tmp/redis.sock";
+const sock_path = "/var/run/socks/node-front.sock";
+const redis_path = "/var/run/socks/redis.sock";
 
 const session = expressSession({
   secret: "secret",

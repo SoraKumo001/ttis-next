@@ -1,19 +1,16 @@
 import { Resolver, Mutation, ID, Args, Query } from '@nestjs/graphql';
 import { Contents } from './contents';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository } from 'typeorm';
+import { TreeRepository } from 'typeorm';
+import { OnModuleInit } from '@nestjs/common';
 
 @Resolver('Contents')
-export class ContentsResolver {
+export class ContentsResolver implements OnModuleInit{
   constructor(
     @InjectRepository(Contents)
     private readonly rep: TreeRepository<Contents>
   ) {
-    rep.count().then(count => {
-      if (!count) {
-        rep.save({ title: 'TOP' });
-      }
-    });
+
   }
   @Mutation(_ => ID)
   async create(
@@ -38,5 +35,14 @@ export class ContentsResolver {
   ) {
     const { rep } = this;
     return (await rep.findTrees())[0];
+  }
+
+  async onModuleInit() {
+    const {rep} = this;
+    await rep.count().then(count => {
+      if (!count) {
+        rep.save({ title: 'TOP' });
+      }
+    });
   }
 }

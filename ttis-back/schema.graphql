@@ -23,31 +23,23 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Message {
-  id: ID!
-  name: String!
-  value: String!
-  createAt: DateTime!
-  updateAt: DateTime!
-}
-
-type Messages {
-  count: Int!
-  nodes: [Message!]!
+type Login {
+  token: String!
+  user: User!
 }
 
 type Mutation {
-  addMessage(value: String!, name: String!): ID!
   create(page: Boolean, vector: Float, id: String): ID!
   deleteUser(id: Int!): Boolean!
   deleteUsers(ids: [Int!]!): Boolean!
   user(password: String, name: String, id: Int): User
+  login(password: String!, name: String!): Login
 }
 
 type Query {
-  messages(page: Int, last: Int, first: Int): Messages
   contents: Contents
   users: [User!]
+  currentUser: User
 }
 
 type User {

@@ -14,10 +14,19 @@ import {
   createSessionProps
 } from "../libs/next-express-session";
 import axios from "axios";
-import { Header } from '@components/Header';
+import { Header } from "@components/Header";
+import * as nextRouter from "next/router";
+import { setContext } from "apollo-link-context";
 const IS_BROWSER = !!process.browser;
-const URI_ENDPOINT = "/graphql/";
-
+const IS_DOCKER =
+  process.env.NODE_ENV === "production" &&
+  process.platform !== "win32" &&
+  !IS_BROWSER;
+const URI_ENDPOINT = IS_BROWSER
+  ? "/graphql/"
+  : IS_DOCKER
+  ? "http://web-server/graphql/"
+  : "http://localhost/graphql/";
 // セッション情報内からクライアントへ送りたくないデータを指定
 const SessionFilter: string[] = [];
 
@@ -25,16 +34,30 @@ function createClient(
   token: string | undefined | null,
   initialState: any = {}
 ) {
+  const authLink = setContext((_, { headers }) => {
+    //GraphQLのTokenの変更対応処理
+    const newToken =
+      (typeof window !== undefined && localStorage.getItem("graphqlToken")) ||
+      token;
+    return {
+      headers: {
+        ...headers,
+        authorization: newToken ? `Bearer ${newToken}` : ""
+      }
+    };
+  });
+  const link = new HttpLink({
+    fetch,
+    uri: URI_ENDPOINT,
+    headers: {
+      authorization: token ? `Bearer ${token}` : ""
+    }
+  });
+
   return new ApolloClient({
     connectToDevTools: IS_BROWSER,
     ssrMode: !IS_BROWSER,
-    link: new HttpLink({
-      fetch,
-      uri: URI_ENDPOINT,
-      // headers: {
-      //   authorization: `bearer ${token}`
-      // }
-    }),
+    link: IS_BROWSER ? authLink.concat(link) : link,
     cache: new InMemoryCache().restore(initialState)
   });
 }
@@ -49,75 +72,83 @@ export interface Props {
 interface State {
   client?: ApolloClient<NormalizedCacheObject>;
 }
+let ssrClient: ApolloClient<NormalizedCacheObject>;
 
 export default class App extends NextApp<{ session: SessionType }> {
-  static async getInitialProps({ ctx, Component }: AppContext) {
+  static async getInitialProps({ ctx, Component, router }: AppContext) {
     //セッション情報の初期化(SPA時にはundefined)
     const session = (ctx?.req as undefined | { session?: SessionType })
       ?.session;
-    const graphqlToken = session?.graphqlToken;
-    const client = createClient(graphqlToken as string|undefined);
+    const graphqlToken = session?.graphqlToken as string | undefined;
+    ssrClient = createClient(graphqlToken);
+
     const context = {
       ...ctx,
       session
     };
     const pageProps =
       Component.getInitialProps && (await Component.getInitialProps(context));
-    await getMarkupFromTree({
-      tree: (
-        <ApolloProvider client={client}>
-          <Component {...pageProps} />
-        </ApolloProvider>
-      )
-    }).catch(() => {});
+
+    const sessionProps = createSessionProps(session, SessionFilter);
+
+    //SSR用GraphQLデータキャッシュの作成
+    if (!IS_BROWSER) {
+      //getMarkupFromTreeの中ではuseRouterが使えないので強制フック
+      const ssrRouter = nextRouter.makePublicRouterInstance(router);
+      (nextRouter as any).useRouter = () => {
+        return ssrRouter;
+      };
+      //仮コンポーネントでキャッシュを作る
+      await getMarkupFromTree({
+        tree: (
+          <App
+            pageProps={pageProps}
+            Component={Component}
+            router={router}
+            session={sessionProps}
+          />
+        )
+      }).catch(() => {});
+    }
+
     return {
       pageProps: {
         ...pageProps,
         graphqlToken,
-        apolloCache: client.extract()
+        apolloCache: ssrClient.extract()
       },
-      session: createSessionProps(session, SessionFilter)
+      session: sessionProps
     };
   }
-  state: State = {};
-  onMessage(event: MessageEvent) {
-    if (event?.data?.action === "UPDATE_GRAPHQL_TOKEN") {
-      const token = event?.data?.token;
-      if (token) localStorage.setItem("graphqlToken", token);
-      else localStorage.removeItem("graphqlToken");
-      this.setState({ client: createClient(token) });
-      this.forceUpdate();
-    }
-  }
+  state: State = { client: ssrClient };
   componentDidMount() {
-    const graphqlToken =
-      typeof window !== "undefined" && localStorage.getItem("graphqlToken");
+    let graphqlToken = localStorage.getItem("graphqlToken");
     if (graphqlToken) {
-      if (!this.props.pageProps.token) {
+      if (this.props.pageProps.graphqlToken !== graphqlToken) {
         axios.post("/api/token", {
           graphqlToken
         });
       }
+    } else {
+      graphqlToken = this.props.pageProps.graphqlToken;
+      if (graphqlToken) {
+        localStorage.setItem("graphqlToken", graphqlToken);
+      }
     }
-    if (!this.state.client) {
+    if (!this.state.client)
       this.setState({
-        client: createClient(
-          this.props.pageProps.token || graphqlToken,
-          this.props.pageProps.apolloCache
-        )
+        client: createClient(graphqlToken, this.props.pageProps.apolloCache)
       });
-      this.forceUpdate();
-    }
-    addEventListener("message", e => this.onMessage(e));
   }
   render() {
-    initProps(this);
     const { router, Component, pageProps } = this.props;
+    const client = this.state.client;
+    initProps(this);
     return (
       <>
-        {this.state.client && (
-          <ApolloProvider client={this.state.client}>
-            <Header/>
+        {client && (
+          <ApolloProvider client={client}>
+            <Header {...pageProps} />
             <Component {...pageProps} url={createUrl(router)} />
           </ApolloProvider>
         )}

@@ -17,6 +17,7 @@ services:
       - 80:80
     volumes:
       - ./etc/nginx/conf.d:/etc/nginx/conf.d
+    container_name: nginx
   redis:
     image: "redis:latest"
     ports:

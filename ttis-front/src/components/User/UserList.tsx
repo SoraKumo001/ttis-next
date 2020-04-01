@@ -36,7 +36,7 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
           <ListHeader>Info</ListHeader>
         </ListHeaders>
         {!loading &&
-          data.users?.map(({ id, name, info }) => (
+          data?.users?.map(({ id, name, info }) => (
             <ListRow key={id} value={id}>
               <ListItem>{id}</ListItem>
               <ListItem>{name}</ListItem>

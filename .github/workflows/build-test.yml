@@ -1,0 +1,40 @@
+name: BuildTest(push)
+on:
+  push:
+jobs:
+  frontend:
+    name: frontend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: ttis-front:Cache node modules(yarn.lock)
+        id: cache
+        uses: actions/cache@v1
+        with:
+          path: ttis-front/node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('ttis-front/yarn.lock') }}
+          restore-keys: ${{ runner.OS }}-build-${{ env.cache-name }}
+      - name: ttis-front:package-install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn --cwd ttis-front
+      - name: ttis-front:build
+        run: yarn --cwd ttis-front build
+  backend:
+    name: backend test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: ttis-back:Cache node modules(yarn.lock)
+        id: ttis-back-cache
+        uses: actions/cache@v1
+        with:
+          path: ttis-back/node_modules
+          key: ${{ runner.OS }}-build-back-${{ hashFiles('ttis-back/yarn.lock') }}
+          restore-keys: ${{ runner.OS }}-build-${{ env.cache-name }}-
+      - name: ttis-back:package-install
+        if: steps.ttis-back-cache.outputs.cache-hit != 'true'
+        run: yarn --cwd ttis-back
+      - name: ttis-back:build
+        run: yarn --cwd ttis-back build
+      - name: ttis-back:test
+        run: yarn --cwd ttis-back test

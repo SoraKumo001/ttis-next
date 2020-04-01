@@ -2,13 +2,15 @@
   "name": "ttis",
   "scripts": {
     "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
+    "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
     "start:dev:back": "yarn --cwd ttis-back start:dev",
-    "start:dev:front": "yarn --cwd ttis-front dev"
+    "start:dev:front": "yarn --cwd ttis-front dev",
+    "start:prod:back": "yarn --cwd ttis-back build && yarn --cwd ttis-back start",
+    "start:prod:front": "yarn --cwd ttis-front build && yarn --cwd ttis-front start",
+    "start:docker": "docker-compose -f docker/docker-compose.yml up ",
+    "test": "yarn --cwd ttis-back test"
   },
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
-  "devDependencies": {
-    "npm-run-all": "^4.1.5"
-  }
+  "license": "MIT"
 }

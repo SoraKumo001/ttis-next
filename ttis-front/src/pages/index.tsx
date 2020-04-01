@@ -8,7 +8,7 @@ export default () => (
       }
     `}</style>
     <div>
-      <Link  href="?userList">
+      <Link href="?userList">
         <a className="link">UserList</a>
       </Link>
       <Link href="?login">

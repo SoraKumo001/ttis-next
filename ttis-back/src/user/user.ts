@@ -1,15 +1,9 @@
-
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  BaseEntity,
-} from 'typeorm';
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
 @Entity()
-export class User  extends BaseEntity{
+export class User extends BaseEntity {
   @Field(_ => Int)
   @PrimaryGeneratedColumn() //自動番号
   id!: number;
@@ -19,9 +13,9 @@ export class User  extends BaseEntity{
   @Field()
   @Column({ unique: true })
   name!: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   password?: string;
   @Field()
-  @Column({ default: "{}" })
+  @Column({ default: '{}' })
   info!: string;
 }

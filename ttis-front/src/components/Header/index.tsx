@@ -2,6 +2,9 @@ import { useRouter, NextRouter } from "next/router";
 import { UserList } from "../User/UserList";
 import { WindowState, WindowInfo } from "@jswf/react";
 import { UserLogin } from "@components/User/UserLogin";
+import { useQuery } from "react-apollo";
+import { QUERY_CURRENT_USER } from "@components/User/graphql";
+import { CurrentUserQuery } from "../../generated/graphql";
 
 export const createAutoClose = (router: NextRouter, queryKey: string) => {
   {
@@ -26,6 +29,8 @@ export interface AutoCloseProps {
 export const Header = () => {
   const router = useRouter();
   const { userList, login } = router.query;
+
+  const { loading, data } = useQuery<CurrentUserQuery>(QUERY_CURRENT_USER);
   return (
     <>
       {userList !== undefined && (
@@ -34,6 +39,9 @@ export const Header = () => {
       {login !== undefined && (
         <UserLogin autoClose={createAutoClose(router, "login")} />
       )}
+      {
+        !loading && data?.currentUser?.name
+      }
     </>
   );
 };

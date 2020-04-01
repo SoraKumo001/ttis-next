@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserService Create User 1`] = `
+Object {
+  "enable": true,
+  "id": 2,
+  "info": "{}",
+  "name": "Test",
+  "password": "ebdf8cc00bc4d9ceee633c56c63b49955769a92ca060825c9b08e4af61326e2b",
+}
+`;
+
+exports[`UserService Create User 2`] = `
+Object {
+  "enable": true,
+  "id": 3,
+  "info": "{}",
+  "name": "Test2",
+  "password": "42ca698f4ea60cb496520cadbdde9311e33a6319abf4cc5d6aa64e12d0f91fb3",
+}
+`;
+
+exports[`UserService Delete User 1`] = `true`;
+
+exports[`UserService List Users 1`] = `
+Array [
+  User {
+    "enable": true,
+    "id": 1,
+    "info": "{}",
+    "name": "admin",
+    "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  },
+  User {
+    "enable": true,
+    "id": 3,
+    "info": "{}",
+    "name": "Test2",
+    "password": "42ca698f4ea60cb496520cadbdde9311e33a6319abf4cc5d6aa64e12d0f91fb3",
+  },
+]
+`;
+
+exports[`UserService List Users Params 1`] = `
+Array [
+  User {
+    "id": 1,
+    "name": "admin",
+  },
+  User {
+    "id": 3,
+    "name": "Test2",
+  },
+]
+`;
+
+exports[`UserService onModuleInit 1`] = `undefined`;

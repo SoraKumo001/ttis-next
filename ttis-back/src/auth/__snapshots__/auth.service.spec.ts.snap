@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuthService Login 1`] = `
+Object {
+  "token": "eyJhbGciOiJIUzI1NiIs",
+  "user": User {
+    "enable": true,
+    "id": 1,
+    "info": "{}",
+    "name": "admin",
+    "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  },
+}
+`;
+
+exports[`AuthService Login Failure 1`] = `null`;
+
+exports[`AuthService validate 1`] = `
+User {
+  "enable": true,
+  "id": 1,
+  "info": "{}",
+  "name": "admin",
+  "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+}
+`;

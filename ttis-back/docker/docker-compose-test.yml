@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  postgres:
+    container_name: postgres-test
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ttis
+      POSTGRES_USER: ttis
+      POSTGRES_PASSWORD: test
+    volumes:
+      - postgresql-test-vol:/var/lib/postgresql/data
+      # - /tmp:/var/run/postgresql
+    ports:
+      - 15432:5432
+  nginx:
+    container_name: nginx-test
+    image: nginx:latest
+    ports:
+      - 10080:80
+    volumes:
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+  redis:
+    container_name: redis-test
+    image: redis:latest
+    ports:
+      - 16379:6379
+    volumes:
+      - redis-test-vol:/data
+volumes:
+  postgresql-test-vol:
+  redis-test-vol:

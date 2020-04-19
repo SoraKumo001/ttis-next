@@ -8,12 +8,10 @@ export class ContentsResolver {
   @Mutation((_) => ID)
   async create(
     @Args('parent') parent: string,
-    @Args('vector', {
-      type: () => ['CHILD_FIRST', 'CHILD_LAST', 'BEFORE', 'NEXT'],
-    })
+    @Args('vector')
     vector: 'CHILD_FIRST' | 'CHILD_LAST' | 'BEFORE' | 'NEXT',
     @Args('page') page?: boolean,
-  ): Promise<string> {
+  ): Promise<Contents> {
     const { service } = this;
     return service.create(parent, vector, page);
   }

@@ -12,7 +12,15 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+};
+
+export type Query = {
+   __typename?: 'Query';
+  contents?: Maybe<Contents>;
+  users?: Maybe<Array<User>>;
+  currentUser?: Maybe<User>;
 };
 
 export type Contents = {
@@ -25,7 +33,7 @@ export type Contents = {
   title: Scalars['String'];
   value_type: Scalars['String'];
   value: Scalars['String'];
-  parentId: Scalars['Float'];
+  parentId: Scalars['String'];
   children?: Maybe<Array<Contents>>;
   parent: Contents;
   createAt: Scalars['DateTime'];
@@ -33,31 +41,18 @@ export type Contents = {
 };
 
 
-export type Login = {
-   __typename?: 'Login';
-  token: Scalars['String'];
-  user: User;
-};
-
-export type Message = {
-   __typename?: 'Message';
-  id: Scalars['ID'];
+export type User = {
+   __typename?: 'User';
+  id: Scalars['Int'];
+  enable: Scalars['Boolean'];
   name: Scalars['String'];
-  value: Scalars['String'];
-  createAt: Scalars['DateTime'];
-  updateAt: Scalars['DateTime'];
-};
-
-export type Messages = {
-   __typename?: 'Messages';
-  count: Scalars['Int'];
-  nodes: Array<Message>;
+  info: Scalars['String'];
 };
 
 export type Mutation = {
    __typename?: 'Mutation';
-  addMessage: Scalars['ID'];
   create: Scalars['ID'];
+  update: Scalars['ID'];
   deleteUser: Scalars['Boolean'];
   deleteUsers: Scalars['Boolean'];
   user?: Maybe<User>;
@@ -65,16 +60,23 @@ export type Mutation = {
 };
 
 
-export type MutationAddMessageArgs = {
-  value: Scalars['String'];
-  name: Scalars['String'];
+export type MutationCreateArgs = {
+  page: Scalars['Boolean'];
+  vector: Scalars['String'];
+  parent: Scalars['String'];
 };
 
 
-export type MutationCreateArgs = {
+export type MutationUpdateArgs = {
+  value?: Maybe<Scalars['String']>;
+  value_type?: Maybe<Scalars['String']>;
+  parent?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  title_type?: Maybe<Scalars['Float']>;
+  visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
-  vector?: Maybe<Scalars['Float']>;
-  id?: Maybe<Scalars['String']>;
+  vector?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
 };
 
 
@@ -100,27 +102,10 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
-export type Query = {
-   __typename?: 'Query';
-  messages?: Maybe<Messages>;
-  contents?: Maybe<Contents>;
-  users?: Maybe<Array<User>>;
-  currentUser?: Maybe<User>;
-};
-
-
-export type QueryMessagesArgs = {
-  page?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
-  first?: Maybe<Scalars['Int']>;
-};
-
-export type User = {
-   __typename?: 'User';
-  id: Scalars['Int'];
-  enable: Scalars['Boolean'];
-  name: Scalars['String'];
-  info: Scalars['String'];
+export type Login = {
+   __typename?: 'Login';
+  token: Scalars['String'];
+  user: User;
 };
 
 export type UsersQueryVariables = {};
@@ -203,13 +188,15 @@ export type UsersComponentProps = Omit<ApolloReactComponents.QueryComponentOptio
       <ApolloReactComponents.Query<UsersQuery, UsersQueryVariables> query={UsersDocument} {...props} />
     );
     
-export type UsersProps<TChildProps = {}> = ApolloReactHoc.DataProps<UsersQuery, UsersQueryVariables> & TChildProps;
-export function withUsers<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type UsersProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<UsersQuery, UsersQueryVariables>
+    } & TChildProps;
+export function withUsers<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
   UsersQuery,
   UsersQueryVariables,
-  UsersProps<TChildProps>>) {
-    return ApolloReactHoc.withQuery<TProps, UsersQuery, UsersQueryVariables, UsersProps<TChildProps>>(UsersDocument, {
+  UsersProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, UsersQuery, UsersQueryVariables, UsersProps<TChildProps, TDataName>>(UsersDocument, {
       alias: 'users',
       ...operationOptions
     });
@@ -230,13 +217,15 @@ export type CurrentUserComponentProps = Omit<ApolloReactComponents.QueryComponen
       <ApolloReactComponents.Query<CurrentUserQuery, CurrentUserQueryVariables> query={CurrentUserDocument} {...props} />
     );
     
-export type CurrentUserProps<TChildProps = {}> = ApolloReactHoc.DataProps<CurrentUserQuery, CurrentUserQueryVariables> & TChildProps;
-export function withCurrentUser<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type CurrentUserProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<CurrentUserQuery, CurrentUserQueryVariables>
+    } & TChildProps;
+export function withCurrentUser<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
   CurrentUserQuery,
   CurrentUserQueryVariables,
-  CurrentUserProps<TChildProps>>) {
-    return ApolloReactHoc.withQuery<TProps, CurrentUserQuery, CurrentUserQueryVariables, CurrentUserProps<TChildProps>>(CurrentUserDocument, {
+  CurrentUserProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, CurrentUserQuery, CurrentUserQueryVariables, CurrentUserProps<TChildProps, TDataName>>(CurrentUserDocument, {
       alias: 'currentUser',
       ...operationOptions
     });
@@ -261,13 +250,15 @@ export type LoginComponentProps = Omit<ApolloReactComponents.MutationComponentOp
       <ApolloReactComponents.Mutation<LoginMutation, LoginMutationVariables> mutation={LoginDocument} {...props} />
     );
     
-export type LoginProps<TChildProps = {}> = ApolloReactHoc.MutateProps<LoginMutation, LoginMutationVariables> & TChildProps;
-export function withLogin<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type LoginProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<LoginMutation, LoginMutationVariables>
+    } & TChildProps;
+export function withLogin<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
   LoginMutation,
   LoginMutationVariables,
-  LoginProps<TChildProps>>) {
-    return ApolloReactHoc.withMutation<TProps, LoginMutation, LoginMutationVariables, LoginProps<TChildProps>>(LoginDocument, {
+  LoginProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, LoginMutation, LoginMutationVariables, LoginProps<TChildProps, TDataName>>(LoginDocument, {
       alias: 'login',
       ...operationOptions
     });
@@ -290,13 +281,15 @@ export type CreateUserComponentProps = Omit<ApolloReactComponents.MutationCompon
       <ApolloReactComponents.Mutation<CreateUserMutation, CreateUserMutationVariables> mutation={CreateUserDocument} {...props} />
     );
     
-export type CreateUserProps<TChildProps = {}> = ApolloReactHoc.MutateProps<CreateUserMutation, CreateUserMutationVariables> & TChildProps;
-export function withCreateUser<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type CreateUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateUserMutation, CreateUserMutationVariables>
+    } & TChildProps;
+export function withCreateUser<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
   CreateUserMutation,
   CreateUserMutationVariables,
-  CreateUserProps<TChildProps>>) {
-    return ApolloReactHoc.withMutation<TProps, CreateUserMutation, CreateUserMutationVariables, CreateUserProps<TChildProps>>(CreateUserDocument, {
+  CreateUserProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateUserMutation, CreateUserMutationVariables, CreateUserProps<TChildProps, TDataName>>(CreateUserDocument, {
       alias: 'createUser',
       ...operationOptions
     });
@@ -315,13 +308,15 @@ export type DeleteUsersComponentProps = Omit<ApolloReactComponents.MutationCompo
       <ApolloReactComponents.Mutation<DeleteUsersMutation, DeleteUsersMutationVariables> mutation={DeleteUsersDocument} {...props} />
     );
     
-export type DeleteUsersProps<TChildProps = {}> = ApolloReactHoc.MutateProps<DeleteUsersMutation, DeleteUsersMutationVariables> & TChildProps;
-export function withDeleteUsers<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type DeleteUsersProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<DeleteUsersMutation, DeleteUsersMutationVariables>
+    } & TChildProps;
+export function withDeleteUsers<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
   DeleteUsersMutation,
   DeleteUsersMutationVariables,
-  DeleteUsersProps<TChildProps>>) {
-    return ApolloReactHoc.withMutation<TProps, DeleteUsersMutation, DeleteUsersMutationVariables, DeleteUsersProps<TChildProps>>(DeleteUsersDocument, {
+  DeleteUsersProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteUsersMutation, DeleteUsersMutationVariables, DeleteUsersProps<TChildProps, TDataName>>(DeleteUsersDocument, {
       alias: 'deleteUsers',
       ...operationOptions
     });

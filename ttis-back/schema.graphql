@@ -11,7 +11,7 @@ type Contents {
   title: String!
   value_type: String!
   value: String!
-  parentId: Float!
+  parentId: String!
   children: [Contents!]
   parent: Contents!
   createAt: DateTime!
@@ -29,7 +29,8 @@ type Login {
 }
 
 type Mutation {
-  create(page: Boolean, vector: Float, id: String): ID!
+  create(page: Boolean!, vector: String!, parent: String!): ID!
+  update(value: String, value_type: String, parent: String, title: String, title_type: Float, visible: Boolean, page: Boolean, vector: String, id: String!): ID!
   deleteUser(id: Int!): Boolean!
   deleteUsers(ids: [Int!]!): Boolean!
   user(password: String, name: String, id: Int): User

@@ -1,11 +1,8 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Contents } from './contents/contents';
-import { User } from './user/user';
 
 const isTest = global["TEST"];
-const socket = !isTest && process.platform !== 'win32';
+const socket = !isTest && process.platform==='linux';
 const sock_path = '/var/run/socks';
-
 
 export const DBModule = TypeOrmModule.forRoot({
   type: 'postgres',
@@ -18,5 +15,4 @@ export const DBModule = TypeOrmModule.forRoot({
   synchronize: true,
   autoLoadEntities: true,
   keepConnectionAlive:true
- // entities: [Contents, User],
 });

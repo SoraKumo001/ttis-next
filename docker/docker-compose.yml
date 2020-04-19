@@ -7,7 +7,7 @@ services:
       - "80:80"
     volumes:
       - ./etc/nginx:/etc/nginx/conf.d
-      - /tmp:/var/run/socks
+      - socket-vol:/var/run/socks
     restart: always
   redis:
     container_name: redis-server
@@ -15,7 +15,7 @@ services:
     volumes:
       - ./etc/redis/redis.conf:/etc/redis.conf
       - redis-vol:/data
-      - /tmp:/var/run/socks
+      - socket-vol:/var/run/socks
     restart: always
     command: redis-server /etc/redis.conf
   ttis-back:
@@ -23,7 +23,7 @@ services:
     image: node:latest
     volumes:
       - ../ttis-back:/src
-      - /tmp:/var/run/socks
+      - socket-vol:/var/run/socks
       - node_modules-back-vol:/src/node_modules
     restart: always
     working_dir: /src
@@ -34,7 +34,7 @@ services:
     image: node:latest
     volumes:
       - ../ttis-front:/src
-      - /tmp:/var/run/socks
+      - socket-vol:/var/run/socks
       - node_modules-front-vol:/src/node_modules
     restart: always
     working_dir: /src
@@ -49,7 +49,7 @@ services:
       POSTGRES_PASSWORD: test
     volumes:
       - postgresql-vol:/var/lib/postgresql/data
-      - /tmp:/var/run/postgresql
+      - socket-vol:/var/run/postgresql
     ports:
       - 5432:5432
     restart: always
@@ -58,3 +58,5 @@ volumes:
   redis-vol:
   node_modules-front-vol:
   node_modules-back-vol:
+  socket-vol:
+    driver: "local"

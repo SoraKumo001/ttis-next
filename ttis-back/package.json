@@ -19,7 +19,7 @@
     "test:init": "wait-on --tcpTimeout 5000 tcp:localhost:15432 && docker exec postgres-test bash -c \"dropdb -U ttis ttis;createdb -U ttis ttis\"",
     "test": "yarn test:docker && yarn test:init && jest",
     "test:snapshot": "yarn test:docker && yarn test:init && jest -u",
-    "test:watch": "jest --watch",
+    "test:watch": "yarn test:docker && jest --watch -u",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
@@ -86,7 +86,8 @@
       "<rootDir>/src/"
     ],
     "moduleNameMapper": {
-      "^@libs/(.+)": "<rootDir>/src/libs/$1"
+      "^@libs/(.+)": "<rootDir>/src/libs/$1",
+      "^@test/(.+)": "<rootDir>/test/$1"
     }
   }
 }

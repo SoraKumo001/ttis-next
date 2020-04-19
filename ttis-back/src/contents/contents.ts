@@ -33,7 +33,7 @@ export class Contents {
   @Column({ default: 'New' })
   title!: string;
   @Field()
-  @Column({ default: 'TEXT' })
+  @Column({ default: 'HTML' })
   value_type!: string;
   @Field()
   @Column({ default: '' })
@@ -41,7 +41,7 @@ export class Contents {
   title2?: string;
   @Field()
   @Column({ nullable: true })
-  parentId?: number;
+  parentId?: string;
   @Field(_=>[Contents],{ nullable: true })
   @TreeChildren()
   children!: Contents[];

@@ -59,4 +59,4 @@ volumes:
   node_modules-front-vol:
   node_modules-back-vol:
   socket-vol:
-    driver: "local"
+    driver: local

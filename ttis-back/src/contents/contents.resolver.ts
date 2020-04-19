@@ -1,48 +1,49 @@
 import { Resolver, Mutation, ID, Args, Query } from '@nestjs/graphql';
 import { Contents } from './contents';
-import { InjectRepository } from '@nestjs/typeorm';
-import { TreeRepository } from 'typeorm';
-import { OnModuleInit } from '@nestjs/common';
+import { ContentsService } from './contents.service';
 
 @Resolver('Contents')
-export class ContentsResolver implements OnModuleInit{
-  constructor(
-    @InjectRepository(Contents)
-    private readonly rep: TreeRepository<Contents>
-  ) {
-
-  }
-  @Mutation(_ => ID)
+export class ContentsResolver {
+  constructor(private readonly service: ContentsService) {}
+  @Mutation((_) => ID)
   async create(
-    @Args('id', { nullable: true }) parent?: string,
-    @Args('vector', { nullable: true }) vector?: number,
-    @Args('page', { nullable: true }) page?: boolean,
+    @Args('parent') parent: string,
+    @Args('vector', {
+      type: () => ['CHILD_FIRST', 'CHILD_LAST', 'BEFORE', 'NEXT'],
+    })
+    vector: 'CHILD_FIRST' | 'CHILD_LAST' | 'BEFORE' | 'NEXT',
+    @Args('page') page?: boolean,
   ): Promise<string> {
-    const { rep } = this;
-    if (!parent) {
-      parent = (await rep.findOne(undefined, { where: { parentId: null } })).id;
-    }
-    const contents = await rep.save({
-      parent: { id: parent },
-      page: !!page,
-      title: 'New',
-    });
-    return contents.id;
+    const { service } = this;
+    return service.create(parent, vector, page);
   }
-
-  @Query(_ => Contents, { nullable: true })
-  async contents(
+  @Mutation((_) => ID)
+  async update(
+    @Args('id') id: string,
+    @Args('vector', { nullable: true }) vector?: string,
+    @Args('page', { nullable: true }) page?: boolean,
+    @Args('visible', { nullable: true }) visible?: boolean,
+    @Args('title_type', { nullable: true }) title_type?: number,
+    @Args('title', { nullable: true }) title?: string,
+    @Args('parent', { nullable: true }) parent?: string,
+    @Args('value_type', { nullable: true }) value_type?: string,
+    @Args('value', { nullable: true }) value?: string,
   ) {
-    const { rep } = this;
-    return (await rep.findTrees())[0];
-  }
-
-  async onModuleInit() {
-    const {rep} = this;
-    await rep.count().then(count => {
-      if (!count) {
-        rep.save({ title: 'TOP' });
-      }
+    const { service } = this;
+    return service.update({
+      id,
+      page,
+      visible,
+      title_type,
+      title,
+      parentId: parent,
+      value_type,
+      value,
     });
+  }
+  @Query((_) => Contents, { nullable: true })
+  async contents() {
+    const { service } = this;
+    return service.contents();
   }
 }

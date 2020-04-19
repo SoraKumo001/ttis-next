@@ -13,6 +13,9 @@
     "paths": {
       "@libs/*": [
         "./src/libs/*"
+      ],
+      "@test/*": [
+        "./test/*"
       ]
     }
   },

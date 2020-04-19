@@ -62,7 +62,7 @@ export type Mutation = {
 
 export type MutationCreateArgs = {
   page: Scalars['Boolean'];
-  vector: Scalars['String'];
+  vector: ContentsVector;
   parent: Scalars['String'];
 };
 
@@ -101,6 +101,13 @@ export type MutationLoginArgs = {
   password: Scalars['String'];
   name: Scalars['String'];
 };
+
+export enum ContentsVector {
+  ChildFirst = 'CHILD_FIRST',
+  ChildLast = 'CHILD_LAST',
+  Before = 'BEFORE',
+  Next = 'NEXT'
+}
 
 export type Login = {
    __typename?: 'Login';

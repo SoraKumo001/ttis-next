@@ -1,25 +1,47 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import gql from 'graphql-tag';
 import { AppModule } from './../src/app.module';
-
-describe('AppController (e2e)', () => {
+import {
+  createTestClient,
+  ApolloServerTestClient,
+} from 'apollo-server-testing';
+import { GraphQLModule } from '@nestjs/graphql';
+describe('GraphQL', () => {
   let app: INestApplication;
+  let client: ApolloServerTestClient;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    const module = moduleFixture.get<GraphQLModule>(
+      GraphQLModule
+    );
+
+    client = createTestClient((module as any).apolloServer);
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('should be defined', () => {
+    expect(client).toBeDefined();
+  });
+
+  const queryTest = gql`
+    query {
+      contents {
+        id
+      }
+    }
+  `;
+
+  it('query contents', async () => {
+    expect(
+      await client.query({
+        query: queryTest,
+      }),
+    ).toMatchSnapshot();
   });
 });
-console.log("test!!!!")

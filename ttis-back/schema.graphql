@@ -18,6 +18,13 @@ type Contents {
   updateAt: DateTime!
 }
 
+enum ContentsVector {
+  CHILD_FIRST
+  CHILD_LAST
+  BEFORE
+  NEXT
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -29,8 +36,8 @@ type Login {
 }
 
 type Mutation {
-  create(page: Boolean!, vector: String!, parent: String!): ID!
-  update(value: String, value_type: String, parent: String, title: String, title_type: Float, visible: Boolean, page: Boolean, vector: String, id: String!): ID!
+  create(page: Boolean!, vector: ContentsVector!, parent: String!): Contents!
+  update(value: String, value_type: String, parent: String, title: String, title_type: Float, visible: Boolean, page: Boolean, vector: String, id: String!): Contents!
   deleteUser(id: Int!): Boolean!
   deleteUsers(ids: [Int!]!): Boolean!
   user(password: String, name: String, id: Int): User

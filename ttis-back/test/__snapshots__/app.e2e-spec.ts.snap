@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GraphQL query contents 1`] = `
+Object {
+  "data": Object {
+    "contents": Object {
+      "id": "eb5e667c-14a6-4f9d-8bf1-fd226afed52a",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

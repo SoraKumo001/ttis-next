@@ -8,6 +8,7 @@
     "start:prod:back": "yarn --cwd ttis-back build && yarn --cwd ttis-back start",
     "start:prod:front": "yarn --cwd ttis-front build && yarn --cwd ttis-front start",
     "start:docker": "docker-compose -f docker/docker-compose.yml up ",
+    "deploy": "bash docker/deploy.sh",
     "test": "yarn --cwd ttis-back test"
   },
   "version": "1.0.0",

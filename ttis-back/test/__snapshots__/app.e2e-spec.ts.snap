@@ -1,18 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GraphQL query contents 1`] = `
+exports[`GraphQL mutation login 1`] = `
 Object {
   "data": Object {
-    "contents": Object {
-      "id": "eb5e667c-14a6-4f9d-8bf1-fd226afed52a",
+    "login": Object {
+      "__typename": "Login",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGFzc3dvcmQiOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiaWF0IjoxNTg3NTM5MjY1LCJleHAiOjE1ODc1NDUyNjV9._Xop-3B1SBIzhtUVgRUmbHOMPnS_1cCPfrK-5ebfuAM",
+      "user": Object {
+        "__typename": "User",
+        "info": "{}",
+        "name": "admin",
+      },
     },
   },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
+}
+`;
+
+exports[`GraphQL mutation login 2`] = `
+Object {
+  "data": Object {
+    "currentUser": Object {
+      "__typename": "User",
+      "id": 1,
+      "info": "{}",
+      "name": "admin",
     },
   },
+  "loading": false,
+  "networkStatus": 7,
+  "stale": false,
 }
 `;

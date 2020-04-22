@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { secret } from './secret.secret';
-import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
 
 @Module({

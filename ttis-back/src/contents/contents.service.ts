@@ -54,7 +54,6 @@ export class ContentsService implements OnModuleInit {
     let parentId: string;
     if (vector === 'BEFORE' || vector === 'NEXT') {
       parentId = baseContents.parentId;
-      console.log("parent",parentId);
       if (parentId) {
         const list = await rep.find({
           select: ['id', 'priority'],

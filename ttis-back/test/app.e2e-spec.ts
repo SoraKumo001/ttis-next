@@ -48,6 +48,9 @@ describe('GraphQL', () => {
       cache: new InMemoryCache().restore({}),
     });
   });
+  afterEach(async () => {
+    await app.close();
+  });
   const QUERY_LOGIN = gql`
     mutation Login($name: String!, $password: String!) {
       login(name: $name, password: $password) {

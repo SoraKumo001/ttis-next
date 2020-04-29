@@ -1,18 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
-import { DBModule } from '../db.module';
+import { DBModule2 } from '../db.module';
 import { UserModule } from './user.module';
 
 describe('UserService', () => {
   let service: UserService;
-
+  let module: TestingModule;
   beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [DBModule, UserModule],
+    const module = await Test.createTestingModule({
+      imports: [DBModule2, UserModule],
     }).compile();
     service = module.get<UserService>(UserService);
+    await module.init();
   });
-
+  afterAll(async () => {
+    await module.close();
+  });
   it('should be defined', async () => {
     expect(service).toBeDefined();
     await service.onModuleInit();
@@ -22,8 +25,11 @@ describe('UserService', () => {
   });
   it('Create User', async () => {
     expect(await service.setUser(undefined, 'Test', 'Pass')).toMatchSnapshot();
+  });
+  it('Update User', async () => {
+    const result = await service.setUser(undefined, 'Test2', 'Pass2');
     expect(
-      await service.setUser(undefined, 'Test2', 'Pass2'),
+      await service.setUser(result.id, 'Test2-2', 'abc', { test: 123 }),
     ).toMatchSnapshot();
   });
   it('Delete User', async () => {
@@ -33,6 +39,6 @@ describe('UserService', () => {
     expect(await service.users()).toMatchSnapshot();
   });
   it('List Users Params', async () => {
-    expect(await service.users(["id","name"])).toMatchSnapshot();
+    expect(await service.users(['id', 'name'])).toMatchSnapshot();
   });
 });

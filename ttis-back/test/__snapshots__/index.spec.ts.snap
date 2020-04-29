@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test User(login) CreateUser 1`] = `
+Object {
+  "data": Object {
+    "createUser": Object {
+      "__typename": "User",
+      "id": 2,
+      "info": "{}",
+      "name": "Test01",
+    },
+  },
+}
+`;
+
+exports[`Test User(login) CurrentUser 1`] = `
+Object {
+  "data": Object {
+    "currentUser": Object {
+      "__typename": "User",
+      "id": 1,
+      "info": "{}",
+      "name": "admin",
+    },
+  },
+  "loading": false,
+  "networkStatus": 7,
+  "stale": false,
+}
+`;
+
+exports[`Test User(login) UpdateUser 1`] = `
+Object {
+  "data": Object {
+    "updateUser": Object {
+      "__typename": "User",
+      "id": 2,
+      "info": "{}",
+      "name": "Test01-02",
+    },
+  },
+}
+`;
+
+exports[`Test User(login) User List 1`] = `
+Array [
+  Object {
+    "__typename": "User",
+    "id": 1,
+    "info": "{}",
+    "name": "admin",
+  },
+]
+`;

@@ -8,7 +8,6 @@ import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService extends PassportStrategy(Strategy) {
-  debugToken?:string;
   constructor(
     private readonly userService: UserService,
     private readonly jwt: JwtService,
@@ -37,8 +36,5 @@ export class AuthService extends PassportStrategy(Strategy) {
 
     const token = jwt.sign({ id: user.id, password: user.password });
     return { token, user: user };
-  }
-  setDebugToken(token:string){
-    this.debugToken=token;
   }
 }

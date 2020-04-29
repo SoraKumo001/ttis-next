@@ -21,7 +21,8 @@ async function bootstrap() {
     });
   } else {
     app.listen(port_number, () => {
-      console.log(`> Ready on http://localhost:${port_number}/`);
+      console.log(`> Ready on Backend http://localhost:${port_number}/graphql`);
+      console.log(`> Ready on Nginx   http://localhost/`);
     });
   }
 }

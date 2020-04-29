@@ -4,10 +4,10 @@ import imageLoginId from "./images/login_id.svg";
 import imageLoginPass from "./images/login_pass.svg";
 import { useMutation } from "react-apollo";
 import { useState } from "react";
-import { MUTATION_USER, QUERY_USERS } from "./graphql";
+import { QUERY_USERS, MUTATION_CREATE_USER } from "./graphql";
 
 export const UserEdit = ({ autoClose }: AutoCloseProps) => {
-  const [createUser] = useMutation(MUTATION_USER);
+  const [createUser] = useMutation(MUTATION_CREATE_USER);
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   return (

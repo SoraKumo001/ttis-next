@@ -21,11 +21,15 @@ export class UserService implements OnModuleInit {
       });
     });
   }
-  async setUser(id?: number, name?: string, password?: string) {
+  async setUser(id?: number, name?: string, password?: string, info?: object) {
     const { rep } = this;
     if (!id) {
       if (name && password) {
-        return rep.save({ name, password: getSHA256(password) });
+        return rep.save({
+          name,
+          password: getSHA256(password),
+          info: info && JSON.stringify(info),
+        });
       }
     } else {
       const user = await rep.findOne(id);

@@ -10,16 +10,6 @@ Object {
 }
 `;
 
-exports[`UserService Create User 2`] = `
-Object {
-  "enable": true,
-  "id": 3,
-  "info": "{}",
-  "name": "Test2",
-  "password": "42ca698f4ea60cb496520cadbdde9311e33a6319abf4cc5d6aa64e12d0f91fb3",
-}
-`;
-
 exports[`UserService Delete User 1`] = `true`;
 
 exports[`UserService List Users 1`] = `
@@ -35,8 +25,8 @@ Array [
     "enable": true,
     "id": 3,
     "info": "{}",
-    "name": "Test2",
-    "password": "42ca698f4ea60cb496520cadbdde9311e33a6319abf4cc5d6aa64e12d0f91fb3",
+    "name": "Test2-2",
+    "password": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
   },
 ]
 `;
@@ -49,9 +39,19 @@ Array [
   },
   User {
     "id": 3,
-    "name": "Test2",
+    "name": "Test2-2",
   },
 ]
+`;
+
+exports[`UserService Update User 1`] = `
+User {
+  "enable": true,
+  "id": 3,
+  "info": "{}",
+  "name": "Test2-2",
+  "password": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+}
 `;
 
 exports[`UserService onModuleInit 1`] = `undefined`;

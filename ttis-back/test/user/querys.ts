@@ -1,12 +1,13 @@
-import { gql } from "apollo-boost";
+import { gql } from 'apollo-boost';
 
-
-export const QUERY_USERS = gql`
-  query Users {
-    users {
-      id
-      name
-      info
+export const MUTATION_LOGIN = gql`
+  mutation Login($name: String!, $password: String!) {
+    login(name: $name, password: $password) {
+      token
+      user {
+        name
+        info
+      }
     }
   }
 `;
@@ -19,18 +20,16 @@ export const QUERY_CURRENT_USER = gql`
     }
   }
 `;
-export const QUERY_LOGIN = gql`
-  mutation Login($name: String!, $password: String!) {
-    login(name: $name, password: $password) {
-      token
-      user {
-        id
-        name
-        info
-      }
+export const QUERY_USERS = gql`
+  query Users {
+    users {
+      id
+      name
+      info
     }
   }
 `;
+
 export const MUTATION_CREATE_USER = gql`
   mutation createUser($name: String!, $password: String!, $info: String) {
     createUser(name: $name, password: $password, info: $info) {

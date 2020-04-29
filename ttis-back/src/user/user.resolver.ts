@@ -7,39 +7,62 @@ import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(
-    private readonly service: UserService,
-  ) {}
+  constructor(private readonly service: UserService) {}
+
   @UseGuards(JwtAuthGuard)
   @Query((_) => [User], { nullable: true })
-  async users(@Info() info, @CurrentUser() user) {
+  async users(@CurrentUser() user, @Info() info) {
     if (!user) return null;
     return this.service.users(getFields(info));
   }
-  @Mutation((_) => Boolean)
-  async deleteUser(
-    @Args('id', { type: () => Int }) id: number,
-    @CurrentUser() user,
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation((_) => User, { nullable: true })
+  async createUser(
+    @Args('name') name: string,
+    @Args('password') password: string,
+    @Args('info', { nullable: true }) info?: string,
+    @CurrentUser() user?,
   ) {
     if (!user) return null;
-    return this.service.deleteUser(id);
+    return this.service.setUser(
+      undefined,
+      name,
+      password,
+      info && JSON.parse(info),
+    );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Mutation((_) => User, { nullable: true })
+  async updateUser(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('name', { nullable: true }) name?: string,
+    @Args('password', { nullable: true }) password?: string,
+    @Args('info', { nullable: true }) info?: string,
+    @CurrentUser() user?,
+  ) {
+    if (!user) return null;
+    return this.service.setUser(id, name, password, info && JSON.parse(info));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation((_) => Boolean)
+  async deleteUser(
+    @CurrentUser() user,
+    @Args('id', { type: () => Int }) id: number,
+  ) {
+    if (!user) return false;
+    return this.service.deleteUser(id);
+  }
+  @UseGuards(JwtAuthGuard)
   @Mutation((_) => Boolean)
   async deleteUsers(
     @Args('ids', { type: () => [Int] }) ids: number[],
-    @CurrentUser() user,
+    @CurrentUser() user?,
   ) {
-    if (!user) return null;
+    if (!user) return false;
     return this.service.deleteUsers(ids);
   }
 
-  @Mutation((_) => User, { nullable: true })
-  async user(
-    @Args('id', { nullable: true, type: () => Int }) id?: number,
-    @Args('name', { nullable: true }) name?: string,
-    @Args('password', { nullable: true }) password?: string,
-  ) {
-    return this.service.setUser(id,name,password);
-  }
 }

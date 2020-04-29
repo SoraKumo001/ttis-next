@@ -1,5 +1,5 @@
 {
-  "schema": "http://localhost/graphql/",
+  "schema": "../ttis-back/graphql/schema.graphql",
   "overwrite": true,
   "documents": "src/**/*.{ts,tsx}",
   "generates": {

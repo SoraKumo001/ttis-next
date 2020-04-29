@@ -38,9 +38,10 @@ type Login {
 type Mutation {
   create(page: Boolean!, vector: ContentsVector!, parent: String!): Contents!
   update(value: String, value_type: String, parent: String, title: String, title_type: Float, visible: Boolean, page: Boolean, vector: String, id: String!): Contents!
+  createUser(info: String, password: String!, name: String!): User
+  updateUser(info: String, password: String, name: String, id: Int!): User
   deleteUser(id: Int!): Boolean!
   deleteUsers(ids: [Int!]!): Boolean!
-  user(password: String, name: String, id: Int): User
   login(password: String!, name: String!): Login
 }
 

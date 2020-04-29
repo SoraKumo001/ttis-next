@@ -9,8 +9,8 @@ import { DBModule } from './db.module';
   imports: [
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
-      autoSchemaFile: 'schema.graphql',
-      context: ({ req, res }) => ({ req, res }),
+      autoSchemaFile: 'graphql/schema.graphql',
+      context: (con) => con,
     }),
     DBModule,
     ContentsModule,

@@ -16,13 +16,6 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type Query = {
-   __typename?: 'Query';
-  contents?: Maybe<Contents>;
-  users?: Maybe<Array<User>>;
-  currentUser?: Maybe<User>;
-};
-
 export type Contents = {
    __typename?: 'Contents';
   id: Scalars['ID'];
@@ -40,22 +33,28 @@ export type Contents = {
   updateAt: Scalars['DateTime'];
 };
 
+export enum ContentsVector {
+  ChildFirst = 'CHILD_FIRST',
+  ChildLast = 'CHILD_LAST',
+  Before = 'BEFORE',
+  Next = 'NEXT'
+}
 
-export type User = {
-   __typename?: 'User';
-  id: Scalars['Int'];
-  enable: Scalars['Boolean'];
-  name: Scalars['String'];
-  info: Scalars['String'];
+
+export type Login = {
+   __typename?: 'Login';
+  token: Scalars['String'];
+  user: User;
 };
 
 export type Mutation = {
    __typename?: 'Mutation';
-  create: Scalars['ID'];
-  update: Scalars['ID'];
+  create: Contents;
+  update: Contents;
+  createUser?: Maybe<User>;
+  updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
   deleteUsers: Scalars['Boolean'];
-  user?: Maybe<User>;
   login?: Maybe<Login>;
 };
 
@@ -80,6 +79,21 @@ export type MutationUpdateArgs = {
 };
 
 
+export type MutationCreateUserArgs = {
+  info?: Maybe<Scalars['String']>;
+  password: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  info?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  id: Scalars['Int'];
+};
+
+
 export type MutationDeleteUserArgs = {
   id: Scalars['Int'];
 };
@@ -90,29 +104,24 @@ export type MutationDeleteUsersArgs = {
 };
 
 
-export type MutationUserArgs = {
-  password?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-};
-
-
 export type MutationLoginArgs = {
   password: Scalars['String'];
   name: Scalars['String'];
 };
 
-export enum ContentsVector {
-  ChildFirst = 'CHILD_FIRST',
-  ChildLast = 'CHILD_LAST',
-  Before = 'BEFORE',
-  Next = 'NEXT'
-}
+export type Query = {
+   __typename?: 'Query';
+  contents?: Maybe<Contents>;
+  users?: Maybe<Array<User>>;
+  currentUser?: Maybe<User>;
+};
 
-export type Login = {
-   __typename?: 'Login';
-  token: Scalars['String'];
-  user: User;
+export type User = {
+   __typename?: 'User';
+  id: Scalars['Int'];
+  enable: Scalars['Boolean'];
+  name: Scalars['String'];
+  info: Scalars['String'];
 };
 
 export type UsersQueryVariables = {};
@@ -156,14 +165,31 @@ export type LoginMutation = (
 );
 
 export type CreateUserMutationVariables = {
-  name?: Maybe<Scalars['String']>;
-  password?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  password: Scalars['String'];
+  info?: Maybe<Scalars['String']>;
 };
 
 
 export type CreateUserMutation = (
   { __typename?: 'Mutation' }
-  & { user?: Maybe<(
+  & { createUser?: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'name' | 'info'>
+  )> }
+);
+
+export type UpdateUserMutationVariables = {
+  id: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  password?: Maybe<Scalars['String']>;
+  info?: Maybe<Scalars['String']>;
+};
+
+
+export type UpdateUserMutation = (
+  { __typename?: 'Mutation' }
+  & { updateUser?: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'id' | 'name' | 'info'>
   )> }
@@ -273,8 +299,8 @@ export function withLogin<TProps, TChildProps = {}, TDataName extends string = '
 export type LoginMutationResult = ApolloReactCommon.MutationResult<LoginMutation>;
 export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const CreateUserDocument = gql`
-    mutation createUser($name: String, $password: String) {
-  user(name: $name, password: $password) {
+    mutation createUser($name: String!, $password: String!, $info: String) {
+  createUser(name: $name, password: $password, info: $info) {
     id
     name
     info
@@ -303,6 +329,37 @@ export function withCreateUser<TProps, TChildProps = {}, TDataName extends strin
 };
 export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation updateUser($id: Int!, $name: String, $password: String, $info: String) {
+  updateUser(id: $id, name: $name, password: $password, info: $info) {
+    id
+    name
+    info
+  }
+}
+    `;
+export type UpdateUserMutationFn = ApolloReactCommon.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+export type UpdateUserComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateUserMutation, UpdateUserMutationVariables>, 'mutation'>;
+
+    export const UpdateUserComponent = (props: UpdateUserComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateUserMutation, UpdateUserMutationVariables> mutation={UpdateUserDocument} {...props} />
+    );
+    
+export type UpdateUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>
+    } & TChildProps;
+export function withUpdateUser<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateUserMutation,
+  UpdateUserMutationVariables,
+  UpdateUserProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateUserMutation, UpdateUserMutationVariables, UpdateUserProps<TChildProps, TDataName>>(UpdateUserDocument, {
+      alias: 'updateUser',
+      ...operationOptions
+    });
+};
+export type UpdateUserMutationResult = ApolloReactCommon.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const DeleteUsersDocument = gql`
     mutation deleteUsers($ids: [Int!]!) {
   deleteUsers(ids: $ids)

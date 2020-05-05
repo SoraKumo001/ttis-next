@@ -13,8 +13,7 @@ export class AuthService extends PassportStrategy(Strategy) {
     private readonly jwt: JwtService,
   ) {
     super({
-      jwtFromRequest:
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: secret,
     });
@@ -25,7 +24,7 @@ export class AuthService extends PassportStrategy(Strategy) {
   }: {
     id: number;
     password: string;
-  }): Promise<User> {
+  }): Promise<User | undefined> {
     const { userService } = this;
     return userService.validateUser(id, password);
   }

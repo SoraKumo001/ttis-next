@@ -14,21 +14,21 @@ import { AuthService } from './auth.service';
 @ObjectType()
 export class Login {
   @Field()
-  token: string;
+  token?: string;
   @Field()
-  user: User;
+  user?: User;
 }
 
 @Resolver('Auth')
 export class AuthResolver {
   constructor(private readonly service: AuthService) {}
   @UseGuards(JwtAuthGuard)
-  @Query((_) => User, { nullable: true })
+  @Query(() => User, { nullable: true })
   async currentUser(@CurrentUser() user: User) {
     return user;
   }
 
-  @Mutation((_) => Login, { nullable: true })
+  @Mutation(() => Login, { nullable: true })
   async login(@Args('name') name: string, @Args('password') password: string) {
     return this.service.login(name, password);
   }

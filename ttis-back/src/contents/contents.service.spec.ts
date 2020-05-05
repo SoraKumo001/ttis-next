@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ContentsService } from './contents.service';
 import { Contents } from './contents';
@@ -14,8 +15,8 @@ const masks = {
 
 describe('ContentsService', () => {
   let service: ContentsService;
-  let contents: Contents;
-  let parentId;
+  let contents: Contents|null;
+  let parentId:string;
   let module: TestingModule;
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -32,50 +33,128 @@ describe('ContentsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-  it('List Contents', async () => {
-    contents = await service.contents();
+  it('List Contents first', async () => {
+    contents = (await service.contentsTree())!;
     expect(ObjectMask(contents, masks)).toMatchSnapshot();
-  });
-  it('Create', async () => {
-    parentId = (await service.create(contents.id, 'CHILD_FIRST', true)).id;
-    expect(!!parentId).toMatchSnapshot();
   });
   it('Create & update', async () => {
-    let id: string;
-    id = (await service.create(parentId, 'CHILD_LAST', true)).id;
-    await service.update({ id, title: 'タイトル1', value: '<div>内容1</div>' });
-    id = (await service.create(parentId, 'CHILD_FIRST', true)).id;
-    await service.update({ id, title: 'タイトル2', value: '<div>内容2</div>' });
-    id = (await service.create(parentId, 'CHILD_LAST', true)).id;
-    await service.update({ id, title: 'タイトル3', value: '<div>内容3</div>' });
-    id = (await service.create(parentId, 'CHILD_FIRST', true)).id;
-    await service.update({ id, title: 'タイトル4', value: '<div>内容4</div>' });
-
-    id = (await service.create(parentId, 'NEXT', true)).id;
+    parentId = (await service.create({ parentId: contents!.id }))!.id;
     await service.update({
-      id,
-      title: 'タイトル10',
+      id: parentId,
+      title: 'タイトル0',
       value: '<div>内容1</div>',
+      visible: true,
     });
-    id = (await service.create(parentId, 'BEFORE', true)).id;
-    await service.update({
-      id,
-      title: 'タイトル20',
-      value: '<div>内容2</div>',
-    });
-    id = (await service.create(parentId, 'NEXT', true)).id;
-    await service.update({
-      id,
-      title: 'タイトル30',
-      value: '<div>内容3</div>',
-    });
-    id = (await service.create(parentId, 'BEFORE', true)).id;
-    await service.update({ id, title: 'タイト40', value: '<div>内容4</div>' });
-
-    expect(!!contents.priority).toMatchSnapshot();
+    expect(!!parentId).toMatchSnapshot();
   });
-  it('List Contents', async () => {
-    contents = await service.contents();
+  it('Next', async () => {
+    const id = (
+      await service.create({
+        parentId,
+        title: 'Next',
+        visible: true,
+      })
+    )!.id;
+    for (let i = 0; i < 2; i++) {
+      await service.create({
+        parentId: id,
+        vector: 'NEXT',
+        title: `Next ${i}`,
+        value: `<div>内容${i}</div>`,
+        visible: true,
+      });
+    }
+  });
+  it('Before', async () => {
+    const id = (
+      await service.create({
+        parentId,
+        title: 'Before',
+        visible: true,
+      })
+    )!.id;
+    for (let i = 0; i < 2; i++) {
+      await service.create({
+        parentId: id,
+        vector: 'BEFORE',
+        title: `Before ${i}`,
+        value: `<div>内容${i}</div>`,
+        visible: true,
+      });
+    }
+  });
+  it('ChildLast', async () => {
+    const id = (
+      await service.create({
+        parentId,
+        title: 'ChildLast',
+        visible: true,
+      })
+    )!.id;
+    for (let i = 0; i < 2; i++) {
+      await service.create({
+        parentId: id,
+        vector: 'CHILD_LAST',
+        title: `ChildLast ${i}`,
+        value: `<div>内容${i}</div>`,
+        visible: true,
+      });
+    }
+  });
+  it('ChildFirst', async () => {
+    const id = (
+      await service.create({
+        parentId,
+        title: 'ChildFirst',
+        visible: true,
+      })
+    )!.id;
+    for (let i = 0; i < 2; i++) {
+      await service.create({
+        parentId: id,
+        vector: 'CHILD_FIRST',
+        title: `ChildFirst ${i}`,
+        value: `<div>内容${i}</div>`,
+        visible: true,
+      });
+    }
+  });
+
+  // it('List Contents', async () => {
+  //   const contents = await service.contents();
+  //   expect(ObjectMask(contents, masks)).toMatchSnapshot();
+  // });
+  it('List ContentsTree', async () => {
+    contents = await service.contentsTree();
+    expect(contents).toBeDefined();
     expect(ObjectMask(contents, masks)).toMatchSnapshot();
+  });
+
+  it('List ContentsTree(set visible)', async () => {
+    contents = await service.contentsTree({
+      visible: true,
+      select: ['title', 'id'],
+    });
+    expect(ObjectMask(contents, masks)).toMatchSnapshot();
+  });
+
+  //階層テスト
+  it('List ContentsTree(set level)', async () => {
+    const getLevel = (contents: Contents, level?: number):number => {
+      if (level === undefined) level = 1;
+      return (
+        contents.children?.reduce(
+          (lv, contents) => Math.max(getLevel(contents, level! + 1), lv),
+          level,
+        ) || level
+      );
+    };
+    for (let i = 1; i <= 3; i++) {
+      contents = await service.contentsTree({
+        level: i,
+        select: ['title', 'id'],
+      });
+      expect(getLevel(contents!)).toEqual(i);
+    }
   });
 });

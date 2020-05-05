@@ -29,7 +29,7 @@ describe('UserService', () => {
   it('Update User', async () => {
     const result = await service.setUser(undefined, 'Test2', 'Pass2');
     expect(
-      await service.setUser(result.id, 'Test2-2', 'abc', { test: 123 }),
+      await service.setUser(result?.id, 'Test2-2', 'abc', { test: 123 }),
     ).toMatchSnapshot();
   });
   it('Delete User', async () => {

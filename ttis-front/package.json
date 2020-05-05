@@ -14,7 +14,7 @@
     "capture": "npm-run-all -p -r sc:*",
     "sc:start-storybook": "start-storybook -p 9001 --ci",
     "sc:screenshot": "storycap http://localhost:9001 --stateChangeDelay 3000 --serverCmd \"yarn start-storybook -p 9001 --ci\"",
-    "graphql:gen": "graphql-codegen --config graphql/codegen.json"
+    "generate": "graphql-codegen --config graphql/codegen.json"
   },
   "dependencies": {
     "apollo-boost": "^0.4.7",

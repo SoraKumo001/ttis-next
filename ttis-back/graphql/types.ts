@@ -14,13 +14,13 @@ export type Contents = {
    __typename?: 'Contents';
   id: Scalars['ID'];
   priority: Scalars['Float'];
-  visible: Scalars['Boolean'];
+  visible?: Maybe<Scalars['Boolean']>;
   page: Scalars['Boolean'];
-  title_type: Scalars['Float'];
+  title_type: Scalars['Int'];
   title: Scalars['String'];
   value_type: Scalars['String'];
   value: Scalars['String'];
-  parentId: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
   children?: Maybe<Array<Contents>>;
   parent: Contents;
   createAt: Scalars['DateTime'];
@@ -43,8 +43,8 @@ export type Login = {
 
 export type Mutation = {
    __typename?: 'Mutation';
-  create: Contents;
-  update: Contents;
+  createContents?: Maybe<Contents>;
+  updateContents?: Maybe<Contents>;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -53,23 +53,27 @@ export type Mutation = {
 };
 
 
-export type MutationCreateArgs = {
-  page: Scalars['Boolean'];
-  vector: ContentsVector;
-  parent: Scalars['String'];
+export type MutationCreateContentsArgs = {
+  value?: Maybe<Scalars['String']>;
+  value_type?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  title_type?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  vector?: Maybe<ContentsVector>;
+  parent?: Maybe<Scalars['ID']>;
 };
 
 
-export type MutationUpdateArgs = {
+export type MutationUpdateContentsArgs = {
   value?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
-  parent?: Maybe<Scalars['String']>;
+  parent?: Maybe<Scalars['ID']>;
   title?: Maybe<Scalars['String']>;
-  title_type?: Maybe<Scalars['Float']>;
+  title_type?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
-  vector?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
+  id: Scalars['ID'];
 };
 
 
@@ -105,9 +109,24 @@ export type MutationLoginArgs = {
 
 export type Query = {
    __typename?: 'Query';
-  contents?: Maybe<Contents>;
+  contentsTree: Contents;
+  contentsList: Array<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<User>;
+};
+
+
+export type QueryContentsTreeArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsListArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
 };
 
 export type User = {
@@ -117,6 +136,66 @@ export type User = {
   name: Scalars['String'];
   info: Scalars['String'];
 };
+
+export type FragmentContentsFragment = (
+  { __typename?: 'Contents' }
+  & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
+);
+
+export type ContentsListQueryVariables = {
+  id?: Maybe<Scalars['ID']>;
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type ContentsListQuery = (
+  { __typename?: 'Query' }
+  & { contentsList: Array<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  )> }
+);
+
+export type CreateContentsMutationVariables = {
+  parent?: Maybe<Scalars['ID']>;
+  vector?: Maybe<ContentsVector>;
+  page?: Maybe<Scalars['Boolean']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  title_type?: Maybe<Scalars['Int']>;
+  title?: Maybe<Scalars['String']>;
+  value_type?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+
+export type CreateContentsMutation = (
+  { __typename?: 'Mutation' }
+  & { createContents?: Maybe<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  )> }
+);
+
+export type UpdateContentsMutationVariables = {
+  id: Scalars['ID'];
+  page?: Maybe<Scalars['Boolean']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  title_type?: Maybe<Scalars['Int']>;
+  title?: Maybe<Scalars['String']>;
+  parent?: Maybe<Scalars['ID']>;
+  value_type?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+
+export type UpdateContentsMutation = (
+  { __typename?: 'Mutation' }
+  & { updateContents?: Maybe<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  )> }
+);
 
 export type LoginMutationVariables = {
   name: Scalars['String'];

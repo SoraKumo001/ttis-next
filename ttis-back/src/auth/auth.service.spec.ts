@@ -25,9 +25,10 @@ describe('AuthService', () => {
   });
   it('Login', async () => {
     const result = await service.login('admin', '');
-    expect(result.token).toBeDefined();
-    expect(result.user).toBeDefined();
-    testUser = result.user;
+    expect(result?.token).toBeDefined();
+    expect(result?.user).toBeDefined();
+    if(result)
+      testUser = result.user;
   });
   it('Login Failure', async () => {
     const result = await service.login('admin', 'test');
@@ -36,8 +37,8 @@ describe('AuthService', () => {
   it('validate', async () => {
     const result = await service.validate({
       id: testUser.id,
-      password: testUser.password,
+      password: testUser.password||'',
     });
-    expect(result.id).toBeDefined();
+    expect(result?.id).toBeDefined();
   });
 });

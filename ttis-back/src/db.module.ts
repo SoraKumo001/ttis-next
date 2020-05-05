@@ -1,5 +1,8 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+// eslint-disable-next-line no-var
+declare var global: NodeJS.Global & { TEST: string };
+
 const isTest = global['TEST'];
 const socket = !isTest && process.platform === 'linux';
 const sock_path = '/var/run/socks';

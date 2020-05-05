@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: test
     volumes:
       - postgresql-vol:/var/lib/postgresql/data
-      - socket-vol/var/run/postgresql
+      - socket-vol:/var/run/postgresql
     ports:
       - 5432:5432
   nginx:

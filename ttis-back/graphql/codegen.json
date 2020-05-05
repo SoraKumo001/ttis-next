@@ -1,9 +1,9 @@
 {
   "schema": "graphql/schema.graphql",
   "overwrite": true,
-  "documents": "test/**/*.{ts,tsx}",
+  "documents": "src/**/*.{ts,tsx}",
   "generates": {
-    "test/generated/graphql.ts": {
+    "graphql/types.ts": {
       "plugins": [
         "typescript",
         "typescript-operations"

@@ -5,13 +5,13 @@
 type Contents {
   id: ID!
   priority: Float!
-  visible: Boolean!
+  visible: Boolean
   page: Boolean!
-  title_type: Float!
+  title_type: Int!
   title: String!
   value_type: String!
   value: String!
-  parentId: String!
+  parentId: String
   children: [Contents!]
   parent: Contents!
   createAt: DateTime!
@@ -36,8 +36,8 @@ type Login {
 }
 
 type Mutation {
-  create(page: Boolean!, vector: ContentsVector!, parent: String!): Contents!
-  update(value: String, value_type: String, parent: String, title: String, title_type: Float, visible: Boolean, page: Boolean, vector: String, id: String!): Contents!
+  createContents(value: String, value_type: String, title: String, title_type: Int, visible: Boolean, page: Boolean, vector: ContentsVector, parent: ID): Contents
+  updateContents(value: String, value_type: String, parent: ID, title: String, title_type: Int, visible: Boolean, page: Boolean, id: ID!): Contents
   createUser(info: String, password: String!, name: String!): User
   updateUser(info: String, password: String, name: String, id: Int!): User
   deleteUser(id: Int!): Boolean!
@@ -46,7 +46,8 @@ type Mutation {
 }
 
 type Query {
-  contents: Contents
+  contentsTree(level: Int, visible: Boolean, id: ID): Contents!
+  contentsList(level: Int, visible: Boolean, id: ID): [Contents!]!
   users: [User!]
   currentUser: User
 }

@@ -5,17 +5,24 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "strict": true,
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@libs/*": [
-        "./src/libs/*"
+      "src/*": [
+        "./src/*"
       ],
       "@test/*": [
         "./test/*"
+      ],
+      "@libs/*": [
+        "./src/libs/*"
+      ],
+      "@graphql/*": [
+        "./graphql/*"
       ]
     }
   },

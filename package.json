@@ -1,6 +1,9 @@
 {
   "name": "ttis",
   "scripts": {
+    "test": "yarn --cwd ttis-back test",
+    "test:snapshot": "yarn --cwd ttis-back test:snapshot",
+    "generate": "npm-run-all -p generate:*",
     "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
     "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
     "start:dev:back": "yarn --cwd ttis-back start:dev",
@@ -9,8 +12,8 @@
     "start:prod:front": "yarn --cwd ttis-front build && yarn --cwd ttis-front start",
     "start:docker": "docker-compose -f docker/docker-compose.yml up ",
     "deploy": "bash docker/deploy.sh",
-    "test": "yarn --cwd ttis-back test",
-    "test:snapshot": "yarn --cwd ttis-back test:snapshot"
+    "generate:back": "yarn --cwd ttis-back generate",
+    "generate:front": "yarn --cwd ttis-front generate"
   },
   "version": "1.0.0",
   "main": "index.js",

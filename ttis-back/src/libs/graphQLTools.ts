@@ -5,7 +5,7 @@ export const getFields = (info: GraphQLResolveInfo) => {
   const createFields = (nodes: FieldNode[]) => {
     const fealds: GraphQLFeald = [];
     nodes
-      .filter((n) => n.name.value !== '__typename')
+      ?.filter((n) => n.kind === 'Field' && n.name.value !== "__typename")
       .forEach((n) => {
         fealds.push(
           n.selectionSet
@@ -18,7 +18,12 @@ export const getFields = (info: GraphQLResolveInfo) => {
       });
     return fealds;
   };
+
   return createFields(
-    info.fieldNodes[0].selectionSet.selections as FieldNode[],
+    info?.fieldNodes[0].selectionSet?.selections as FieldNode[],
+  ).concat(
+    createFields(
+      info.fragments.FragmentContents?.selectionSet.selections as FieldNode[],
+    ),
   );
 };

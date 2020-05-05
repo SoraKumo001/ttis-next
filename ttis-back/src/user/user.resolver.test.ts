@@ -1,24 +1,20 @@
-import * as types from '../generated/graphql';
-import * as querys from './querys';
-import { CustomApolloClient, createClient } from '../index.spec';
-import { concurrentSync } from '../testTools';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import * as types from '@graphql/types';
+import * as querys from './user.resolver.graphql';
+import { testAsync, testSync } from 'jest-async';
+import { login } from '@test/testTools';
+import { createClient } from '@test/test.module';
 
-export const login = async (client: CustomApolloClient) => {
-  const result = await client.mutate<types.LoginMutation>({
-    mutation: querys.MUTATION_LOGIN,
-    variables: { name: 'admin', password: '' },
-  });
-  return result.data?.login.token;
-};
+
 describe('User', () => {
-  concurrentSync('CurrentUser', async () => {
+  testAsync('CurrentUser', async () => {
     const client = await createClient();
     const currentUser = await client.query<types.CurrentUserQuery>({
       query: querys.QUERY_CURRENT_USER,
     });
     expect(currentUser.data.currentUser).toBeNull();
   });
-  concurrentSync('CreateUser', async () => {
+  testAsync('CreateUser', async () => {
     const client = await createClient();
     const currentUser = await client.mutate<
       types.CreateUserMutation,
@@ -27,9 +23,9 @@ describe('User', () => {
       mutation: querys.MUTATION_CREATE_USER,
       variables: { name: 'Test02', password: 'Pass02', info: '{}' },
     });
-    expect(currentUser.data.createUser).toBeNull();
+    expect(currentUser.data?.createUser).toBeNull();
   });
-  concurrentSync('UpdateUser', async () => {
+  testAsync('UpdateUser', async () => {
     const client = await createClient();
     const currentUser = await client.mutate<
       types.UpdateUserMutation,
@@ -43,9 +39,9 @@ describe('User', () => {
         info: '{test:123}',
       },
     });
-    expect(currentUser.data.updateUser).toBeNull();
+    expect(currentUser.data?.updateUser).toBeNull();
   });
-  concurrentSync('Delete User', async () => {
+  testAsync('Delete User', async () => {
     const client = await createClient();
     const result = await client.mutate<
       types.DeleteUsersMutation,
@@ -56,9 +52,9 @@ describe('User', () => {
         ids: [2],
       },
     });
-    expect(result.data.deleteUsers).toBeFalsy();
+    expect(result.data?.deleteUsers).toBeFalsy();
   });
-  concurrentSync('User List', async () => {
+  testAsync('User List', async () => {
     const client = await createClient();
     const users = await client.query<types.UsersQuery>({
       query: querys.QUERY_USERS,
@@ -68,14 +64,14 @@ describe('User', () => {
 });
 
 describe('User(login)', () => {
-  const token = concurrentSync('Login', async () => {
+  const token = testSync('Login', async () => {
     const client = await createClient();
     const token = await login(client);
     expect(token).toBeDefined();
     return token;
   });
 
-  concurrentSync('CurrentUser', async () => {
+  testAsync('CurrentUser', async () => {
     const client = await createClient();
     client.setToken(await token);
     const currentUser = await client.query<types.CurrentUserQuery>({
@@ -84,7 +80,7 @@ describe('User(login)', () => {
     expect(currentUser).toMatchSnapshot();
   });
 
-  const id = concurrentSync('CreateUser', async () => {
+  const id = testAsync('CreateUser', async () => {
     const client = await createClient();
     client.setToken(await token);
     const currentUser = await client.mutate<
@@ -95,10 +91,10 @@ describe('User(login)', () => {
       variables: { name: 'Test01', password: 'Pass01', info: '{}' },
     });
     expect(currentUser).toMatchSnapshot();
-    return currentUser.data.createUser.id;
+    return currentUser.data?.createUser?.id;
   });
 
-  const update = concurrentSync('UpdateUser', async () => {
+  const update = testAsync('UpdateUser', async () => {
     const client = await createClient();
     client.setToken(await token);
     const currentUser = await client.mutate<
@@ -107,7 +103,7 @@ describe('User(login)', () => {
     >({
       mutation: querys.MUTATION_UPDATE_USER,
       variables: {
-        id: await id,
+        id: (await id)!,
         name: 'Test01-02',
         password: 'Pass01-02',
         info: JSON.stringify({ test: 123 }),
@@ -116,7 +112,7 @@ describe('User(login)', () => {
     expect(currentUser).toMatchSnapshot();
   });
 
-  const del = concurrentSync('Delete User', async () => {
+  const del = testAsync('Delete User', async () => {
     await update;
     const client = await createClient();
     client.setToken(await login(client));
@@ -129,10 +125,10 @@ describe('User(login)', () => {
         ids: [2],
       },
     });
-    expect(result.data.deleteUsers).toBeTruthy();
+    expect(result.data?.deleteUsers).toBeTruthy();
   });
 
-  concurrentSync('User List', async () => {
+  testAsync('User List', async () => {
     await del;
     const client = await createClient();
     const token = await login(client);

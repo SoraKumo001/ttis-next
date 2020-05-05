@@ -1,0 +1,178 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Contens(Login) Create & update 1`] = `
+Object {
+  "data": Object {
+    "updateContents": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "UpdateTest",
+      "title_type": 2,
+      "updateAt": "",
+      "value": "Test Value",
+      "value_type": "TEXT",
+      "visible": null,
+    },
+  },
+}
+`;
+
+exports[`Contens(Login) Create contens 1`] = `
+Object {
+  "createContents": Object {
+    "__typename": "Contents",
+    "createAt": "",
+    "id": "",
+    "page": true,
+    "parentId": "",
+    "priority": 1,
+    "title": "New",
+    "title_type": 1,
+    "updateAt": "",
+    "value": "",
+    "value_type": "HTML",
+    "visible": null,
+  },
+}
+`;
+
+exports[`Contens(Login) Levels 1`] = `
+Object {
+  "data": Object {
+    "updateContents": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "UpdateTest",
+      "title_type": 2,
+      "updateAt": "",
+      "value": "Test Value",
+      "value_type": "TEXT",
+      "visible": null,
+    },
+  },
+}
+`;
+
+exports[`Contens(Login) Query contens 1`] = `
+Object {
+  "contentsList": Object {
+    "0": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1000,
+      "title": "TOP",
+      "title_type": 1,
+      "updateAt": "",
+      "value": "",
+      "value_type": "HTML",
+      "visible": true,
+    },
+    "1": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "New",
+      "title_type": 1,
+      "updateAt": "",
+      "value": "",
+      "value_type": "HTML",
+      "visible": null,
+    },
+    "2": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "UpdateTest",
+      "title_type": 2,
+      "updateAt": "",
+      "value": "Test Value",
+      "value_type": "TEXT",
+      "visible": null,
+    },
+    "3": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "UpdateTest",
+      "title_type": 2,
+      "updateAt": "",
+      "value": "Test Value",
+      "value_type": "TEXT",
+      "visible": null,
+    },
+  },
+}
+`;
+
+exports[`User(login) CreateUser 1`] = `
+Object {
+  "data": Object {
+    "createUser": Object {
+      "__typename": "User",
+      "id": 2,
+      "info": "{}",
+      "name": "Test01",
+    },
+  },
+}
+`;
+
+exports[`User(login) CurrentUser 1`] = `
+Object {
+  "data": Object {
+    "currentUser": Object {
+      "__typename": "User",
+      "id": 1,
+      "info": "{}",
+      "name": "admin",
+    },
+  },
+  "loading": false,
+  "networkStatus": 7,
+  "stale": false,
+}
+`;
+
+exports[`User(login) UpdateUser 1`] = `
+Object {
+  "data": Object {
+    "updateUser": Object {
+      "__typename": "User",
+      "id": 2,
+      "info": "{}",
+      "name": "Test01-02",
+    },
+  },
+}
+`;
+
+exports[`User(login) User List 1`] = `
+Array [
+  Object {
+    "__typename": "User",
+    "id": 1,
+    "info": "{}",
+    "name": "admin",
+  },
+]
+`;

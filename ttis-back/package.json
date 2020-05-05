@@ -6,6 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "test": "yarn test:docker && yarn test:init && jest",
+    "test:snapshot": "yarn test:docker && yarn test:init && jest -u",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
@@ -17,16 +19,15 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test:docker": "docker-compose -f docker/docker-compose.yml up -d",
     "test:init": "wait-on --tcpTimeout 5000 tcp:localhost:5432 && docker exec postgres bash -c \"dropdb -U ttis ttis-combined-test;dropdb -U ttis ttis-unit-test;createdb -U ttis ttis-combined-test;createdb -U ttis ttis-unit-test\"",
-    "test": "yarn test:docker && yarn test:init && jest",
-    "test:snapshot": "yarn test:docker && yarn test:init && jest -u",
     "test-:watch": "yarn test:docker && jest --watch -u",
     "test:cov": "jest --coverage",
-    "graphql:gen": "graphql-codegen --config graphql/codegen.json"
+    "generate": "graphql-codegen --config graphql/codegen.json",
+    "generate:watch": "graphql-codegen -w --config graphql/codegen.json"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.9",
     "@nestjs/core": "^7.0.9",
-    "@nestjs/graphql": "^7.3.4",
+    "@nestjs/graphql": "^7.3.5",
     "@nestjs/jwt": "^7.0.0",
     "@nestjs/passport": "^7.0.0",
     "@nestjs/platform-express": "^7.0.9",
@@ -42,10 +43,10 @@
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.13.3",
-    "@graphql-codegen/introspection": "^1.13.3",
-    "@graphql-codegen/typescript": "^1.13.3",
-    "@graphql-codegen/typescript-operations": "^1.13.3",
+    "@graphql-codegen/cli": "^1.13.4",
+    "@graphql-codegen/introspection": "^1.13.4",
+    "@graphql-codegen/typescript": "^1.13.4",
+    "@graphql-codegen/typescript-operations": "^1.13.4",
     "@nestjs/cli": "^7.1.4",
     "@nestjs/schematics": "^7.0.0",
     "@nestjs/testing": "^7.0.9",
@@ -53,7 +54,7 @@
     "@types/jest": "25.2.1",
     "@types/node": "^13.13.4",
     "@types/passport-jwt": "^3.0.3",
-    "@types/supertest": "^2.0.8",
+    "@types/supertest": "^2.0.9",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "apollo-boost": "^0.4.7",
@@ -63,11 +64,12 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.2",
     "isomorphic-unfetch": "^3.0.0",
-    "jest": "^25.5.1",
+    "jest": "^25.5.4",
+    "jest-async": "^1.0.1",
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
     "ts-jest": "25.4.0",
-    "ts-loader": "^7.0.1",
+    "ts-loader": "^7.0.2",
     "ts-node": "^8.9.1",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^3.8.3",
@@ -95,7 +97,9 @@
     ],
     "moduleNameMapper": {
       "^@libs/(.+)": "<rootDir>/src/libs/$1",
-      "^@test/(.+)": "<rootDir>/test/$1"
+      "^@test/(.+)": "<rootDir>/test/$1",
+      "^src/(.+)": "<rootDir>/src/$1",
+      "^@graphql/(.+)": "<rootDir>/graphql/$1"
     }
   }
 }

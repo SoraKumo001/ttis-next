@@ -26,7 +26,7 @@ export type Contents = {
   title: Scalars['String'];
   value_type: Scalars['String'];
   value: Scalars['String'];
-  parentId: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
   children?: Maybe<Array<Contents>>;
   parent: Contents;
   createAt: Scalars['DateTime'];
@@ -49,8 +49,8 @@ export type Login = {
 
 export type Mutation = {
    __typename?: 'Mutation';
-  create: Contents;
-  update: Contents;
+  createContents: Contents;
+  updateContents: Contents;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -59,14 +59,14 @@ export type Mutation = {
 };
 
 
-export type MutationCreateArgs = {
+export type MutationCreateContentsArgs = {
   page: Scalars['Boolean'];
   vector: ContentsVector;
   parent: Scalars['String'];
 };
 
 
-export type MutationUpdateArgs = {
+export type MutationUpdateContentsArgs = {
   value?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
   parent?: Maybe<Scalars['String']>;
@@ -111,9 +111,16 @@ export type MutationLoginArgs = {
 
 export type Query = {
    __typename?: 'Query';
-  contents?: Maybe<Contents>;
+  contentsTree: Array<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<User>;
+};
+
+
+export type QueryContentsTreeArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
 };
 
 export type User = {

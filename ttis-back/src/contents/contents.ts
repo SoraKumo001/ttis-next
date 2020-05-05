@@ -8,25 +8,25 @@ import {
   TreeChildren,
   TreeParent,
 } from 'typeorm';
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 
 @ObjectType()
 @Entity()
 @Tree('materialized-path')
 export class Contents {
-  @Field(_ => ID)
+  @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;
   @Field()
   @Column({ default: 1000 })
   priority!: number;
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
   visible?: boolean;
   @Field()
   @Column({ default: true })
   page!: boolean;
-  @Field()
+  @Field(() => Int)
   @Column({ default: 1 })
   title_type!: number;
   @Field()
@@ -39,12 +39,12 @@ export class Contents {
   @Column({ default: '' })
   value!: string;
   title2?: string;
-  @Field()
-  @Column({ nullable: true })
+  @Field({ nullable: true })
+  @Column({ nullable: true , default: null })
   parentId?: string;
-  @Field(_=>[Contents],{ nullable: true })
+  @Field(() => [Contents], { nullable: true})
   @TreeChildren()
-  children!: Contents[];
+  children!: Contents[]|null;
   @Field()
   @TreeParent()
   parent?: Contents;
@@ -54,5 +54,5 @@ export class Contents {
   createAt!: Date;
   @Field()
   @UpdateDateColumn()
-  updateAt: Date;
+  updateAt!: Date;
 }

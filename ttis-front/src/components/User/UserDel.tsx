@@ -1,12 +1,12 @@
 import { JSWindow } from "@jswf/react";
-import { AutoCloseProps } from "@components/Header";
+import { AutoCloseProps } from "@components/Footer";
 import { useMutation } from "react-apollo";
 import { QUERY_USERS, MUTATION_DELETE_USERS } from "./graphql";
-import { UsersQuery } from '../../generated/graphql';
+import { UsersQuery } from "../../generated/graphql";
 
 export const UserDel = ({
   autoClose,
-  ids
+  ids,
 }: AutoCloseProps & { ids: number[] }) => {
   const [deleteUsers] = useMutation(MUTATION_DELETE_USERS);
   return (
@@ -36,12 +36,17 @@ export const UserDel = ({
               deleteUsers({
                 variables: { ids },
                 update: (cache) => {
-                  const { users } = cache.readQuery<UsersQuery>({ query: QUERY_USERS });
-                  cache.writeQuery({
+                  const result = cache.readQuery<UsersQuery>({
                     query: QUERY_USERS,
-                    data: { users: users.filter(user => !v.has(user.id)) }
                   });
-                }
+                  if (result && result.users)
+                    cache.writeQuery({
+                      query: QUERY_USERS,
+                      data: {
+                        users: result.users.filter((user) => !v.has(user.id)),
+                      },
+                    });
+                },
               }).then(() => {
                 autoClose();
               });

@@ -1,5 +1,5 @@
 import { JSWindow } from "@jswf/react";
-import { AutoClose } from "@components/Header";
+import { AutoClose } from "@components/Footer";
 import imageLoginId from "./images/login_id.svg";
 import imageLoginPass from "./images/login_pass.svg";
 import { useMutation, useApolloClient } from "react-apollo";
@@ -77,7 +77,7 @@ export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
                     if (data && data.login) {
                       localStorage.setItem("lastUser", name);
                       localStorage.setItem("graphqlToken", data.login.token);
-                      autoClose();
+                      autoClose && autoClose();
                       axios.post("/api/token", {
                         graphqlToken: data.login.token
                       });
@@ -102,7 +102,7 @@ export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
                   .then(() => {
                     localStorage.removeItem("graphqlToken");
                     client.resetStore();
-                    autoClose();
+                    autoClose && autoClose();
                   });
               }}
             >

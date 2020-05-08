@@ -1,10 +1,11 @@
 import { JSWindow } from "@jswf/react";
-import { AutoCloseProps } from "@components/Header";
+import { AutoCloseProps } from "@components/Footer";
 import imageLoginId from "./images/login_id.svg";
 import imageLoginPass from "./images/login_pass.svg";
 import { useMutation } from "react-apollo";
 import { useState } from "react";
 import { QUERY_USERS, MUTATION_CREATE_USER } from "./graphql";
+import { UsersQuery } from "@generated/graphql";
 
 export const UserEdit = ({ autoClose }: AutoCloseProps) => {
   const [createUser] = useMutation(MUTATION_CREATE_USER);
@@ -41,7 +42,7 @@ export const UserEdit = ({ autoClose }: AutoCloseProps) => {
         <div className="line">
           <img src={imageLoginId} />
           <input
-            onChange={e => {
+            onChange={(e) => {
               setName(e.target.value);
             }}
           />
@@ -51,7 +52,7 @@ export const UserEdit = ({ autoClose }: AutoCloseProps) => {
           <img src={imageLoginPass} />
           <input
             type="password"
-            onChange={e => {
+            onChange={(e) => {
               setPassword(e.target.value);
             }}
           />
@@ -62,13 +63,14 @@ export const UserEdit = ({ autoClose }: AutoCloseProps) => {
               createUser({
                 variables: { name, password },
                 update: (cache, { data }) => {
-                  const { users } = cache.readQuery({ query: QUERY_USERS });
+                  const result = cache.readQuery<UsersQuery>({ query: QUERY_USERS });
+                  if(result && result.users)
                   cache.writeQuery({
                     query: QUERY_USERS,
-                    data: { users: [...users, data.user] }
+                    data: { users: [...result.users, data.user] },
                   });
-                }
-              }).then(result => {
+                },
+              }).then((result) => {
                 autoClose();
               });
             }}

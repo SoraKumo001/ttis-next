@@ -20,9 +20,9 @@ export type Contents = {
    __typename?: 'Contents';
   id: Scalars['ID'];
   priority: Scalars['Float'];
-  visible: Scalars['Boolean'];
+  visible?: Maybe<Scalars['Boolean']>;
   page: Scalars['Boolean'];
-  title_type: Scalars['Float'];
+  title_type: Scalars['Int'];
   title: Scalars['String'];
   value_type: Scalars['String'];
   value: Scalars['String'];
@@ -49,8 +49,8 @@ export type Login = {
 
 export type Mutation = {
    __typename?: 'Mutation';
-  createContents: Contents;
-  updateContents: Contents;
+  createContents?: Maybe<Contents>;
+  updateContents?: Maybe<Contents>;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -60,22 +60,26 @@ export type Mutation = {
 
 
 export type MutationCreateContentsArgs = {
-  page: Scalars['Boolean'];
-  vector: ContentsVector;
-  parent: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
+  value_type?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+  title_type?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  vector?: Maybe<ContentsVector>;
+  parent?: Maybe<Scalars['ID']>;
 };
 
 
 export type MutationUpdateContentsArgs = {
   value?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
-  parent?: Maybe<Scalars['String']>;
+  parent?: Maybe<Scalars['ID']>;
   title?: Maybe<Scalars['String']>;
-  title_type?: Maybe<Scalars['Float']>;
+  title_type?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
-  vector?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
+  id: Scalars['ID'];
 };
 
 
@@ -111,13 +115,21 @@ export type MutationLoginArgs = {
 
 export type Query = {
    __typename?: 'Query';
-  contentsTree: Array<Contents>;
+  contentsTree: Contents;
+  contentsList: Array<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<User>;
 };
 
 
 export type QueryContentsTreeArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsListArgs = {
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
@@ -130,6 +142,17 @@ export type User = {
   name: Scalars['String'];
   info: Scalars['String'];
 };
+
+export type ContentsListQueryVariables = {};
+
+
+export type ContentsListQuery = (
+  { __typename?: 'Query' }
+  & { contentsList: Array<(
+    { __typename?: 'Contents' }
+    & Pick<Contents, 'id' | 'visible' | 'title' | 'page' | 'parentId'>
+  )> }
+);
 
 export type UsersQueryVariables = {};
 
@@ -213,6 +236,37 @@ export type DeleteUsersMutation = (
 );
 
 
+export const ContentsListDocument = gql`
+    query contentsList {
+  contentsList {
+    id
+    visible
+    title
+    page
+    parentId
+  }
+}
+    `;
+export type ContentsListComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsListQuery, ContentsListQueryVariables>, 'query'>;
+
+    export const ContentsListComponent = (props: ContentsListComponentProps) => (
+      <ApolloReactComponents.Query<ContentsListQuery, ContentsListQueryVariables> query={ContentsListDocument} {...props} />
+    );
+    
+export type ContentsListProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ContentsListQuery, ContentsListQueryVariables>
+    } & TChildProps;
+export function withContentsList<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ContentsListQuery,
+  ContentsListQueryVariables,
+  ContentsListProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ContentsListQuery, ContentsListQueryVariables, ContentsListProps<TChildProps, TDataName>>(ContentsListDocument, {
+      alias: 'contentsList',
+      ...operationOptions
+    });
+};
+export type ContentsListQueryResult = ApolloReactCommon.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
 export const UsersDocument = gql`
     query Users {
   users {

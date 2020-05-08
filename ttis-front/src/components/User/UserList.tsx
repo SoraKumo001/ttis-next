@@ -4,9 +4,9 @@ import {
   ListHeaders,
   ListHeader,
   ListItem,
-  ListRow
+  ListRow,
 } from "@jswf/react";
-import { AutoClose, createAutoClose } from "@components/Header";
+import { AutoClose, createAutoClose } from "@components/Footer";
 import { useRouter } from "next/router";
 import { UserEdit } from "./UserEdit";
 
@@ -19,7 +19,7 @@ import { UserDel } from "./UserDel";
 export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
   const router = useRouter();
   const { loading, data } = useQuery<UsersQuery>(QUERY_USERS);
-  const listView = useRef<ListView>();
+  const listView = useRef<ListView>(null);
   const [ids, setIds] = useState<number[]>([]);
   return (
     <JSWindow
@@ -50,7 +50,7 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
           onClick={() => {
             router.push({
               pathname: router.pathname,
-              query: { ...router.query, add: null }
+              query: { ...router.query, add: null },
             });
           }}
         >
@@ -59,13 +59,16 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
         <button
           onClick={() => {
             const list = listView.current;
-            setIds(
-              list.getSelectItems().map(index => list.getItemValue(index) as number)
-            );
+            if (list)
+              setIds(
+                list
+                  .getSelectItems()
+                  .map((index) => list.getItemValue(index) as number)
+              );
 
             router.push({
               pathname: router.pathname,
-              query: { ...router.query, del: JSON.stringify(ids) }
+              query: { ...router.query, del: JSON.stringify(ids) },
             });
           }}
         >

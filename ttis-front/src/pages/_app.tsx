@@ -4,19 +4,20 @@ import {
   ApolloClient,
   HttpLink,
   InMemoryCache,
-  NormalizedCacheObject
+  NormalizedCacheObject,
 } from "apollo-boost";
 import fetch from "isomorphic-unfetch";
 import { ApolloProvider, getMarkupFromTree } from "react-apollo";
 import {
   initProps,
   SessionType,
-  createSessionProps
+  createSessionProps,
 } from "../libs/next-express-session";
 import axios from "axios";
 import { Header } from "@components/Header";
 import * as nextRouter from "next/router";
 import { setContext } from "apollo-link-context";
+import { Footer } from "@components/Footer";
 const IS_BROWSER = !!process.browser;
 const IS_DOCKER =
   process.env.NODE_ENV === "production" &&
@@ -42,23 +43,23 @@ function createClient(
     return {
       headers: {
         ...headers,
-        authorization: newToken ? `Bearer ${newToken}` : ""
-      }
+        authorization: newToken ? `Bearer ${newToken}` : "",
+      },
     };
   });
   const link = new HttpLink({
     fetch,
     uri: URI_ENDPOINT,
     headers: {
-      authorization: token ? `Bearer ${token}` : ""
-    }
+      authorization: token ? `Bearer ${token}` : "",
+    },
   });
 
   return new ApolloClient({
     connectToDevTools: IS_BROWSER,
     ssrMode: !IS_BROWSER,
     link: IS_BROWSER ? authLink.concat(link) : link,
-    cache: new InMemoryCache().restore(initialState)
+    cache: new InMemoryCache().restore(initialState),
   });
 }
 
@@ -84,7 +85,7 @@ export default class App extends NextApp<{ session: SessionType }> {
 
     const context = {
       ...ctx,
-      session
+      session,
     };
     const pageProps =
       Component.getInitialProps && (await Component.getInitialProps(context));
@@ -99,25 +100,26 @@ export default class App extends NextApp<{ session: SessionType }> {
         return ssrRouter;
       };
       //仮コンポーネントでキャッシュを作る
-      await getMarkupFromTree({
-        tree: (
-          <App
-            pageProps={pageProps}
-            Component={Component}
-            router={router}
-            session={sessionProps}
-          />
-        )
-      }).catch(() => {});
+      sessionProps &&
+        (await getMarkupFromTree({
+          tree: (
+            <App
+              pageProps={pageProps}
+              Component={Component}
+              router={router}
+              session={sessionProps}
+            />
+          ),
+        }).catch(() => {}));
     }
 
     return {
       pageProps: {
         ...pageProps,
         graphqlToken,
-        apolloCache: ssrClient.extract()
+        apolloCache: ssrClient.extract(),
       },
-      session: sessionProps
+      session: sessionProps,
     };
   }
   state: State = { client: ssrClient };
@@ -126,7 +128,7 @@ export default class App extends NextApp<{ session: SessionType }> {
     if (graphqlToken) {
       if (this.props.pageProps.graphqlToken !== graphqlToken) {
         axios.post("/api/token", {
-          graphqlToken
+          graphqlToken,
         });
       }
     } else {
@@ -137,7 +139,7 @@ export default class App extends NextApp<{ session: SessionType }> {
     }
     if (!this.state.client)
       this.setState({
-        client: createClient(graphqlToken, this.props.pageProps.apolloCache)
+        client: createClient(graphqlToken, this.props.pageProps.apolloCache),
       });
   }
   render() {
@@ -146,10 +148,16 @@ export default class App extends NextApp<{ session: SessionType }> {
     initProps(this);
     return (
       <>
+        <style jsx global>{`
+          body {
+            margin: 0;
+          }
+        `}</style>
         {client && (
           <ApolloProvider client={client}>
             <Header {...pageProps} />
             <Component {...pageProps} url={createUrl(router)} />
+            <Footer {...pageProps} />
           </ApolloProvider>
         )}
       </>

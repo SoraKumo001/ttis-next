@@ -1,56 +1,48 @@
 import { useRef, useEffect } from "react";
 import ResizeObserver from "react-resize-observer";
 
-interface Color {
-  r: number;
-  g: number;
-  b: number;
-}
-
 interface Values {
-  color: Color;
-  color2: Color;
+  color: number;
+  colorLevel: number;
   triangleSize: number;
+  update?: boolean;
   trianglePoint: { x: number; y: number }[];
 }
-
-export const ColorPickerView = () => {
-  const nodeTriangle = useRef<HTMLCanvasElement>(null);
+interface Props {
+  color: number;
+  onChange?: (color: number) => void;
+}
+export const ColorPickerView = ({ color, onChange }: Props) => {
+  const nodeCircle = useRef<HTMLCanvasElement>(null);
   const nodeLevel = useRef<HTMLCanvasElement>(null);
   const nodeTarget = useRef<HTMLCanvasElement>(null);
+  const nodePointer = useRef<HTMLDivElement>(null);
+  const nodeLevelPointer = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onTriangle = (e: MouseEvent | TouchEvent) => {
-      if (
-        ("touches" in e && e.touches.length === 0) ||
-        ("buttons" in e && e.buttons == 0)
-      )
-        return;
-      setTriangleColor(e);
-    };
-    nodeTriangle.current?.addEventListener("mousemove", onTriangle);
-    nodeTriangle.current?.addEventListener("mousedown", onTriangle);
-    nodeTriangle.current?.addEventListener("touchstart", onTriangle);
-    const onLevel = (e: MouseEvent) => {
-      if (e.buttons == 0 || !(e.target instanceof HTMLCanvasElement)) return;
-      const rect = e.target.getBoundingClientRect();
-      const mouseY = e.clientY - rect.top;
-      const color = This.color;
-      const color2 = This.color2;
-      color2.r = getColorLevel(mouseY, color.r);
-      color2.g = getColorLevel(mouseY, color.g);
-      color2.b = getColorLevel(mouseY, color.b);
-      setColorTarget();
-    };
+    setColor(color);
+  }, [color]);
+  useEffect(() => {
+    nodeCircle.current?.addEventListener("mousemove", onCircle);
+    nodeCircle.current?.addEventListener("mousedown", onCircle);
+    nodeCircle.current?.addEventListener("touchstart", onCircle);
     nodeLevel.current?.addEventListener("mousemove", onLevel);
+    nodeLevel.current?.addEventListener("touchstart", onLevel);
+    nodeLevel.current?.addEventListener("mousedown", onLevel);
+    setColorLevel(1);
     return () => {
-      nodeTriangle.current?.removeEventListener("mousemove", onTriangle);
+      nodeCircle.current?.removeEventListener("mousemove", onCircle);
+      nodeCircle.current?.removeEventListener("mousedown", onCircle);
+      nodeCircle.current?.removeEventListener("touchstart", onCircle);
+      nodeLevel.current?.removeEventListener("mousemove", onLevel);
+      nodeLevel.current?.removeEventListener("touchstart", onLevel);
+      nodeLevel.current?.removeEventListener("mousedown", onLevel);
     };
-  });
+  }, []);
   const This = useRef<Values>({
-    color: { r: 100, g: 100, b: 100 },
-    color2: { r: 100, g: 100, b: 100 },
+    color: 0xffffff,
     trianglePoint: [],
     triangleSize: 100,
+    colorLevel: 1,
   }).current;
 
   return (
@@ -79,11 +71,43 @@ export const ColorPickerView = () => {
           border: solid 1px;
           flex: 1;
         }
-        .colorTriangle {
-          min-width: 0;
+        .colorLevel canvas {
+          position: absolute;
+          user-select: none;
+          top: 0;
+          height: 100%;
           flex: 1;
-          background-color: black;
+        }
+        .colorCircle {
+          position: relative;
 
+          flex: 1;
+        }
+        .colorCircle canvas {
+          width: 100%;
+          height: 100%;
+          background-color: black;
+          user-select: none;
+          cursor: pointer;
+        }
+        .pointer {
+          position: absolute;
+          top: 0;
+          width: 1ex;
+          height: 1ex;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 100%;
+          pointer-events: none;
+        }
+        .levelPointer {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 4px;
+          border: 1px solid;
+          box-sizing: border-box;
+          pointer-events: none;
+          background: rgba(255, 255, 255, 0.4);
         }
         .leftBar {
           display: flex;
@@ -97,65 +121,70 @@ export const ColorPickerView = () => {
           <div className="targetBox">
             <canvas ref={nodeTarget} className="colorTarget"></canvas>
           </div>
-          <canvas ref={nodeLevel} className="colorLevel"></canvas>
+          <div className="colorLevel">
+            <canvas ref={nodeLevel}></canvas>
+            <div ref={nodeLevelPointer} className="levelPointer" />
+          </div>
         </div>
-        <canvas ref={nodeTriangle} className="colorTriangle"></canvas>
+        <div className="colorCircle">
+          <canvas ref={nodeCircle}></canvas>
+          <div ref={nodePointer} className="pointer" />
+        </div>
         <ResizeObserver
           onResize={() => {
-            drawTriangle();
+            drawCircle();
           }}
         />
       </div>
     </>
   );
-  function setColorLevel(r?: number, g?: number, b?: number) {
-    if (r === undefined || g === undefined || b === undefined) {
-      r = This.color.r;
-      g = This.color.g;
-      b = This.color.b;
-    } else {
-      This.color = { r, g, b };
-      This.color2 = { r, g, b };
-    }
-    const canvasLevel = nodeLevel.current!;
-    const ctxLevel = canvasLevel.getContext("2d");
-    if (!ctxLevel) return false;
-    const grad = ctxLevel.createLinearGradient(0, canvasLevel.height, 0, 0);
-    grad.addColorStop(0 + (1 - 1 / 1.1), "rgb(0,0,0)");
-    grad.addColorStop(0.5, "rgb(" + r + "," + g + "," + b + ")");
-    grad.addColorStop(1 - (1 - 1 / 1.1), "rgb(255,255,255)");
-    ctxLevel.fillStyle = grad;
-    ctxLevel.fillRect(0, 0, canvasLevel.width, canvasLevel.height);
-
-    setColorTarget();
+  function getRGB(color: number) {
+    return {
+      r: (color / 256 / 256) % 256,
+      g: (color / 256) % 256,
+      b: color % 256,
+    };
   }
-  function drawTriangle() {
-    const triangleCanvas = nodeTriangle.current!;
+  function getRGBtoColor({ r, g, b }: { r: number; g: number; b: number }) {
+    return Math.floor(r) * 256 * 256 + Math.floor(g) * 256 + Math.floor(b);
+  }
+
+  function drawCircle() {
+    const triangleCanvas = nodeCircle.current!;
     //クライアントサイズの取得
-    let width = triangleCanvas.clientWidth;
-    let height = triangleCanvas.clientHeight;
-    console.log(triangleCanvas.clientWidth)
+    let width = triangleCanvas.offsetWidth;
+    let height = triangleCanvas.offsetHeight;
+    triangleCanvas.width = width;
+    triangleCanvas.height = height;
+
+    let centerX = width / 2;
+    let centerY = height / 2;
 
     const ctx = triangleCanvas.getContext("2d");
     if (!ctx) return;
-
-    //トライアングルサイズの補正
-    const triangle = Math.min(width, height);
-    triangleCanvas.width = triangle;
-    triangleCanvas.height = triangle;
-    This.triangleSize = triangle * 0.95;
-    width = This.triangleSize;
-    height = This.triangleSize;
     ctx.clearRect(0, 0, width, height);
 
-    const x = (triangleCanvas.width - width) / 2;
-    const y = (triangleCanvas.height - height) / 2;
-    const trianglePoinst = [
-      { x: x + width / 2, y },
-      { x, y: y + height },
-      { x: x + width, y: y + height },
+    //トライアングルサイズの補正
+    const triangle = Math.floor(Math.min(width, height) * 0.9);
+
+    This.triangleSize = triangle;
+
+    const r = triangle / 2;
+    const trianglePoint = [
+      {
+        x: centerX + Math.sin((0 * Math.PI) / 180) * r,
+        y: centerY - Math.cos((0 * Math.PI) / 180) * r,
+      },
+      {
+        x: centerX + Math.sin((120 * Math.PI) / 180) * r,
+        y: centerY - Math.cos((120 * Math.PI) / 180) * r,
+      },
+      {
+        x: centerX + Math.sin((240 * Math.PI) / 180) * r,
+        y: centerY - Math.cos((240 * Math.PI) / 180) * r,
+      },
     ];
-    This.trianglePoint = trianglePoinst;
+    This.trianglePoint = trianglePoint;
     const color = [
       ["RGBA(255,0,0,255)", "RGBA(0,0,0,255)"],
       ["RGBA(0,255,0,255)", "RGBA(0,0,0,255)"],
@@ -166,95 +195,166 @@ export const ColorPickerView = () => {
       const i0 = i % 3;
       const i1 = (i + 1) % 3;
       const i2 = (i + 2) % 3;
-      /* 三角形を描く */
       const grad = ctx.createLinearGradient(
-        trianglePoinst[i0].x,
-        trianglePoinst[i0].y,
-        (trianglePoinst[i1].x + trianglePoinst[i2].x) / 2,
-        (trianglePoinst[i1].y + trianglePoinst[i2].y) / 2
+        trianglePoint[i0].x,
+        trianglePoint[i0].y,
+        (trianglePoint[i1].x + trianglePoint[i2].x) / 2,
+        (trianglePoint[i1].y + trianglePoint[i2].y) / 2
       );
       grad.addColorStop(0, color[i][0]);
       grad.addColorStop(1 / 1.1, color[i][1]);
       ctx.fillStyle = grad;
 
       ctx.beginPath();
-      ctx.moveTo(trianglePoinst[i0].x, trianglePoinst[i0].y);
-      ctx.lineTo(trianglePoinst[i1].x, trianglePoinst[i1].y);
-      ctx.lineTo(trianglePoinst[i2].x, trianglePoinst[i2].y);
+      ctx.arc(
+        centerX,
+        centerY,
+        r,
+        (0 * Math.PI) / 180,
+        (360 * Math.PI) / 180,
+        false
+      );
       ctx.closePath();
       /* 三角形を塗りつぶす */
       ctx.fill();
     }
   }
-  function setTriangleColor(e: MouseEvent | TouchEvent) {
-    if (!e.target) return;
-    const trianglePoinst = This.trianglePoint;
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const mouseX =
-      "clientX" in e ? e.clientX - rect.left : e.touches[0].clientX;
-    const mouseY =
-      "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
-    const r = getColor(
-      mouseX,
-      mouseY,
-      trianglePoinst[0].x,
-      trianglePoinst[0].y
-    );
-    const g = getColor(
-      mouseX,
-      mouseY,
-      trianglePoinst[1].x,
-      trianglePoinst[1].y
-    );
-    const b = getColor(
-      mouseX,
-      mouseY,
-      trianglePoinst[2].x,
-      trianglePoinst[2].y
-    );
-    setColorLevel(r, g, b);
-  }
 
   function getColor(px: number, py: number, cx: number, cy: number) {
-    let value = Math.floor(
+    let value = Math.round(
       (1 -
         Math.sqrt(Math.pow(px - cx, 2) + Math.pow(py - cy, 2)) /
-          This.triangleSize) *
-        255 *
-        1.1
+          ((This.triangleSize * Math.sqrt(3)) / 2)) *
+        255
     );
-    if (value < 0) value = 0;
-    else if (value > 255) value = 255;
-    return value;
-  }
-  function getColorLevel(py: number, color: number) {
-    const length = nodeLevel.current!.offsetHeight / 2;
-    const level = ((py - length) / length) * 1.1;
-    let value: number;
-    if (level < 0) {
-      value = Math.floor(255 * -level + color * (1 + level));
-    } else {
-      value = Math.floor(color * (1 - level));
-    }
-    if (value < 0) value = 0;
-    else if (value > 255) value = 255;
-    return value;
+    return Math.min(Math.max(value, 0), 255);
   }
   function setColorTarget() {
     const canvasTarget = nodeTarget.current!;
     const ctx = canvasTarget.getContext("2d");
     if (!ctx) return;
-    const color2 = This.color2;
+    const rgb = getRGB(color);
     ctx.fillStyle =
-      "rgb(" +
-      (255 - color2.r) +
-      "," +
-      (255 - color2.g) +
-      "," +
-      (255 - color2.b) +
-      ")";
+      "rgb(" + (255 - rgb.r) + "," + (255 - rgb.g) + "," + (255 - rgb.b) + ")";
     ctx.fillRect(0, 0, canvasTarget.width, canvasTarget.height);
-    ctx.fillStyle = "rgb(" + color2.r + "," + color2.g + "," + color2.b + ")";
+    ctx.fillStyle = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")";
     ctx.fillRect(2, 2, canvasTarget.width - 4, canvasTarget.height - 4);
+  }
+  function onCircle(e: MouseEvent | TouchEvent) {
+    if (
+      ("touches" in e && e.touches.length === 0) ||
+      ("buttons" in e && e.buttons == 0)
+    )
+      return;
+    if (!e.target) return;
+    const trianglePoinst = This.trianglePoint;
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const mouseX =
+      "clientX" in e ? e.clientX - rect.left : e.touches[0].clientX;
+    const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
+
+    const node = nodeCircle.current!;
+    const centerX = node.offsetWidth / 2;
+    const centerY = node.offsetHeight / 2;
+    const x = mouseX - centerX;
+    const y = mouseY - centerY;
+    let length = Math.sqrt(x * x + y * y);
+    if (length > This.triangleSize / 2) length = This.triangleSize / 2 / length;
+    else length = 1;
+    const mx = centerX + x * length;
+    const my = centerY + y * length;
+
+    const pointer = nodePointer.current!;
+    pointer.style.left = mx - pointer.offsetWidth / 2 + "px";
+    pointer.style.top = my - pointer.offsetHeight / 2 + "px";
+    const r = getColor(mx, my, trianglePoinst[0].x, trianglePoinst[0].y);
+    const g = getColor(mx, my, trianglePoinst[1].x, trianglePoinst[1].y);
+    const b = getColor(mx, my, trianglePoinst[2].x, trianglePoinst[2].y);
+    This.color = getRGBtoColor({ r, g, b });
+    setColorLevel(1);
+    drawColorLevel();
+  }
+  function setColorLevel(level: number, update?: boolean) {
+    This.colorLevel = level;
+    const length = nodeLevel.current!.offsetHeight;
+    const pointer = nodeLevelPointer.current!;
+    pointer.style.top =
+      -pointer.offsetHeight + length - (length * level) / 4 + "px";
+
+    const { r, g, b } = getRGB(This.color);
+    const color2 = getRGBtoColor({
+      r: Math.min(r * level, 255),
+      g: Math.min(g * level, 255),
+      b: Math.min(b * level, 255),
+    });
+
+    if (onChange && color !== color2) {
+      This.update = update;
+      onChange(color2);
+    } else if (update !== false) This.update = true;
+  }
+  function onLevel(e: MouseEvent | TouchEvent) {
+    if (
+      ("touches" in e && e.touches.length === 0) ||
+      ("buttons" in e && e.buttons == 0)
+    )
+      return;
+    const target = "touches" in e ? e.touches[0].target : e.target;
+    if (!(target instanceof HTMLCanvasElement)) return;
+    const rect = target.getBoundingClientRect();
+    const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
+
+    const length = nodeLevel.current!.offsetHeight / 2;
+    const level = 2 - ((mouseY - length) / length) * 2;
+    setColorLevel(level, false);
+  }
+  function drawColorLevel() {
+    const { r, g, b } = getRGB(This.color);
+    const canvasLevel = nodeLevel.current!;
+    canvasLevel.height = canvasLevel.offsetHeight;
+    const ctxLevel = canvasLevel.getContext("2d");
+    if (!ctxLevel) return false;
+    const grad = ctxLevel.createLinearGradient(
+      0,
+      canvasLevel.offsetHeight,
+      0,
+      0
+    );
+    grad.addColorStop(1, `rgb(${r * 4},${g * 4},${b * 4})`);
+    grad.addColorStop(1 / 4, `rgb(${r},${g},${b})`);
+    grad.addColorStop(0, `rgb(0,0,0)`);
+    ctxLevel.fillStyle = grad;
+    ctxLevel.fillRect(0, 0, canvasLevel.width, canvasLevel.height);
+  }
+  function setColor(color: number) {
+    const pointer = nodePointer.current!;
+    const node = nodeCircle.current!;
+    const centerX = node.offsetWidth / 2;
+    const centerY = node.offsetHeight / 2;
+    const { r, g, b } = getRGB(color);
+    const length = Math.sqrt(r * r + g * g + b * b);
+    const r2 = !length ? 0 : r / length;
+    const g2 = !length ? 0 : g / length;
+    const b2 = !length ? 0 : b / length;
+    const p = This.trianglePoint;
+    const x =
+      ((p[0].x - centerX) * r2 +
+        (p[1].x - centerX) * g2 +
+        (p[2].x - centerX) * b2) /
+      1;
+    const y =
+      ((p[0].y - centerY) * r2 +
+        (p[1].y - centerY) * g2 +
+        (p[2].y - centerY) * b2) /
+      1;
+    pointer.style.left = centerX + x - pointer.offsetWidth / 2 + "px";
+    pointer.style.top = centerY + y - pointer.offsetHeight / 2 + "px";
+    if (This.update === false) {
+      This.update = true;
+    } else {
+      This.color = color;
+      drawColorLevel();
+    }
+    setColorTarget();
   }
 };

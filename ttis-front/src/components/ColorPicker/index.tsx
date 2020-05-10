@@ -6,6 +6,20 @@ import { useState, useEffect } from "react";
 interface Props {
   onChange?: (color: number) => void;
 }
+export const getRGB = (color: number) => ({
+  r: (color / 256 / 256) % 256,
+  g: (color / 256) % 256,
+  b: color % 256,
+});
+export const getRGBtoColor = ({
+  r,
+  g,
+  b,
+}: {
+  r: number;
+  g: number;
+  b: number;
+}) => Math.floor(r) * 256 * 256 + Math.floor(g) * 256 + Math.floor(b);
 
 export const ColorPickerWindow = ({ onChange }: Props) => {
   const [color, setColor] = useState(0xffffff);

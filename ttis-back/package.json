@@ -18,7 +18,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test:docker": "docker-compose -f docker/docker-compose.yml up -d",
-    "test:init": "wait-on --tcpTimeout 5000 tcp:localhost:5432 && docker exec postgres bash -c \"dropdb -U ttis ttis-combined-test;dropdb -U ttis ttis-unit-test;createdb -U ttis ttis-combined-test;createdb -U ttis ttis-unit-test\"",
+    "test:init": "wait-on --tcpTimeout 10000 tcp:localhost:5432 && docker exec postgres bash -c \"dropdb -U ttis ttis-combined-test;dropdb -U ttis ttis-unit-test;createdb -U ttis ttis-combined-test;createdb -U ttis ttis-unit-test\"",
     "test-:watch": "yarn test:docker && jest --watch -u",
     "test:cov": "jest --coverage",
     "generate": "graphql-codegen --config graphql/codegen.json",

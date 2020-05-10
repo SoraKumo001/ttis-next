@@ -50,6 +50,9 @@ export const ColorPallet = ({ color, onChange }: Props) => {
   useEffect(() => {
     setColor(color);
   }, [color]);
+  useEffect(()=>{
+    updateColor();
+  },[input0,input1,input2])
 
   return (
     <>
@@ -148,7 +151,7 @@ export const ColorPallet = ({ color, onChange }: Props) => {
   function updateColor(color?: number) {
     if (color === undefined) color = input0 * 256 * 256 + input1 * 256 + input2;
     if (colors[This.index] !== color) {
-      const c = [...colors];
+      const c = colors.concat();
       c[This.index] = color;
       setColors(c);
     }

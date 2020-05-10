@@ -10,41 +10,26 @@ interface Values {
 }
 interface Props {
   color: number;
-  onChange?: (color: number) => void;
+  onChange: (color: number) => void;
 }
 export const ColorPickerView = ({ color, onChange }: Props) => {
-  const nodeCircle = useRef<HTMLCanvasElement>(null);
-  const nodeLevel = useRef<HTMLCanvasElement>(null);
-  const nodeTarget = useRef<HTMLCanvasElement>(null);
-  const nodePointer = useRef<HTMLDivElement>(null);
-  const nodeLevelPointer = useRef<HTMLDivElement>(null);
+  const refCircle = useRef<HTMLCanvasElement>(null);
+  const refLevel = useRef<HTMLCanvasElement>(null);
+  const refTarget = useRef<HTMLCanvasElement>(null);
+  const refPointer = useRef<HTMLDivElement>(null);
+  const refLevelPointer = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setColorLevel(1);
+  }, []);
   useEffect(() => {
     setColor(color);
   }, [color]);
-  useEffect(() => {
-    nodeCircle.current?.addEventListener("mousemove", onCircle);
-    nodeCircle.current?.addEventListener("mousedown", onCircle);
-    nodeCircle.current?.addEventListener("touchstart", onCircle);
-    nodeLevel.current?.addEventListener("mousemove", onLevel);
-    nodeLevel.current?.addEventListener("touchstart", onLevel);
-    nodeLevel.current?.addEventListener("mousedown", onLevel);
-    setColorLevel(1);
-    return () => {
-      nodeCircle.current?.removeEventListener("mousemove", onCircle);
-      nodeCircle.current?.removeEventListener("mousedown", onCircle);
-      nodeCircle.current?.removeEventListener("touchstart", onCircle);
-      nodeLevel.current?.removeEventListener("mousemove", onLevel);
-      nodeLevel.current?.removeEventListener("touchstart", onLevel);
-      nodeLevel.current?.removeEventListener("mousedown", onLevel);
-    };
-  }, []);
   const This = useRef<Values>({
     color: 0xffffff,
     trianglePoint: [],
     triangleSize: 100,
     colorLevel: 1,
   }).current;
-
   return (
     <>
       <style jsx>{`
@@ -80,7 +65,6 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
         }
         .colorCircle {
           position: relative;
-
           flex: 1;
         }
         .colorCircle canvas {
@@ -112,23 +96,35 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
         .leftBar {
           display: flex;
           flex-direction: column;
-          width: 3em;
+          width: 2em;
         }
       `}</style>
 
       <div className="root">
         <div className="leftBar">
           <div className="targetBox">
-            <canvas ref={nodeTarget} className="colorTarget"></canvas>
+            <canvas ref={refTarget} className="colorTarget"></canvas>
           </div>
           <div className="colorLevel">
-            <canvas ref={nodeLevel}></canvas>
-            <div ref={nodeLevelPointer} className="levelPointer" />
+            <canvas
+              ref={refLevel}
+              onMouseMove={onColorLevel}
+              onMouseDown={onColorLevel}
+              onTouchMove={onColorLevel}
+              onTouchStart={onColorLevel}
+            ></canvas>
+            <div ref={refLevelPointer} className="levelPointer" />
           </div>
         </div>
         <div className="colorCircle">
-          <canvas ref={nodeCircle}></canvas>
-          <div ref={nodePointer} className="pointer" />
+          <canvas
+            ref={refCircle}
+            onMouseMove={onCircle}
+            onMouseDown={onCircle}
+            onTouchMove={onCircle}
+            onTouchStart={onCircle}
+          ></canvas>
+          <div ref={refPointer} className="pointer" />
         </div>
         <ResizeObserver
           onResize={() => {
@@ -150,7 +146,7 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
   }
 
   function drawCircle() {
-    const triangleCanvas = nodeCircle.current!;
+    const triangleCanvas = refCircle.current!;
     //クライアントサイズの取得
     let width = triangleCanvas.offsetWidth;
     let height = triangleCanvas.offsetHeight;
@@ -230,7 +226,7 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
     return Math.min(Math.max(value, 0), 255);
   }
   function setColorTarget() {
-    const canvasTarget = nodeTarget.current!;
+    const canvasTarget = refTarget.current!;
     const ctx = canvasTarget.getContext("2d");
     if (!ctx) return;
     const rgb = getRGB(color);
@@ -240,7 +236,9 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
     ctx.fillStyle = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")";
     ctx.fillRect(2, 2, canvasTarget.width - 4, canvasTarget.height - 4);
   }
-  function onCircle(e: MouseEvent | TouchEvent) {
+  function onCircle(
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) {
     if (
       ("touches" in e && e.touches.length === 0) ||
       ("buttons" in e && e.buttons == 0)
@@ -253,7 +251,7 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
       "clientX" in e ? e.clientX - rect.left : e.touches[0].clientX;
     const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
 
-    const node = nodeCircle.current!;
+    const node = refCircle.current!;
     const centerX = node.offsetWidth / 2;
     const centerY = node.offsetHeight / 2;
     const x = mouseX - centerX;
@@ -264,7 +262,7 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
     const mx = centerX + x * length;
     const my = centerY + y * length;
 
-    const pointer = nodePointer.current!;
+    const pointer = refPointer.current!;
     pointer.style.left = mx - pointer.offsetWidth / 2 + "px";
     pointer.style.top = my - pointer.offsetHeight / 2 + "px";
     const r = getColor(mx, my, trianglePoinst[0].x, trianglePoinst[0].y);
@@ -276,24 +274,27 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
   }
   function setColorLevel(level: number, update?: boolean) {
     This.colorLevel = level;
-    const length = nodeLevel.current!.offsetHeight;
-    const pointer = nodeLevelPointer.current!;
+    const length = refLevel.current!.offsetHeight;
+    const pointer = refLevelPointer.current!;
     pointer.style.top =
       -pointer.offsetHeight + length - (length * level) / 4 + "px";
 
     const { r, g, b } = getRGB(This.color);
     const color2 = getRGBtoColor({
-      r: Math.min(r * level, 255),
-      g: Math.min(g * level, 255),
-      b: Math.min(b * level, 255),
+      r: Math.min(Math.round(r * level), 255),
+      g: Math.min(Math.round(g * level), 255),
+      b: Math.min(Math.round(b * level), 255),
     });
 
-    if (onChange && color !== color2) {
+    if (color !== color2) {
       This.update = update;
       onChange(color2);
     } else if (update !== false) This.update = true;
+    setColorTarget();
   }
-  function onLevel(e: MouseEvent | TouchEvent) {
+  function onColorLevel(
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) {
     if (
       ("touches" in e && e.touches.length === 0) ||
       ("buttons" in e && e.buttons == 0)
@@ -304,13 +305,13 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
     const rect = target.getBoundingClientRect();
     const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
 
-    const length = nodeLevel.current!.offsetHeight / 2;
+    const length = refLevel.current!.offsetHeight / 2;
     const level = 2 - ((mouseY - length) / length) * 2;
     setColorLevel(level, false);
   }
   function drawColorLevel() {
     const { r, g, b } = getRGB(This.color);
-    const canvasLevel = nodeLevel.current!;
+    const canvasLevel = refLevel.current!;
     canvasLevel.height = canvasLevel.offsetHeight;
     const ctxLevel = canvasLevel.getContext("2d");
     if (!ctxLevel) return false;
@@ -327,8 +328,8 @@ export const ColorPickerView = ({ color, onChange }: Props) => {
     ctxLevel.fillRect(0, 0, canvasLevel.width, canvasLevel.height);
   }
   function setColor(color: number) {
-    const pointer = nodePointer.current!;
-    const node = nodeCircle.current!;
+    const pointer = refPointer.current!;
+    const node = refCircle.current!;
     const centerX = node.offsetWidth / 2;
     const centerY = node.offsetHeight / 2;
     const { r, g, b } = getRGB(color);

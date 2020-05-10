@@ -1,7 +1,7 @@
 import { JSWindow } from "@jswf/react";
 import { ColorPickerView } from "./ColorPickerView";
 import { ColorPallet } from "./ColorPallet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   onChange?: (color: number) => void;
@@ -9,6 +9,9 @@ interface Props {
 
 export const ColorPickerWindow = ({ onChange }: Props) => {
   const [color, setColor] = useState(0xffffff);
+  useEffect(() => {
+    onChange && onChange(color);
+  }, [color]);
   return (
     <>
       <style jsx>{`
@@ -36,10 +39,7 @@ export const ColorPickerWindow = ({ onChange }: Props) => {
             <ColorPallet
               color={color}
               onChange={(c) => {
-                if (c !== color) {
-                  setColor(c);
-                  onChange && onChange(c);
-                }
+                setColor(c);
               }}
             />
           </div>
@@ -47,10 +47,7 @@ export const ColorPickerWindow = ({ onChange }: Props) => {
             <ColorPickerView
               color={color}
               onChange={(c) => {
-                if (c !== color) {
-                  setColor(c);
-                  onChange && onChange(c);
-                }
+                setColor(c);
               }}
             />
           </div>

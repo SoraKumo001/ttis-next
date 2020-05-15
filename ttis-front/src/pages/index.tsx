@@ -5,7 +5,8 @@ import { QUERY_CURRENT_USER } from "@components/User/graphql";
 import { CurrentUserQuery } from "@generated/graphql";
 import { useQuery } from "react-apollo";
 import imgLoginId from "../images/login_id.svg";
-import { ColorPickerWindow } from "@components/ColorPicker";
+import { CalendarView } from '../components/Calendar/index';
+import { ContentsEditWindow } from "@components/ContentsEditWindow";
 
 const MainWindow = () => (
   <>
@@ -83,7 +84,7 @@ const Footer = () => {
           </>
         )}
       </div>
-      <ColorPickerWindow/>
+      <ContentsEditWindow/>
     </>
   );
 };

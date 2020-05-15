@@ -1,7 +1,8 @@
 import { JSWindow } from "@jswf/react";
-import { ColorPickerView } from "./ColorPickerView";
 import { ColorPallet } from "./ColorPallet";
 import { useState, useEffect } from "react";
+import { ColorLevel } from "./ColorLevel";
+import { ColorCircle } from "./ColorCircle";
 
 interface Props {
   onChange?: (color: number) => void;
@@ -23,6 +24,7 @@ export const getRGBtoColor = ({
 
 export const ColorPickerWindow = ({ onChange }: Props) => {
   const [color, setColor] = useState(0xffffff);
+  const [levelColor, setLevelColor] = useState(0xffffff);
   useEffect(() => {
     onChange && onChange(color);
   }, [color]);
@@ -38,6 +40,9 @@ export const ColorPickerWindow = ({ onChange }: Props) => {
         .right {
           flex: 1;
           position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
         }
         .left {
           text-align: center;
@@ -58,10 +63,17 @@ export const ColorPickerWindow = ({ onChange }: Props) => {
             />
           </div>
           <div className="right">
-            <ColorPickerView
+            <ColorLevel
               color={color}
-              onChange={(c) => {
-                setColor(c);
+              levelColor={levelColor}
+              onChange={(color) => {
+                setColor(color);
+              }}
+            />
+            <ColorCircle
+              color={color}
+              onChange={(color) => {
+                setLevelColor(color);
               }}
             />
           </div>

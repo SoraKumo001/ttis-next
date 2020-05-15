@@ -71,7 +71,7 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
         .leftBar {
           display: flex;
           flex-direction: column;
-          width: 2em;
+          width: 3em;
         }
       `}</style>
 

@@ -116,14 +116,22 @@ export type MutationLoginArgs = {
 export type Query = {
    __typename?: 'Query';
   contentsTree: Contents;
+  contentsPage: Array<Contents>;
   contentsList: Array<Contents>;
+  contents: Contents;
   users?: Maybe<Array<User>>;
-  currentUser?: Maybe<User>;
+  currentUser?: Maybe<Login>;
 };
 
 
 export type QueryContentsTreeArgs = {
   level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsPageArgs = {
   visible?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
 };
@@ -135,6 +143,11 @@ export type QueryContentsListArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
+
+export type QueryContentsArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type User = {
    __typename?: 'User';
   id: Scalars['Int'];
@@ -142,6 +155,44 @@ export type User = {
   name: Scalars['String'];
   info: Scalars['String'];
 };
+
+export type FragmentContentsFragment = (
+  { __typename?: 'Contents' }
+  & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
+);
+
+export type ContentsQueryVariables = {
+  id: Scalars['ID'];
+};
+
+
+export type ContentsQuery = (
+  { __typename?: 'Query' }
+  & { contents: (
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  ) }
+);
+
+export type UpdateContentsMutationVariables = {
+  id: Scalars['ID'];
+  page?: Maybe<Scalars['Boolean']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  title_type?: Maybe<Scalars['Int']>;
+  title?: Maybe<Scalars['String']>;
+  parent?: Maybe<Scalars['ID']>;
+  value_type?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+
+export type UpdateContentsMutation = (
+  { __typename?: 'Mutation' }
+  & { updateContents?: Maybe<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  )> }
+);
 
 export type ContentsListQueryVariables = {};
 
@@ -171,8 +222,12 @@ export type CurrentUserQueryVariables = {};
 export type CurrentUserQuery = (
   { __typename?: 'Query' }
   & { currentUser?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name' | 'info'>
+    { __typename?: 'Login' }
+    & Pick<Login, 'token'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'name' | 'info'>
+    ) }
   )> }
 );
 
@@ -235,7 +290,77 @@ export type DeleteUsersMutation = (
   & Pick<Mutation, 'deleteUsers'>
 );
 
+export const FragmentContentsFragmentDoc = gql`
+    fragment FragmentContents on Contents {
+  id
+  priority
+  visible
+  page
+  title_type
+  title
+  value_type
+  value
+  parentId
+  createAt
+  updateAt
+}
+    `;
+export const ContentsDocument = gql`
+    query contents($id: ID!) {
+  contents(id: $id) {
+    ...FragmentContents
+  }
+}
+    ${FragmentContentsFragmentDoc}`;
+export type ContentsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsQuery, ContentsQueryVariables>, 'query'> & ({ variables: ContentsQueryVariables; skip?: boolean; } | { skip: boolean; });
 
+    export const ContentsComponent = (props: ContentsComponentProps) => (
+      <ApolloReactComponents.Query<ContentsQuery, ContentsQueryVariables> query={ContentsDocument} {...props} />
+    );
+    
+export type ContentsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ContentsQuery, ContentsQueryVariables>
+    } & TChildProps;
+export function withContents<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ContentsQuery,
+  ContentsQueryVariables,
+  ContentsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ContentsQuery, ContentsQueryVariables, ContentsProps<TChildProps, TDataName>>(ContentsDocument, {
+      alias: 'contents',
+      ...operationOptions
+    });
+};
+export type ContentsQueryResult = ApolloReactCommon.QueryResult<ContentsQuery, ContentsQueryVariables>;
+export const UpdateContentsDocument = gql`
+    mutation updateContents($id: ID!, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $parent: ID, $value_type: String, $value: String) {
+  updateContents(id: $id, page: $page, visible: $visible, title_type: $title_type, title: $title, parent: $parent, value_type: $value_type, value: $value) {
+    ...FragmentContents
+  }
+}
+    ${FragmentContentsFragmentDoc}`;
+export type UpdateContentsMutationFn = ApolloReactCommon.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>;
+export type UpdateContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateContentsMutation, UpdateContentsMutationVariables>, 'mutation'>;
+
+    export const UpdateContentsComponent = (props: UpdateContentsComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateContentsMutation, UpdateContentsMutationVariables> mutation={UpdateContentsDocument} {...props} />
+    );
+    
+export type UpdateContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>
+    } & TChildProps;
+export function withUpdateContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateContentsMutation,
+  UpdateContentsMutationVariables,
+  UpdateContentsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateContentsMutation, UpdateContentsMutationVariables, UpdateContentsProps<TChildProps, TDataName>>(UpdateContentsDocument, {
+      alias: 'updateContents',
+      ...operationOptions
+    });
+};
+export type UpdateContentsMutationResult = ApolloReactCommon.MutationResult<UpdateContentsMutation>;
+export type UpdateContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateContentsMutation, UpdateContentsMutationVariables>;
 export const ContentsListDocument = gql`
     query contentsList {
   contentsList {
@@ -299,9 +424,11 @@ export type UsersQueryResult = ApolloReactCommon.QueryResult<UsersQuery, UsersQu
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {
-    id
-    name
-    info
+    token
+    user {
+      name
+      info
+    }
   }
 }
     `;

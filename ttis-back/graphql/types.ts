@@ -110,9 +110,11 @@ export type MutationLoginArgs = {
 export type Query = {
    __typename?: 'Query';
   contentsTree: Contents;
+  contentsPage: Array<Contents>;
   contentsList: Array<Contents>;
+  contents: Contents;
   users?: Maybe<Array<User>>;
-  currentUser?: Maybe<User>;
+  currentUser?: Maybe<Login>;
 };
 
 
@@ -123,9 +125,20 @@ export type QueryContentsTreeArgs = {
 };
 
 
+export type QueryContentsPageArgs = {
+  visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
 export type QueryContentsListArgs = {
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
@@ -155,6 +168,19 @@ export type ContentsListQuery = (
     { __typename?: 'Contents' }
     & FragmentContentsFragment
   )> }
+);
+
+export type ContentsQueryVariables = {
+  id: Scalars['ID'];
+};
+
+
+export type ContentsQuery = (
+  { __typename?: 'Query' }
+  & { contents: (
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  ) }
 );
 
 export type CreateContentsMutationVariables = {
@@ -221,8 +247,12 @@ export type CurrentUserQueryVariables = {};
 export type CurrentUserQuery = (
   { __typename?: 'Query' }
   & { currentUser?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name' | 'info'>
+    { __typename?: 'Login' }
+    & Pick<Login, 'token'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'name' | 'info'>
+    ) }
   )> }
 );
 

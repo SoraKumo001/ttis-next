@@ -103,7 +103,31 @@ export class ContentsResolver {
       ),
     });
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Query(() => [Contents])
+  async contentsPage(
+    @CurrentUser() user: User,
+    @Info() info: GraphQLResolveInfo,
+    @Args('id', { nullable: true, type: () => ID }) id?: string,
+    @Args('visible', { nullable: true }) visible?: boolean,
+  ) {
+    const { service } = this;
+    const filter = new Set(['parentId', 'children']);
+    const contents = await service.contentsPage({
+      id,
+      visible: !user ? true : visible,
+      select: getFields(info).filter(
+        (name) => !filter.has(typeof name === 'string' ? name : name[0]),
+      ),
+    });
+    const contentsList: Contents[] = [];
+    const createList = (contens: Contents) => {
+      contentsList.push(contens);
+      contens.children?.forEach(createList);
+    };
+    if (contents) createList(contents);
+    return contentsList;
+  }
   @UseGuards(JwtAuthGuard)
   @Query(() => [Contents])
   async contentsList(
@@ -130,5 +154,19 @@ export class ContentsResolver {
     };
     if (contents) createList(contents);
     return contentsList;
+  }
+  @UseGuards(JwtAuthGuard)
+  @Query(() => Contents)
+  async contents(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID, nullable: true }) id?: string,
+  ) {
+    const { service } = this;
+    return (
+      user &&
+      service.contents({
+        id,
+      })
+    );
   }
 }

@@ -2,21 +2,19 @@
 
 exports[`Contens(Login) Create & update 1`] = `
 Object {
-  "data": Object {
-    "updateContents": Object {
-      "__typename": "Contents",
-      "createAt": "",
-      "id": "",
-      "page": true,
-      "parentId": "",
-      "priority": 1,
-      "title": "UpdateTest",
-      "title_type": 2,
-      "updateAt": "",
-      "value": "Test Value",
-      "value_type": "TEXT",
-      "visible": null,
-    },
+  "updateContents": Object {
+    "__typename": "Contents",
+    "createAt": "",
+    "id": "",
+    "page": true,
+    "parentId": "",
+    "priority": 1,
+    "title": "UpdateTest",
+    "title_type": 2,
+    "updateAt": "",
+    "value": "Test Value",
+    "value_type": "TEXT",
+    "visible": null,
   },
 }
 `;
@@ -120,6 +118,25 @@ Object {
       "value_type": "TEXT",
       "visible": null,
     },
+  },
+}
+`;
+
+exports[`Contens(Login) Query contens 2`] = `
+Object {
+  "contents": Object {
+    "__typename": "Contents",
+    "createAt": "",
+    "id": "",
+    "page": true,
+    "parentId": "",
+    "priority": 1,
+    "title": "New",
+    "title_type": 1,
+    "updateAt": "",
+    "value": "",
+    "value_type": "HTML",
+    "visible": null,
   },
 }
 `;

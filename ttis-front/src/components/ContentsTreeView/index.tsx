@@ -2,6 +2,7 @@ import { TreeView, TreeItem } from "@jswf/react";
 import { useQuery } from "react-apollo";
 import { CONTENTS_TREE } from "./graphql";
 import { ContentsListQuery } from "../../generated/graphql";
+import { useRouter } from "next/router";
 
 type ContentsItem = ContentsListQuery["contentsList"][0] & {
   children?: ContentsItem[];
@@ -10,11 +11,14 @@ type ContentsItem = ContentsListQuery["contentsList"][0] & {
 export const ContentsTreeView = () => {
   const { loading, data } = useQuery<ContentsListQuery>(CONTENTS_TREE);
   const tree = data && createTree(data.contentsList);
+  const router = useRouter();
 
   return loading ? (
     <div>Loading</div>
   ) : (
-    <TreeView>{tree && createTreeItem(tree)}</TreeView>
+    <TreeView onItemClick={onClick} onItemDoubleClick={onDoubleClick}>
+      {tree && createTreeItem(tree)}
+    </TreeView>
   );
 
   function createTree(contentsList: ContentsItem[]) {
@@ -34,9 +38,17 @@ export const ContentsTreeView = () => {
   }
   function createTreeItem(item: ContentsItem) {
     return (
-      <TreeItem key={item.id} label={item.title}>
+      <TreeItem key={item.id} label={item.title} value={item} select={item.id === router.query.id}>
         {item.children?.map((item) => createTreeItem(item))}
       </TreeItem>
     );
+  }
+  function onClick(item: TreeItem) {
+    const {id} = item.getValue() as { id: string };
+    router.push(`/?id=${id}`, `/${id}/`, { id });
+  }
+  function onDoubleClick(item: TreeItem) {
+    const contents = item.getValue() as { id: string };
+    router.push(router.asPath, `?edit=${contents.id}`);
   }
 };

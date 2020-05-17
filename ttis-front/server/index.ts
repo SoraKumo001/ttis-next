@@ -20,10 +20,8 @@ const session = expressSession({
   resave: false,
   saveUninitialized: false,
   store: new (redisStore(expressSession))({
-    client: socket
-      ? redis.createClient(redis_path)
-      : redis.createClient()
-  })
+    client: socket ? redis.createClient(redis_path) : redis.createClient(),
+  }),
 });
 
 try {
@@ -32,17 +30,26 @@ try {
 
 app.prepare().then(() => {
   const server = express();
-  server.use(session).use((req, res) => {
+
+  server.use(session);
+  server.get("/:id", (req, res) => {
+    // const actualPage = "/";
+    // const queryParams = { id: req.params.id };
+    // app.render(req, res, actualPage, queryParams);
+    // req.url = "/";
+     handle(req, res, parse(`/?id=${req.params.id}`, true));
+  });
+  server.use((req, res) => {
     handle(req, res, parse(req.url, true));
   });
   if (socket) {
-    server.listen(sock_path, err => {
+    server.listen(sock_path, (err) => {
       if (err) throw err;
       fs.chmodSync(sock_path, "666");
       console.log(`> Ready on unix:${sock_path}`);
     });
   } else {
-    server.listen(port_number, err => {
+    server.listen(port_number, (err) => {
       if (err) throw err;
       console.log(`> Ready on http://localhost:${port_number}/`);
     });

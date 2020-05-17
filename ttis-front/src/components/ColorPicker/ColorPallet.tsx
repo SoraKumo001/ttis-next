@@ -70,6 +70,7 @@ export const ColorPallet = ({ color, onChange }: Props) => {
           overflow-y: scroll;
           font-size: 0;
           text-align: center;
+          user-select: none;
         }
         .box {
           box-sizing: border-box;

@@ -5,8 +5,8 @@ import {
   HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
+  ApolloLink,
 } from "apollo-boost";
-import fetch from "isomorphic-unfetch";
 import { ApolloProvider, getMarkupFromTree } from "react-apollo";
 import {
   initProps,
@@ -31,36 +31,38 @@ const URI_ENDPOINT = IS_BROWSER
 // セッション情報内からクライアントへ送りたくないデータを指定
 const SessionFilter: string[] = [];
 
-function createClient(
-  token: string | undefined | null,
-  initialState: any = {}
-) {
-  const authLink = setContext((_, { headers }) => {
-    //GraphQLのTokenの変更対応処理
-    const newToken =
-      (typeof window !== undefined && localStorage.getItem("graphqlToken")) ||
-      token;
-    return {
-      headers: {
-        ...headers,
-        authorization: newToken ? `Bearer ${newToken}` : "",
-      },
-    };
-  });
-  const link = new HttpLink({
-    fetch,
-    uri: URI_ENDPOINT,
-    headers: {
-      authorization: token ? `Bearer ${token}` : "",
-    },
-  });
+export interface AuthLink extends ApolloLink {
+  setToken: (token?: string) => void;
+}
+export const createAuthLink = (options: HttpLink.Options) => {
+  let bearerToken: string;
+  const apolloLink = setContext((_, { headers }) => ({
+    headers: { ...headers, authorization: `bearer ${bearerToken || ""}` },
+  })).concat(new HttpLink(options)) as AuthLink;
+  apolloLink.setToken = (token) => {
+    bearerToken = token || "";
+  };
+  return apolloLink;
+};
 
-  return new ApolloClient({
-    connectToDevTools: IS_BROWSER,
-    ssrMode: !IS_BROWSER,
-    link: IS_BROWSER ? authLink.concat(link) : link,
-    cache: new InMemoryCache().restore(initialState),
-  });
+export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
+  // static port: number=3000;
+  link: AuthLink;
+  constructor(token?: string | null, cache: NormalizedCacheObject = {}) {
+    const link: AuthLink = createAuthLink({
+      fetch,
+      uri: URI_ENDPOINT,
+    });
+    super({ link, cache: new InMemoryCache().restore(cache) });
+    this.link = link;
+    if (token) link.setToken(token);
+  }
+  setToken(token?: string) {
+    this.link.setToken(token);
+  }
+  // static setPort(port: number) {
+  //   CustomApolloClient.port = port;
+  // }
 }
 
 export interface PagesProps {
@@ -73,15 +75,14 @@ export interface Props {
 interface State {
   client?: ApolloClient<NormalizedCacheObject>;
 }
-let ssrClient: ApolloClient<NormalizedCacheObject>;
-
+let ssrClient: CustomApolloClient;
 export default class App extends NextApp<{ session: SessionType }> {
   static async getInitialProps({ ctx, Component, router }: AppContext) {
     //セッション情報の初期化(SPA時にはundefined)
     const session = (ctx?.req as undefined | { session?: SessionType })
       ?.session;
     const graphqlToken = session?.graphqlToken as string | undefined;
-    ssrClient = createClient(graphqlToken);
+    ssrClient = new CustomApolloClient(graphqlToken);
 
     const context = {
       ...ctx,
@@ -111,6 +112,12 @@ export default class App extends NextApp<{ session: SessionType }> {
             />
           ),
         }).catch(() => {}));
+      const newToken = ssrClient.extract()["$ROOT_QUERY.currentUser"]?.[
+        "token"
+      ];
+      if (newToken) {
+        session!.graphqlToken = newToken;
+      }
     }
 
     return {
@@ -122,42 +129,51 @@ export default class App extends NextApp<{ session: SessionType }> {
       session: sessionProps,
     };
   }
-  state: State = { client: ssrClient };
-  componentDidMount() {
-    let graphqlToken = localStorage.getItem("graphqlToken");
-    if (graphqlToken) {
-      if (this.props.pageProps.graphqlToken !== graphqlToken) {
-        axios.post("/api/token", {
-          graphqlToken,
-        });
-      }
-    } else {
-      graphqlToken = this.props.pageProps.graphqlToken;
-      if (graphqlToken) {
-        localStorage.setItem("graphqlToken", graphqlToken);
-      }
-    }
-    if (!this.state.client)
-      this.setState({
-        client: createClient(graphqlToken, this.props.pageProps.apolloCache),
-      });
+  client: CustomApolloClient;
+  constructor(props: any) {
+    super(props);
+    this.client =
+      ssrClient ||
+      new CustomApolloClient(
+        props.session?.graphqlToken as string,
+        props.pageProps.apolloCache
+      );
   }
   render() {
     const { router, Component, pageProps } = this.props;
-    const client = this.state.client;
+    const client = this.client;
     initProps(this);
     return (
       <>
         <style jsx global>{`
+          html,
           body {
             margin: 0;
+            height: 100%;
+          }
+        `}</style>
+        <style jsx>{`
+          .root {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+          }
+          .body {
+            position: relative;
+            flex: 1;
           }
         `}</style>
         {client && (
           <ApolloProvider client={client}>
-            <Header {...pageProps} />
-            <Component {...pageProps} url={createUrl(router)} />
-            <Footer {...pageProps} />
+            <div className="root">
+              <Header {...pageProps} />
+              <div className="body">
+                <Component {...pageProps} url={createUrl(router)} />
+              </div>
+              <Footer {...pageProps} />
+            </div>
           </ApolloProvider>
         )}
       </>

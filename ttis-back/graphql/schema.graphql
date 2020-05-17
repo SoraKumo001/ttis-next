@@ -47,9 +47,11 @@ type Mutation {
 
 type Query {
   contentsTree(level: Int, visible: Boolean, id: ID): Contents!
+  contentsPage(visible: Boolean, id: ID): [Contents!]!
   contentsList(level: Int, visible: Boolean, id: ID): [Contents!]!
+  contents(id: ID): Contents!
   users: [User!]
-  currentUser: User
+  currentUser: Login
 }
 
 type User {

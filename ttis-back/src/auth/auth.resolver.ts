@@ -23,9 +23,9 @@ export class Login {
 export class AuthResolver {
   constructor(private readonly service: AuthService) {}
   @UseGuards(JwtAuthGuard)
-  @Query(() => User, { nullable: true })
+  @Query(() => Login, { nullable: true })
   async currentUser(@CurrentUser() user: User) {
-    return user;
+    return this.service.currentUser(user);
   }
 
   @Mutation(() => Login, { nullable: true })

@@ -36,4 +36,11 @@ export class AuthService extends PassportStrategy(Strategy) {
     const token = jwt.sign({ id: user.id, password: user.password });
     return { token, user: user };
   }
+  async currentUser(user:User) {
+    const { jwt } = this;
+    if (!user) return null;
+
+    const token = jwt.sign({ id: user.id, password: user.password });
+    return { token, user: user };
+  }
 }

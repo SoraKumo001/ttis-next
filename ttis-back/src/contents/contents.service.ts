@@ -58,10 +58,10 @@ export class ContentsService implements OnModuleInit {
     return null;
   }
 
-  async contents() {
+  async contents({ id }: { id?: string }) {
     const { expRep } = this;
-    const root = await expRep.findOne({ where: { parent: null } });
-    return root ? expRep.getChildren(root, { order: 'priority' }) : null;
+    if (id) return expRep.findOne(id);
+    else return expRep.findOne({ where: { parent: null } });
   }
   async contentsTree({
     id,
@@ -94,15 +94,16 @@ export class ContentsService implements OnModuleInit {
     createSelect(select);
     if (fieldSet.size) fieldSet.add('id');
 
-    const contents = await expRep.getChildrenTree(root, {
-      select:
-        fieldSet.size === 0
-          ? undefined
-          : (Array.from(fieldSet) as (keyof Contents)[]),
-      level,
-      where: visible ? 'visible = true' : undefined,
-      order: 'priority',
-    })||null;
+    const contents =
+      (await expRep.getChildrenTree(root, {
+        select:
+          fieldSet.size === 0
+            ? undefined
+            : (Array.from(fieldSet) as (keyof Contents)[]),
+        level,
+        where: visible ? 'visible = true' : undefined,
+        order: 'priority',
+      })) || null;
 
     //Level制限した場合に、最終レベルのchildrenをnullにする
     if (level && contents) {
@@ -122,6 +123,48 @@ export class ContentsService implements OnModuleInit {
     }
     return contents;
   }
+
+  async contentsPage({
+    id,
+    visible,
+    select,
+  }: {
+    id?: string;
+    visible?: boolean;
+    select?: GraphQLField;
+  } = {}) {
+    const { expRep } = this;
+    const rootWhere: { [key: string]: unknown } = {};
+    if (id) rootWhere['id'] = id;
+    else rootWhere['parentId'] = null;
+    if (visible) {
+      rootWhere['visible'] = true;
+    }
+    const root = await expRep.findOne({ select: ['id'], where: rootWhere });
+    if (!root) return null;
+
+    const fieldSet = new Set<string>();
+    const createSelect = (fields?: GraphQLField) => {
+      fields?.forEach((field) => {
+        if (typeof field === 'string') fieldSet.add(field);
+        else createSelect(field[1]);
+      });
+    };
+    createSelect(select);
+    if (fieldSet.size) fieldSet.add('id');
+
+    const contents =
+      (await expRep.getChildrenTree(root, {
+        select:
+          fieldSet.size === 0
+            ? undefined
+            : (Array.from(fieldSet) as (keyof Contents)[]),
+        where: `(id=${id} or page = false)` + (visible ? 'and visible = true' : ''),
+        order: 'priority',
+      })) || null;
+
+    return contents;
+  }
   async update(contents: Partial<Contents>) {
     const { rep } = this;
     const con = await rep.findOne(contents.id, { select: ['id'] });
@@ -137,7 +180,7 @@ export class ContentsService implements OnModuleInit {
       select: ['id', 'parentId'],
       where: { id },
     });
-    let priority=0;
+    let priority = 0;
     let parentId: string | undefined;
     if (vector === 'BEFORE' || vector === 'NEXT') {
       parentId = baseContents?.parentId;

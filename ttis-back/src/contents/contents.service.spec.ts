@@ -47,6 +47,10 @@ describe('ContentsService', () => {
     });
     expect(!!parentId).toMatchSnapshot();
   });
+  it('Get Contents', async () => {
+    const contents = (await service.contents({id:parentId}));
+    expect(contents?.title).toMatchSnapshot();
+  });
   it('Next', async () => {
     const id = (
       await service.create({

@@ -79,7 +79,8 @@ describe('Contens(Login)', () => {
       value_type: 'TEXT',
       value: 'Test Value',
     });
-    expect(ObjectMask(updateResult, masks)).toMatchSnapshot();
+    expect(ObjectMask(updateResult.data, masks)).toMatchSnapshot();
+    return updateResult.data;
   });
   const task3 = testAsync('Levels', async () => {
     const client = await createClient();
@@ -96,14 +97,21 @@ describe('Contens(Login)', () => {
       value: 'Test Value',
     });
     expect(ObjectMask(updateResult, masks)).toMatchSnapshot();
+    return updateResult.data;
   });
   testAsync('Query contens', async () => {
-    await Promise.all([task1, task2,task3]);
+    const results = await Promise.all([task1, task2, task3]);
     const client = await createClient();
     client.setToken(await token);
     const result = await client.query<types.Contents>({
-      query: querys.QUERY_CONTENTS,
-    });
+      query: querys.QUERY_CONTENTS_LIST,
+    })!;
     expect(ObjectMask(result.data, masks)).toMatchSnapshot();
+
+    const result2 = await client.query<types.Contents>({
+      query: querys.QUERY_CONTENTS,
+      variables: { id: results[0]!.createContents!.id },
+    });
+    expect(ObjectMask(result2.data, masks)).toMatchSnapshot();
   });
 });

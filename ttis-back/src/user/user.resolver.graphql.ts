@@ -14,9 +14,11 @@ export const MUTATION_LOGIN = gql`
 export const QUERY_CURRENT_USER = gql`
   query CurrentUser {
     currentUser {
-      id
-      name
-      info
+      token
+      user {
+        name
+        info
+      }
     }
   }
 `;

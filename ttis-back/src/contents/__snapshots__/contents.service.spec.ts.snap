@@ -2,6 +2,8 @@
 
 exports[`ContentsService Create & update 1`] = `true`;
 
+exports[`ContentsService Get Contents 1`] = `"タイトル0"`;
+
 exports[`ContentsService List Contents first 1`] = `
 Object {
   "children": Object {},

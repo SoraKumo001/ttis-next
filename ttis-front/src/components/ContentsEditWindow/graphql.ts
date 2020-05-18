@@ -1,19 +1,6 @@
 import { gql } from "apollo-boost";
-const FRAGMENT_CONTENTS = gql`
-  fragment FragmentContents on Contents {
-    id
-    priority
-    visible
-    page
-    title_type
-    title
-    value_type
-    value
-    parentId
-    createAt
-    updateAt
-  }
-`;
+import { FRAGMENT_CONTENTS } from "src/graphql";
+
 export const QUERY_CONTENTS = gql`
   ${FRAGMENT_CONTENTS}
   query contents($id: ID!) {
@@ -48,3 +35,34 @@ export const UPDATE_CONTENTS = gql`
     }
   }
 `;
+export const CREATE_CONTENTS = gql`
+  ${FRAGMENT_CONTENTS}
+  mutation createContents(
+    $parent: ID
+    $vector: ContentsVector
+    $page: Boolean
+    $visible: Boolean
+    $title_type: Int
+    $title: String
+    $value_type: String
+    $value: String
+  ) {
+    createContents(
+      parent: $parent
+      vector: $vector
+      page: $page
+      visible: $visible
+      title_type: $title_type
+      title: $title
+      value_type: $value_type
+      value: $value
+    ) {
+      ...FragmentContents
+    }
+  }
+`;
+export const DELETE_CONTENTS = gql`
+  mutation deleteContents($id:ID!){
+    deleteContents(id:$id)
+  }
+`

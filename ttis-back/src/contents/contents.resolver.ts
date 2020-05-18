@@ -9,7 +9,7 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-import { Contents } from './contents';
+import { Contents, PageContents } from './contents';
 import { ContentsService } from './contents.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '../auth/auth.guard';
@@ -25,6 +25,7 @@ enum ContentsVector {
 registerEnumType(ContentsVector, {
   name: 'ContentsVector',
 });
+
 @Resolver('Contents')
 export class ContentsResolver {
   constructor(private readonly service: ContentsService) {}
@@ -84,6 +85,16 @@ export class ContentsResolver {
     });
   }
   @UseGuards(JwtAuthGuard)
+  @Mutation(() => [ID])
+  async deleteContents(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID }) id: string,
+  ) {
+    if (!user) return null;
+    const { service } = this;
+    return service.delete(id);
+  }
+  @UseGuards(JwtAuthGuard)
   @Query(() => Contents)
   async contentsTree(
     @CurrentUser() user: User,
@@ -104,7 +115,7 @@ export class ContentsResolver {
     });
   }
   @UseGuards(JwtAuthGuard)
-  @Query(() => [Contents])
+  @Query(() => PageContents, { nullable: true })
   async contentsPage(
     @CurrentUser() user: User,
     @Info() info: GraphQLResolveInfo,
@@ -125,8 +136,11 @@ export class ContentsResolver {
       contentsList.push(contens);
       contens.children?.forEach(createList);
     };
-    if (contents) createList(contents);
-    return contentsList;
+    if (contents) {
+      createList(contents);
+      return { id: contentsList[0].id, contents: contentsList };
+    }
+    return null;
   }
   @UseGuards(JwtAuthGuard)
   @Query(() => [Contents])
@@ -156,7 +170,7 @@ export class ContentsResolver {
     return contentsList;
   }
   @UseGuards(JwtAuthGuard)
-  @Query(() => Contents)
+  @Query(() => Contents, { nullable: true })
   async contents(
     @CurrentUser() user: User,
     @Args('id', { type: () => ID, nullable: true }) id?: string,

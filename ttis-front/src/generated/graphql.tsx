@@ -51,6 +51,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
+  deleteContents: Array<Scalars['ID']>;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -79,6 +80,11 @@ export type MutationUpdateContentsArgs = {
   title_type?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteContentsArgs = {
   id: Scalars['ID'];
 };
 
@@ -113,12 +119,18 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
+export type PageContents = {
+   __typename?: 'PageContents';
+  id: Scalars['ID'];
+  contents: Array<Contents>;
+};
+
 export type Query = {
    __typename?: 'Query';
   contentsTree: Contents;
-  contentsPage: Array<Contents>;
+  contentsPage?: Maybe<PageContents>;
   contentsList: Array<Contents>;
-  contents: Contents;
+  contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<Login>;
 };
@@ -156,11 +168,6 @@ export type User = {
   info: Scalars['String'];
 };
 
-export type FragmentContentsFragment = (
-  { __typename?: 'Contents' }
-  & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
-);
-
 export type ContentsQueryVariables = {
   id: Scalars['ID'];
 };
@@ -168,10 +175,10 @@ export type ContentsQueryVariables = {
 
 export type ContentsQuery = (
   { __typename?: 'Query' }
-  & { contents: (
+  & { contents?: Maybe<(
     { __typename?: 'Contents' }
     & FragmentContentsFragment
-  ) }
+  )> }
 );
 
 export type UpdateContentsMutationVariables = {
@@ -194,6 +201,36 @@ export type UpdateContentsMutation = (
   )> }
 );
 
+export type CreateContentsMutationVariables = {
+  parent?: Maybe<Scalars['ID']>;
+  vector?: Maybe<ContentsVector>;
+  page?: Maybe<Scalars['Boolean']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  title_type?: Maybe<Scalars['Int']>;
+  title?: Maybe<Scalars['String']>;
+  value_type?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+
+export type CreateContentsMutation = (
+  { __typename?: 'Mutation' }
+  & { createContents?: Maybe<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
+  )> }
+);
+
+export type DeleteContentsMutationVariables = {
+  id: Scalars['ID'];
+};
+
+
+export type DeleteContentsMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteContents'>
+);
+
 export type ContentsListQueryVariables = {};
 
 
@@ -202,6 +239,23 @@ export type ContentsListQuery = (
   & { contentsList: Array<(
     { __typename?: 'Contents' }
     & Pick<Contents, 'id' | 'visible' | 'title' | 'page' | 'parentId'>
+  )> }
+);
+
+export type ContentsPageQueryVariables = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type ContentsPageQuery = (
+  { __typename?: 'Query' }
+  & { contentsPage?: Maybe<(
+    { __typename?: 'PageContents' }
+    & Pick<PageContents, 'id'>
+    & { contents: Array<(
+      { __typename?: 'Contents' }
+      & FragmentContentsFragment
+    )> }
   )> }
 );
 
@@ -290,6 +344,11 @@ export type DeleteUsersMutation = (
   & Pick<Mutation, 'deleteUsers'>
 );
 
+export type FragmentContentsFragment = (
+  { __typename?: 'Contents' }
+  & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
+);
+
 export const FragmentContentsFragmentDoc = gql`
     fragment FragmentContents on Contents {
   id
@@ -361,6 +420,62 @@ export function withUpdateContents<TProps, TChildProps = {}, TDataName extends s
 };
 export type UpdateContentsMutationResult = ApolloReactCommon.MutationResult<UpdateContentsMutation>;
 export type UpdateContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateContentsMutation, UpdateContentsMutationVariables>;
+export const CreateContentsDocument = gql`
+    mutation createContents($parent: ID, $vector: ContentsVector, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $value_type: String, $value: String) {
+  createContents(parent: $parent, vector: $vector, page: $page, visible: $visible, title_type: $title_type, title: $title, value_type: $value_type, value: $value) {
+    ...FragmentContents
+  }
+}
+    ${FragmentContentsFragmentDoc}`;
+export type CreateContentsMutationFn = ApolloReactCommon.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>;
+export type CreateContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateContentsMutation, CreateContentsMutationVariables>, 'mutation'>;
+
+    export const CreateContentsComponent = (props: CreateContentsComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateContentsMutation, CreateContentsMutationVariables> mutation={CreateContentsDocument} {...props} />
+    );
+    
+export type CreateContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>
+    } & TChildProps;
+export function withCreateContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateContentsMutation,
+  CreateContentsMutationVariables,
+  CreateContentsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateContentsMutation, CreateContentsMutationVariables, CreateContentsProps<TChildProps, TDataName>>(CreateContentsDocument, {
+      alias: 'createContents',
+      ...operationOptions
+    });
+};
+export type CreateContentsMutationResult = ApolloReactCommon.MutationResult<CreateContentsMutation>;
+export type CreateContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateContentsMutation, CreateContentsMutationVariables>;
+export const DeleteContentsDocument = gql`
+    mutation deleteContents($id: ID!) {
+  deleteContents(id: $id)
+}
+    `;
+export type DeleteContentsMutationFn = ApolloReactCommon.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>;
+export type DeleteContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteContentsMutation, DeleteContentsMutationVariables>, 'mutation'>;
+
+    export const DeleteContentsComponent = (props: DeleteContentsComponentProps) => (
+      <ApolloReactComponents.Mutation<DeleteContentsMutation, DeleteContentsMutationVariables> mutation={DeleteContentsDocument} {...props} />
+    );
+    
+export type DeleteContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>
+    } & TChildProps;
+export function withDeleteContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DeleteContentsMutation,
+  DeleteContentsMutationVariables,
+  DeleteContentsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteContentsMutation, DeleteContentsMutationVariables, DeleteContentsProps<TChildProps, TDataName>>(DeleteContentsDocument, {
+      alias: 'deleteContents',
+      ...operationOptions
+    });
+};
+export type DeleteContentsMutationResult = ApolloReactCommon.MutationResult<DeleteContentsMutation>;
+export type DeleteContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteContentsMutation, DeleteContentsMutationVariables>;
 export const ContentsListDocument = gql`
     query contentsList {
   contentsList {
@@ -392,6 +507,36 @@ export function withContentsList<TProps, TChildProps = {}, TDataName extends str
     });
 };
 export type ContentsListQueryResult = ApolloReactCommon.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
+export const ContentsPageDocument = gql`
+    query contentsPage($id: ID) {
+  contentsPage(id: $id) {
+    id
+    contents {
+      ...FragmentContents
+    }
+  }
+}
+    ${FragmentContentsFragmentDoc}`;
+export type ContentsPageComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsPageQuery, ContentsPageQueryVariables>, 'query'>;
+
+    export const ContentsPageComponent = (props: ContentsPageComponentProps) => (
+      <ApolloReactComponents.Query<ContentsPageQuery, ContentsPageQueryVariables> query={ContentsPageDocument} {...props} />
+    );
+    
+export type ContentsPageProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ContentsPageQuery, ContentsPageQueryVariables>
+    } & TChildProps;
+export function withContentsPage<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ContentsPageQuery,
+  ContentsPageQueryVariables,
+  ContentsPageProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ContentsPageQuery, ContentsPageQueryVariables, ContentsPageProps<TChildProps, TDataName>>(ContentsPageDocument, {
+      alias: 'contentsPage',
+      ...operationOptions
+    });
+};
+export type ContentsPageQueryResult = ApolloReactCommon.QueryResult<ContentsPageQuery, ContentsPageQueryVariables>;
 export const UsersDocument = gql`
     query Users {
   users {

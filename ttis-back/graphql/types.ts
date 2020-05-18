@@ -45,6 +45,7 @@ export type Mutation = {
    __typename?: 'Mutation';
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
+  deleteContents: Array<Scalars['ID']>;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -73,6 +74,11 @@ export type MutationUpdateContentsArgs = {
   title_type?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteContentsArgs = {
   id: Scalars['ID'];
 };
 
@@ -107,12 +113,18 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
+export type PageContents = {
+   __typename?: 'PageContents';
+  id: Scalars['ID'];
+  contents: Array<Contents>;
+};
+
 export type Query = {
    __typename?: 'Query';
   contentsTree: Contents;
-  contentsPage: Array<Contents>;
+  contentsPage?: Maybe<PageContents>;
   contentsList: Array<Contents>;
-  contents: Contents;
+  contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<Login>;
 };
@@ -177,10 +189,10 @@ export type ContentsQueryVariables = {
 
 export type ContentsQuery = (
   { __typename?: 'Query' }
-  & { contents: (
+  & { contents?: Maybe<(
     { __typename?: 'Contents' }
     & FragmentContentsFragment
-  ) }
+  )> }
 );
 
 export type CreateContentsMutationVariables = {

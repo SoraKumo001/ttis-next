@@ -207,7 +207,7 @@ export class ExtendRepository<Entity> extends TreeRepository<Entity> {
           }),
         ]);
       }
-      if (options.where) builder.andWhere(options.where);
+      if (options.where) builder.andWhere(options.where,options.parameters);
       if (options.level)
         builder.andWhere(
           "(length(mpath) - length(replace(mpath, '.', ''))) <= :level",

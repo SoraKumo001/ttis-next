@@ -102,7 +102,7 @@ export class ContentsService implements OnModuleInit {
             : (Array.from(fieldSet) as (keyof Contents)[]),
         level,
         where: visible ? 'visible = true' : undefined,
-        order: 'priority',
+        order: 'page,priority',
       })) || null;
 
     //Level制限した場合に、最終レベルのchildrenをnullにする
@@ -140,8 +140,23 @@ export class ContentsService implements OnModuleInit {
     if (visible) {
       rootWhere['visible'] = true;
     }
-    const root = await expRep.findOne({ select: ['id'], where: rootWhere });
+    let root = await expRep.findOne({
+      select: ['id', 'page'],
+      where: rootWhere,
+    });
     if (!root) return null;
+    //ページコンテンツを探す
+    if (!root.page) {
+      const nodes = await expRep.findAncestors(root);
+      if (nodes) {
+        for (const n of nodes) {
+          if (n.page) {
+            root = n;
+            break;
+          }
+        }
+      }
+    }
 
     const fieldSet = new Set<string>();
     const createSelect = (fields?: GraphQLField) => {
@@ -159,7 +174,9 @@ export class ContentsService implements OnModuleInit {
           fieldSet.size === 0
             ? undefined
             : (Array.from(fieldSet) as (keyof Contents)[]),
-        where: `(id=${id} or page = false)` + (visible ? 'and visible = true' : ''),
+        where:
+          `(id=:id or page = false)` + (visible ? 'and visible = true' : ''),
+        parameters: { id: root.id },
         order: 'priority',
       })) || null;
 
@@ -173,6 +190,21 @@ export class ContentsService implements OnModuleInit {
       return rep.findOne(contents.id);
     }
     return null;
+  }
+  async delete(id: string) {
+    const { expRep } = this;
+    let root = await expRep.findOne(id);
+    if (!root) return null;
+    const con = await expRep.getChildrenTree(root, { select: ['id'] });
+    if (!con) return null;
+    const list: string[] = [];
+    const del = (contents: Contents) => {
+      contents.children?.forEach(del);
+      list.push(contents.id);
+    };
+    del(con);
+    await expRep.delete(list);
+    return list;
   }
   async updateVector(id: string, vector: VECTOR_TYPE) {
     const { rep } = this;

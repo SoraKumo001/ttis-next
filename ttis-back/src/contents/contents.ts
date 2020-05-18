@@ -40,11 +40,11 @@ export class Contents {
   value!: string;
   title2?: string;
   @Field({ nullable: true })
-  @Column({ nullable: true , default: null })
+  @Column({ nullable: true, default: null })
   parentId?: string;
-  @Field(() => [Contents], { nullable: true})
+  @Field(() => [Contents], { nullable: true })
   @TreeChildren()
-  children!: Contents[]|null;
+  children!: Contents[] | null;
   @Field()
   @TreeParent()
   parent?: Contents;
@@ -55,4 +55,12 @@ export class Contents {
   @Field()
   @UpdateDateColumn()
   updateAt!: Date;
+}
+
+@ObjectType()
+export class PageContents {
+  @Field(() => ID)
+  id!: string;
+  @Field(() => [Contents])
+  contents!: Contents[];
 }

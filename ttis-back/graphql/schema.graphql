@@ -38,6 +38,7 @@ type Login {
 type Mutation {
   createContents(value: String, value_type: String, title: String, title_type: Int, visible: Boolean, page: Boolean, vector: ContentsVector, parent: ID): Contents
   updateContents(value: String, value_type: String, parent: ID, title: String, title_type: Int, visible: Boolean, page: Boolean, id: ID!): Contents
+  deleteContents(id: ID!): [ID!]!
   createUser(info: String, password: String!, name: String!): User
   updateUser(info: String, password: String, name: String, id: Int!): User
   deleteUser(id: Int!): Boolean!
@@ -45,11 +46,16 @@ type Mutation {
   login(password: String!, name: String!): Login
 }
 
+type PageContents {
+  id: ID!
+  contents: [Contents!]!
+}
+
 type Query {
   contentsTree(level: Int, visible: Boolean, id: ID): Contents!
-  contentsPage(visible: Boolean, id: ID): [Contents!]!
+  contentsPage(visible: Boolean, id: ID): PageContents
   contentsList(level: Int, visible: Boolean, id: ID): [Contents!]!
-  contents(id: ID): Contents!
+  contents(id: ID): Contents
   users: [User!]
   currentUser: Login
 }

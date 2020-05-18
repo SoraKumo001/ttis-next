@@ -2,24 +2,21 @@ import { useRouter, NextRouter } from "next/router";
 import { UserList } from "../User/UserList";
 import { WindowState, WindowInfo } from "@jswf/react";
 import { UserLogin } from "@components/User/UserLogin";
-import { useEffect } from "react";
 import { useQuery } from "react-apollo";
 import Link from "next/link";
 import imgLoginId from "../../images/login_id.svg";
 import { CurrentUserQuery } from "@generated/graphql";
 import { QUERY_CURRENT_USER } from "@components/User/graphql";
+import { removeRouterQuery } from "@libs/CustomRouter";
+import * as Url from "url";
+import { getRouterQuery } from '../../libs/CustomRouter';
+
 
 export const createAutoClose = (router: NextRouter, queryKey: string) => {
   {
     return (info?: WindowInfo) => {
       if (!info || info.realWindowState === WindowState.HIDE) {
-        const query: { [key: string]: string[] | string | undefined } = {};
-        Object.entries(router.query).forEach(([key, value]) => {
-          if (key !== queryKey) {
-            query[key] = value;
-          }
-        });
-        router.push({ pathname: router.pathname, query });
+        removeRouterQuery(router, queryKey);
       }
     };
   }
@@ -30,10 +27,12 @@ export interface AutoCloseProps {
 }
 
 export const Footer = () => {
-  const { data ,error,loading} = useQuery<CurrentUserQuery>(QUERY_CURRENT_USER);
+  const { data, error, loading } = useQuery<CurrentUserQuery>(
+    QUERY_CURRENT_USER
+  );
   const user = data?.currentUser?.user;
   const router = useRouter();
-  const { userList, login } = router.query;
+  const { userList, login } = getRouterQuery(router);
   return (
     <>
       <style jsx>{`

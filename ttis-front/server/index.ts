@@ -32,12 +32,8 @@ app.prepare().then(() => {
   const server = express();
 
   server.use(session);
-  server.get("/:id", (req, res) => {
-    // const actualPage = "/";
-    // const queryParams = { id: req.params.id };
-    // app.render(req, res, actualPage, queryParams);
-    // req.url = "/";
-     handle(req, res, parse(`/?id=${req.params.id}`, true));
+  server.get("/page/:id/", (req, res) => {
+    handle(req, res, parse(`/`, true));
   });
   server.use((req, res) => {
     handle(req, res, parse(req.url, true));

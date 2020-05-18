@@ -33,6 +33,7 @@ const SessionFilter: string[] = [];
 
 export interface AuthLink extends ApolloLink {
   setToken: (token?: string) => void;
+  getToken: () => string;
 }
 export const createAuthLink = (options: HttpLink.Options) => {
   let bearerToken: string;
@@ -41,6 +42,9 @@ export const createAuthLink = (options: HttpLink.Options) => {
   })).concat(new HttpLink(options)) as AuthLink;
   apolloLink.setToken = (token) => {
     bearerToken = token || "";
+  };
+  apolloLink.getToken = () => {
+    return bearerToken;
   };
   return apolloLink;
 };
@@ -60,6 +64,9 @@ export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
   setToken(token?: string) {
     this.link.setToken(token);
   }
+  getToken() {
+    return this.link.getToken();
+  }
   // static setPort(port: number) {
   //   CustomApolloClient.port = port;
   // }
@@ -71,9 +78,6 @@ export interface PagesProps {
 }
 export interface Props {
   pageProps: PagesProps;
-}
-interface State {
-  client?: ApolloClient<NormalizedCacheObject>;
 }
 let ssrClient: CustomApolloClient;
 export default class App extends NextApp<{ session: SessionType }> {
@@ -159,10 +163,20 @@ export default class App extends NextApp<{ session: SessionType }> {
             flex-direction: column;
             height: 100%;
             width: 100%;
+            animation: fadeIn 0.5s normal;
           }
           .body {
             position: relative;
             flex: 1;
+          }
+          @keyframes fadeIn {
+            0% {
+              opacity: 0;
+            }
+
+            100% {
+              opacity: 1;
+            }
           }
         `}</style>
         {client && (

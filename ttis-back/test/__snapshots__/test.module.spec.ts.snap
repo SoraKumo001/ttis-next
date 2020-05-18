@@ -158,10 +158,13 @@ exports[`User(login) CurrentUser 1`] = `
 Object {
   "data": Object {
     "currentUser": Object {
-      "__typename": "User",
-      "id": 1,
-      "info": "{}",
-      "name": "admin",
+      "__typename": "Login",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGFzc3dvcmQiOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiaWF0IjoxNTg5NzA1MzYzLCJleHAiOjE1ODk3MTEzNjN9.wCVnNMGchnqU5lBzc_tzLrZt6YE79w1lCXUFvoll7H8",
+      "user": Object {
+        "__typename": "User",
+        "info": "{}",
+        "name": "admin",
+      },
     },
   },
   "loading": false,

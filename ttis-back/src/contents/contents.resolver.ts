@@ -9,7 +9,7 @@ import {
   Int,
 } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-import { Contents, PageContents } from './contents';
+import { Contents } from './contents';
 import { ContentsService } from './contents.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '../auth/auth.guard';
@@ -95,11 +95,24 @@ export class ContentsResolver {
     return service.delete(id);
   }
   @UseGuards(JwtAuthGuard)
+  @Mutation(() => [Contents])
+  async vectorContents(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('vector', { type: () => Int })
+    vector: number,
+  ) {
+    if (!user) return null;
+    const { service } = this;
+    return service.moveVector(id, vector);
+  }
+  @UseGuards(JwtAuthGuard)
   @Query(() => Contents)
   async contentsTree(
     @CurrentUser() user: User,
     @Info() info: GraphQLResolveInfo,
     @Args('id', { nullable: true, type: () => ID }) id?: string,
+    @Args('page', { nullable: true }) page?: boolean,
     @Args('visible', { nullable: true }) visible?: boolean,
     @Args('level', { nullable: true, type: () => Int }) level?: number,
   ) {
@@ -109,45 +122,20 @@ export class ContentsResolver {
       id,
       visible: !user ? true : visible,
       level,
+      page,
       select: getFields(info).filter(
         (name) => !filter.has(typeof name === 'string' ? name : name[0]),
       ),
     });
   }
-  @UseGuards(JwtAuthGuard)
-  @Query(() => PageContents, { nullable: true })
-  async contentsPage(
-    @CurrentUser() user: User,
-    @Info() info: GraphQLResolveInfo,
-    @Args('id', { nullable: true, type: () => ID }) id?: string,
-    @Args('visible', { nullable: true }) visible?: boolean,
-  ) {
-    const { service } = this;
-    const filter = new Set(['parentId', 'children']);
-    const contents = await service.contentsPage({
-      id,
-      visible: !user ? true : visible,
-      select: getFields(info).filter(
-        (name) => !filter.has(typeof name === 'string' ? name : name[0]),
-      ),
-    });
-    const contentsList: Contents[] = [];
-    const createList = (contens: Contents) => {
-      contentsList.push(contens);
-      contens.children?.forEach(createList);
-    };
-    if (contents) {
-      createList(contents);
-      return { id: contentsList[0].id, contents: contentsList };
-    }
-    return null;
-  }
+
   @UseGuards(JwtAuthGuard)
   @Query(() => [Contents])
   async contentsList(
     @CurrentUser() user: User,
     @Info() info: GraphQLResolveInfo,
     @Args('id', { nullable: true, type: () => ID }) id?: string,
+    @Args('page', { nullable: true }) page?: boolean,
     @Args('visible', { nullable: true }) visible?: boolean,
     @Args('level', { nullable: true, type: () => Int }) level?: number,
   ) {
@@ -157,6 +145,7 @@ export class ContentsResolver {
       id,
       visible: !user ? true : visible,
       level,
+      page,
       select: getFields(info).filter(
         (name) => !filter.has(typeof name === 'string' ? name : name[0]),
       ),

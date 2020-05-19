@@ -6,6 +6,7 @@ export const CONTENTS_TREE = gql`
     contentsList {
       id
       visible
+      priority
       title
       page
       parentId

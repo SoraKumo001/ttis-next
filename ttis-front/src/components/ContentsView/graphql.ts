@@ -4,11 +4,8 @@ import { FRAGMENT_CONTENTS } from "src/graphql";
 export const QUERY_CONTENTS_PAGE = gql`
   ${FRAGMENT_CONTENTS}
   query contentsPage($id: ID) {
-    contentsPage(id: $id) {
-      id
-      contents {
-        ...FragmentContents
-      }
+    contentsList(id: $id, page: true) {
+      ...FragmentContents
     }
   }
 `;

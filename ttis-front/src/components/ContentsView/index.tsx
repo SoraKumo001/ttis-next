@@ -1,18 +1,20 @@
 import { useRouter } from "next/router";
-import { getRoutePath } from "../../libs/CustomRouter";
+import { getRoutePath, addRouterQuery } from "../../libs/CustomRouter";
 import { useQuery } from "react-apollo";
 import { QUERY_CONTENTS_PAGE } from "./graphql";
 import dateFormat from "dateformat";
 import {
   ContentsPageQuery,
-  QueryContentsPageArgs,
+  FragmentContentsFragment,
+  ContentsPageQueryVariables,
 } from "../../generated/graphql";
+import { getNullableType } from "graphql";
 
-type ContentsItem = ContentsPageQuery["contentsPage"]["contents"][0] & {
+type ContentsItem = FragmentContentsFragment & {
   children?: ContentsItem[];
 };
 
-function createTree(contentsList: ContentsItem[]) {
+function createTree(contentsList?: ContentsItem[]) {
   if (!contentsList || !contentsList.length) return undefined;
   const idMap = new Map<String, ContentsItem>();
   contentsList.forEach((contents) => {
@@ -32,13 +34,13 @@ function createTree(contentsList: ContentsItem[]) {
 export const ContentsView = () => {
   const router = useRouter();
   const id = (router.query["id"] as string) || getRoutePath(router)[1];
-  const { data } = useQuery<ContentsPageQuery, QueryContentsPageArgs>(
+  const { data } = useQuery<ContentsPageQuery, ContentsPageQueryVariables>(
     QUERY_CONTENTS_PAGE,
     {
       variables: { id },
     }
   );
-  const contents = data && createTree(data?.contentsPage?.contents);
+  const contents = data && createTree(data.contentsList);
   return contents ? (
     <>
       <style jsx>
@@ -81,8 +83,8 @@ export const ContentsView = () => {
             }
           `}
         </style>
-        <div className="contents" >
-          <div className="title" id={"t" + contents.title_type}>
+        <div className="contents">
+          <div className="title" id={"t" + contents.title_type} onDoubleClick={onDoubleClick}>
             {contents.title}
           </div>
           <div className="date">
@@ -101,5 +103,9 @@ export const ContentsView = () => {
         </div>
       </div>
     );
+  }
+  function onDoubleClick() {
+    if(contents)
+      addRouterQuery(router, { edit: contents.id });
   }
 };

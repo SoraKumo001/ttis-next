@@ -8,7 +8,7 @@ import {
   setRouterPath,
   getRoutePath,
 } from "../../libs/CustomRouter";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 
 type ContentsItem = ContentsListQuery["contentsList"][0] & {
   parent?: ContentsItem;
@@ -18,9 +18,8 @@ type ContentsItem = ContentsListQuery["contentsList"][0] & {
 export const ContentsTreeView = () => {
   const { loading, data } = useQuery<ContentsListQuery>(CONTENTS_TREE);
   const router = useRouter();
-  const tree = data && createTree(data.contentsList);
+  const tree = useMemo(() => data && createTree(data.contentsList), [data]);
   const id = getRoutePath(router)[1] || tree?.id;
-
   return loading ? (
     <div>Loading</div>
   ) : (
@@ -28,6 +27,10 @@ export const ContentsTreeView = () => {
       <style>{`
         .item {
           color: cadetblue;
+          font-size:90%;
+        }
+        .hidden{
+          background-color: #ffeeee;
         }
       `}</style>
       <TreeView
@@ -55,13 +58,26 @@ export const ContentsTreeView = () => {
         parent.children.push(contents);
       }
     });
+    idMap.forEach((c) => {
+      c.children?.sort((a, b) =>
+        a.page && !b.page ? -1 : a.priority - b.priority
+      );
+    });
     return idMap.get(contentsList[0].id);
   }
   function createTreeItem(item: ContentsItem) {
     return (
       <TreeItem
         key={item.id}
-        label={<div className={item.page ? "page" : "item"}>{item.title}</div>}
+        label={
+          <div
+            className={`${item.page ? "page" : "item"} ${
+              item.visible === true ? "visible" : "hidden"
+            }`}
+          >
+            {item.title}
+          </div>
+        }
         value={item}
         select={item.id === id}
       >
@@ -78,7 +94,7 @@ export const ContentsTreeView = () => {
         c = c.parent;
       }
       const id = c ? c.id : contents.id;
-      setRouterPath(router, `/page/${contents.id}/`, { id });
+      setRouterPath(router, `/page/${contents.id}/`,undefined, { id });
     }
   }
   function onDoubleClick(item: TreeItem) {

@@ -52,6 +52,7 @@ export type Mutation = {
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
   deleteContents: Array<Scalars['ID']>;
+  vectorContents: Array<Contents>;
   createUser?: Maybe<User>;
   updateUser?: Maybe<User>;
   deleteUser: Scalars['Boolean'];
@@ -89,6 +90,12 @@ export type MutationDeleteContentsArgs = {
 };
 
 
+export type MutationVectorContentsArgs = {
+  vector: Scalars['Int'];
+  id: Scalars['ID'];
+};
+
+
 export type MutationCreateUserArgs = {
   info?: Maybe<Scalars['String']>;
   password: Scalars['String'];
@@ -119,16 +126,9 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
-export type PageContents = {
-   __typename?: 'PageContents';
-  id: Scalars['ID'];
-  contents: Array<Contents>;
-};
-
 export type Query = {
    __typename?: 'Query';
   contentsTree: Contents;
-  contentsPage?: Maybe<PageContents>;
   contentsList: Array<Contents>;
   contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
@@ -139,12 +139,7 @@ export type Query = {
 export type QueryContentsTreeArgs = {
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryContentsPageArgs = {
-  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
 };
 
@@ -152,6 +147,7 @@ export type QueryContentsPageArgs = {
 export type QueryContentsListArgs = {
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
 };
 
@@ -231,6 +227,20 @@ export type DeleteContentsMutation = (
   & Pick<Mutation, 'deleteContents'>
 );
 
+export type VectorContentsMutationVariables = {
+  id: Scalars['ID'];
+  vector: Scalars['Int'];
+};
+
+
+export type VectorContentsMutation = (
+  { __typename?: 'Mutation' }
+  & { vectorContents: Array<(
+    { __typename?: 'Contents' }
+    & Pick<Contents, 'id' | 'priority'>
+  )> }
+);
+
 export type ContentsListQueryVariables = {};
 
 
@@ -238,7 +248,7 @@ export type ContentsListQuery = (
   { __typename?: 'Query' }
   & { contentsList: Array<(
     { __typename?: 'Contents' }
-    & Pick<Contents, 'id' | 'visible' | 'title' | 'page' | 'parentId'>
+    & Pick<Contents, 'id' | 'visible' | 'priority' | 'title' | 'page' | 'parentId'>
   )> }
 );
 
@@ -249,13 +259,9 @@ export type ContentsPageQueryVariables = {
 
 export type ContentsPageQuery = (
   { __typename?: 'Query' }
-  & { contentsPage?: Maybe<(
-    { __typename?: 'PageContents' }
-    & Pick<PageContents, 'id'>
-    & { contents: Array<(
-      { __typename?: 'Contents' }
-      & FragmentContentsFragment
-    )> }
+  & { contentsList: Array<(
+    { __typename?: 'Contents' }
+    & FragmentContentsFragment
   )> }
 );
 
@@ -476,11 +482,42 @@ export function withDeleteContents<TProps, TChildProps = {}, TDataName extends s
 };
 export type DeleteContentsMutationResult = ApolloReactCommon.MutationResult<DeleteContentsMutation>;
 export type DeleteContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteContentsMutation, DeleteContentsMutationVariables>;
+export const VectorContentsDocument = gql`
+    mutation vectorContents($id: ID!, $vector: Int!) {
+  vectorContents(id: $id, vector: $vector) {
+    id
+    priority
+  }
+}
+    `;
+export type VectorContentsMutationFn = ApolloReactCommon.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>;
+export type VectorContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<VectorContentsMutation, VectorContentsMutationVariables>, 'mutation'>;
+
+    export const VectorContentsComponent = (props: VectorContentsComponentProps) => (
+      <ApolloReactComponents.Mutation<VectorContentsMutation, VectorContentsMutationVariables> mutation={VectorContentsDocument} {...props} />
+    );
+    
+export type VectorContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>
+    } & TChildProps;
+export function withVectorContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  VectorContentsMutation,
+  VectorContentsMutationVariables,
+  VectorContentsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, VectorContentsMutation, VectorContentsMutationVariables, VectorContentsProps<TChildProps, TDataName>>(VectorContentsDocument, {
+      alias: 'vectorContents',
+      ...operationOptions
+    });
+};
+export type VectorContentsMutationResult = ApolloReactCommon.MutationResult<VectorContentsMutation>;
+export type VectorContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<VectorContentsMutation, VectorContentsMutationVariables>;
 export const ContentsListDocument = gql`
     query contentsList {
   contentsList {
     id
     visible
+    priority
     title
     page
     parentId
@@ -509,11 +546,8 @@ export function withContentsList<TProps, TChildProps = {}, TDataName extends str
 export type ContentsListQueryResult = ApolloReactCommon.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
 export const ContentsPageDocument = gql`
     query contentsPage($id: ID) {
-  contentsPage(id: $id) {
-    id
-    contents {
-      ...FragmentContents
-    }
+  contentsList(id: $id, page: true) {
+    ...FragmentContents
   }
 }
     ${FragmentContentsFragmentDoc}`;

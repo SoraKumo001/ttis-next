@@ -2,6 +2,27 @@
 
 exports[`Contens(Login) Create & update 1`] = `
 Object {
+  "data": Object {
+    "updateContents": Object {
+      "__typename": "Contents",
+      "createAt": "",
+      "id": "",
+      "page": true,
+      "parentId": "",
+      "priority": 1,
+      "title": "UpdateTest",
+      "title_type": 2,
+      "updateAt": "",
+      "value": "Test Value",
+      "value_type": "TEXT",
+      "visible": null,
+    },
+  },
+}
+`;
+
+exports[`Contens(Login) Create & update 2`] = `
+Object {
   "updateContents": Object {
     "__typename": "Contents",
     "createAt": "",
@@ -34,27 +55,6 @@ Object {
     "value": "",
     "value_type": "HTML",
     "visible": null,
-  },
-}
-`;
-
-exports[`Contens(Login) Levels 1`] = `
-Object {
-  "data": Object {
-    "updateContents": Object {
-      "__typename": "Contents",
-      "createAt": "",
-      "id": "",
-      "page": true,
-      "parentId": "",
-      "priority": 1,
-      "title": "UpdateTest",
-      "title_type": 2,
-      "updateAt": "",
-      "value": "Test Value",
-      "value_type": "TEXT",
-      "visible": null,
-    },
   },
 }
 `;
@@ -159,7 +159,7 @@ Object {
   "data": Object {
     "currentUser": Object {
       "__typename": "Login",
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGFzc3dvcmQiOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiaWF0IjoxNTg5NzA1MzYzLCJleHAiOjE1ODk3MTEzNjN9.wCVnNMGchnqU5lBzc_tzLrZt6YE79w1lCXUFvoll7H8",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGFzc3dvcmQiOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiaWF0IjoxNTg5ODE3ODUyLCJleHAiOjE1ODk4MjM4NTJ9.Zeac4hgGv-PkOIJmgNF8x2Qhj0s0eH5N0eej0mfTkGk",
       "user": Object {
         "__typename": "User",
         "info": "{}",

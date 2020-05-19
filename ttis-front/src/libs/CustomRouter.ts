@@ -29,12 +29,13 @@ export const getRouterQuery = (router: NextRouter) => {
 export const setRouterPath = (
   router: NextRouter,
   path: string,
-  query?: ParsedUrlQueryInput
+  query?: ParsedUrlQueryInput,
+  params?: ParsedUrlQueryInput
 ) => {
   const url = Url.parse(router.asPath, true);
   return router.push(
-    { pathname: router.pathname, query },
-    { pathname: path, query: url.query }
+    { pathname: router.pathname, query: params },
+    { pathname: path, query: query || url.query }
   );
 };
 

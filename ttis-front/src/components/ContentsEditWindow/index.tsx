@@ -8,6 +8,7 @@ import {
   UPDATE_CONTENTS,
   CREATE_CONTENTS,
   DELETE_CONTENTS,
+  VECTOR_CONTENTS,
 } from "./graphql";
 import {
   ContentsQueryVariables,
@@ -20,6 +21,9 @@ import {
   DeleteContentsMutation,
   DeleteContentsMutationVariables,
   Contents,
+  ContentsVector,
+  VectorContentsMutation,
+  VectorContentsMutationVariables,
 } from "@generated/graphql";
 import {
   getRouterQuery,
@@ -80,7 +84,8 @@ export const ContentsEditWindow = () => {
         .panel > button {
           border-radius: 5px;
         }
-        .panel > div {
+        .panel > div,
+        label {
           background-color: #cccccc;
           border-radius: 3px;
           padding: 0.3em;
@@ -101,17 +106,15 @@ export const ContentsEditWindow = () => {
           <div className="panel">
             <button onClick={onSave}>Save</button>
             <button>Preview</button>
+            <label>
+              Visible
+              <input
+                ref={refVisible}
+                type="checkbox"
+                defaultChecked={contents?.visible !== false}
+              />
+            </label>
 
-            <div>
-              <label>
-                Visible
-                <input
-                  ref={refVisible}
-                  type="checkbox"
-                  defaultChecked={contents?.visible !== false}
-                />
-              </label>
-            </div>
             <div>{dateFormat(contents?.updateAt, "yyyy年mm月dd日")}</div>
             <div>{dateFormat(contents?.updateAt, "HH時MM分ss秒")}</div>
             <button onClick={onDelete}>Delete</button>
@@ -144,6 +147,8 @@ export const ContentsEditWindow = () => {
           <div className="panel">
             <button onClick={onCreateNext}>Create Next</button>
             <button onClick={onCreateChild}>Create Child</button>
+            <button onClick={onMoveUp}>↑</button>
+            <button onClick={onMoveDown}>↓</button>
           </div>
           <div className="editor">
             <HtmlEditableView
@@ -178,74 +183,76 @@ export const ContentsEditWindow = () => {
       variables: {
         id: contents.id,
       },
-      update: async (cache, result) => {
-        console.log(contents.parentId)
-        await setRouterPath(router, `/page/${contents.parentId}/`);
-        await removeRouterQuery(router, "edit");
-        // client.cache.writeData({
-        //   id: `Contents:${contents.id}`,
-        //   data: undefined,
-        // });
+      update: async () => {
+        await setRouterPath(router, `/page/${contents.parentId}/`, {});
         //キャッシュの操作
         client.resetStore();
-        // const contentsList = cache.readQuery<ContentsListQuery>({
-        //   query: CONTENTS_TREE,
-        // })?.contentsList as Contents[]|undefined;
-        // if (contentsList) {
-        //   for (let i=0;i<contentsList.length;i++) {
-        //     if (contentsList[i].id === contents.id){
-        //       contentsList.splice(i--,1);
-        //     }
-        //   }
-        //   cache.writeQuery({ query: CONTENTS_TREE, data: contentsList });
-        // }
-        // const contentsPage = cache.readQuery<ContentsPageQuery>({
-        //   query: QUERY_CONTENTS_PAGE,
-        //   variables: { id: contents.id },
-        // })?.contentsPage;
-        // if (contentsPage) {
-        //   contentsPage.contents.push(result.data?.createContents!);
-        //   cache.writeQuery({ query: QUERY_CONTENTS_PAGE, data: contentsPage });
-        // }
       },
     });
   }
-  function onCreateNext() {}
+  function onMoveUp() {
+    if (!contents) return;
+    client.mutate<VectorContentsMutation, VectorContentsMutationVariables>({
+      mutation: VECTOR_CONTENTS,
+      variables: {
+        id: contents.id,
+        vector: -1,
+      },
+      update: async () => {
+        // await setRouterPath(router, `/page/${contents.parentId}/`, {});
+        // //キャッシュの操作
+        // client.resetStore();
+      },
+    });
+  }
+  function onMoveDown() {
+    if (!contents) return;
+    client.mutate<VectorContentsMutation, VectorContentsMutationVariables>({
+      mutation: VECTOR_CONTENTS,
+      variables: {
+        id: contents.id,
+        vector: 1,
+      },
+      update: async () => {
+        // await setRouterPath(router, `/page/${contents.parentId}/`, {});
+        // //キャッシュの操作
+        // client.resetStore();
+      },
+    });
+  }
+  function onCreateNext() {
+    if (!contents) return;
+    client.mutate<CreateContentsMutation, CreateContentsMutationVariables>({
+      mutation: CREATE_CONTENTS,
+      variables: {
+        parent: contents.id,
+        vector: ContentsVector.Next,
+        page: false,
+        title_type: Math.min(parseInt(refTitleType.current!.value) + 1, 2),
+        title: "New",
+      },
+      update: (_, result) => {
+        client.resetStore();
+        const contents = result.data?.createContents;
+        if (contents) addRouterQuery(router, { edit: contents.id });
+      },
+    });
+  }
   function onCreateChild() {
     if (!contents) return;
     client.mutate<CreateContentsMutation, CreateContentsMutationVariables>({
       mutation: CREATE_CONTENTS,
       variables: {
         parent: contents.id,
+        vector: ContentsVector.ChildLast,
         page: false,
         title_type: Math.min(parseInt(refTitleType.current!.value) + 1, 2),
-        title: "New Child",
+        title: "New",
       },
-      update: (cache, result) => {
-        const id = result.data?.createContents?.id;
-        if (id) {
-          addRouterQuery(router, { edit: id });
-          client.resetStore();
-          // //キャッシュの操作
-          // const contentsList = cache.readQuery<ContentsListQuery>({
-          //   query: CONTENTS_TREE,
-          // })?.contentsList;
-          // if (contentsList) {
-          //   contentsList.push(result.data?.createContents!);
-          //   cache.writeQuery({ query: CONTENTS_TREE, data: contentsList });
-          // }
-          // const contentsPage = cache.readQuery<ContentsPageQuery>({
-          //   query: QUERY_CONTENTS_PAGE,
-          //   variables: { id: contents.id },
-          // })?.contentsPage;
-          // if (contentsPage) {
-          //   contentsPage.contents.push(result.data?.createContents!);
-          //   cache.writeQuery({
-          //     query: QUERY_CONTENTS_PAGE,
-          //     data: contentsPage,
-          //   });
-          // }
-        }
+      update: (_, result) => {
+        client.resetStore();
+        const contents = result.data?.createContents;
+        if (contents) addRouterQuery(router, { edit: contents.id });
       },
     });
   }

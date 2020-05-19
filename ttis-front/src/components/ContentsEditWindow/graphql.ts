@@ -62,7 +62,16 @@ export const CREATE_CONTENTS = gql`
   }
 `;
 export const DELETE_CONTENTS = gql`
-  mutation deleteContents($id:ID!){
-    deleteContents(id:$id)
+  mutation deleteContents($id: ID!) {
+    deleteContents(id: $id)
   }
-`
+`;
+
+export const VECTOR_CONTENTS = gql`
+  mutation vectorContents($id: ID!, $vector: Int!) {
+    vectorContents(id: $id, vector: $vector) {
+      id
+      priority
+    }
+  }
+`;

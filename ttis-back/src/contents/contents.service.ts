@@ -43,17 +43,19 @@ export class ContentsService implements OnModuleInit {
         parentId,
         vector === undefined ? 'CHILD_LAST' : vector,
       );
-      const contents = await rep.save({
-        parent: { id: result.parentId },
-        page: page === undefined || page,
-        title_type,
-        title: title,
-        value_type,
-        value,
-        visible,
-        priority: result.priority,
-      });
-      return contents;
+      if (result.parentId) {
+        const contents = await rep.save({
+          parent: { id: result.parentId },
+          page: page === undefined || page,
+          title_type,
+          title: title,
+          value_type,
+          value,
+          visible,
+          priority: result.priority,
+        });
+        return contents;
+      }
     }
     return null;
   }
@@ -67,11 +69,13 @@ export class ContentsService implements OnModuleInit {
     id,
     visible,
     level,
+    page,
     select,
   }: {
     id?: string;
     visible?: boolean;
     level?: number;
+    page?: boolean;
     select?: GraphQLField;
   } = {}) {
     const { expRep } = this;
@@ -81,72 +85,11 @@ export class ContentsService implements OnModuleInit {
     if (visible) {
       rootWhere['visible'] = true;
     }
-    const root = await expRep.findOne({ select: ['id'], where: rootWhere });
+    let root = await expRep.findOne({ select: ['id'], where: rootWhere });
     if (!root) return null;
 
-    const fieldSet = new Set<string>();
-    const createSelect = (fields?: GraphQLField) => {
-      fields?.forEach((field) => {
-        if (typeof field === 'string') fieldSet.add(field);
-        else createSelect(field[1]);
-      });
-    };
-    createSelect(select);
-    if (fieldSet.size) fieldSet.add('id');
-
-    const contents =
-      (await expRep.getChildrenTree(root, {
-        select:
-          fieldSet.size === 0
-            ? undefined
-            : (Array.from(fieldSet) as (keyof Contents)[]),
-        level,
-        where: visible ? 'visible = true' : undefined,
-        order: 'page,priority',
-      })) || null;
-
-    //Level制限した場合に、最終レベルのchildrenをnullにする
-    if (level && contents) {
-      const setChildLevel = (
-        contents: Contents,
-        level: number,
-        nowLevel: number,
-      ) => {
-        if (level === nowLevel) contents.children = null;
-        else
-          contents.children?.forEach((contents) =>
-            setChildLevel(contents, level, nowLevel + 1),
-          );
-      };
-
-      setChildLevel(contents, level, 1);
-    }
-    return contents;
-  }
-
-  async contentsPage({
-    id,
-    visible,
-    select,
-  }: {
-    id?: string;
-    visible?: boolean;
-    select?: GraphQLField;
-  } = {}) {
-    const { expRep } = this;
-    const rootWhere: { [key: string]: unknown } = {};
-    if (id) rootWhere['id'] = id;
-    else rootWhere['parentId'] = null;
-    if (visible) {
-      rootWhere['visible'] = true;
-    }
-    let root = await expRep.findOne({
-      select: ['id', 'page'],
-      where: rootWhere,
-    });
-    if (!root) return null;
     //ページコンテンツを探す
-    if (!root.page) {
+    if (page && !root.page) {
       const nodes = await expRep.findAncestors(root);
       if (nodes) {
         for (const n of nodes) {
@@ -174,14 +117,35 @@ export class ContentsService implements OnModuleInit {
           fieldSet.size === 0
             ? undefined
             : (Array.from(fieldSet) as (keyof Contents)[]),
-        where:
-          `(id=:id or page = false)` + (visible ? 'and visible = true' : ''),
+        level,
+        where: page
+          ? `(id=:id or page = false)` + (visible ? 'and visible = true' : '')
+          : visible
+          ? 'visible = true'
+          : undefined,
         parameters: { id: root.id },
-        order: 'priority',
+        order: 'page,priority',
       })) || null;
 
+    //Level制限した場合に、最終レベルのchildrenをnullにする
+    if (level && contents) {
+      const setChildLevel = (
+        contents: Contents,
+        level: number,
+        nowLevel: number,
+      ) => {
+        if (level === nowLevel) contents.children = null;
+        else
+          contents.children?.forEach((contents) =>
+            setChildLevel(contents, level, nowLevel + 1),
+          );
+      };
+
+      setChildLevel(contents, level, 1);
+    }
     return contents;
   }
+
   async update(contents: Partial<Contents>) {
     const { rep } = this;
     const con = await rep.findOne(contents.id, { select: ['id'] });
@@ -193,18 +157,43 @@ export class ContentsService implements OnModuleInit {
   }
   async delete(id: string) {
     const { expRep } = this;
-    let root = await expRep.findOne(id);
-    if (!root) return null;
-    const con = await expRep.getChildrenTree(root, { select: ['id'] });
+    const target = await expRep.findOne({ select: ['id'], where: { id } });
+    if (!target) return null;
+    const con = await expRep.getChildrenTree(target, { select: ['id','parentId'] });
     if (!con) return null;
     const list: string[] = [];
-    const del = (contents: Contents) => {
-      contents.children?.forEach(del);
-      list.push(contents.id);
+    const delList = (contents: Contents) => {
+      contents.children?.forEach(delList);
+      if(contents.parentId)
+        list.push(contents.id);
     };
-    del(con);
-    await expRep.delete(list);
+    delList(con);
+    if(list.length)
+      await expRep.delete(list);
     return list;
+  }
+  async moveVector(id: string, vector: number) {
+    const { rep } = this;
+    const contents = await rep.findOne({
+      select: ['id', 'parentId', 'page'],
+      where: { id },
+    });
+
+    if (contents) {
+      const list = await rep.find({
+        select: ['id', 'priority'],
+        where: { parentId: contents.parentId, page: contents.page },
+        order: { priority: 'ASC' },
+      });
+      const index = list.findIndex((c) => c.id === id);
+      if (vector < 0 && index > 0)
+        [list[index - 1], list[index]] = [list[index], list[index - 1]];
+      if (vector > 0 && index < list.length - 1)
+        [list[index + 1], list[index]] = [list[index], list[index + 1]];
+      list.forEach((n, index) => (n.priority = index));
+      return await rep.save(list);
+    }
+    return null;
   }
   async updateVector(id: string, vector: VECTOR_TYPE) {
     const { rep } = this;

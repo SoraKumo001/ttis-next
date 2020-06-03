@@ -77,7 +77,7 @@ describe('User(login)', () => {
     const currentUser = await client.query<types.CurrentUserQuery>({
       query: querys.QUERY_CURRENT_USER,
     });
-    expect(currentUser).toMatchSnapshot();
+    expect(currentUser.data.currentUser?.user).toMatchSnapshot();
   });
 
   const id = testAsync('CreateUser', async () => {
@@ -90,7 +90,7 @@ describe('User(login)', () => {
       mutation: querys.MUTATION_CREATE_USER,
       variables: { name: 'Test01', password: 'Pass01', info: '{}' },
     });
-    expect(currentUser).toMatchSnapshot();
+    expect(currentUser.data?.createUser).toMatchSnapshot();
     return currentUser.data?.createUser?.id;
   });
 

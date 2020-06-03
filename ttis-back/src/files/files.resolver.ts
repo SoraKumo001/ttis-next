@@ -1,4 +1,4 @@
 import { Resolver } from '@nestjs/graphql';
 
-@Resolver('File')
+@Resolver('Files')
 export class FilesResolver {}

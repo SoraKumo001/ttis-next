@@ -31,12 +31,11 @@ export class Files {
   @Field({ nullable: true })
   @TreeParent()
   parent?: Files;
-  @Field()
+  @Field(() => [Files], { nullable: true })
   @TreeChildren()
   children?: Files[];
   @Field()
   size!: number;
-  @Field()
   @Column({ type: 'bytea', nullable: true })
   value?: Buffer;
   @Field()

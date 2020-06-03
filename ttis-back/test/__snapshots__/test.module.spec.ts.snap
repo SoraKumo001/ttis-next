@@ -143,33 +143,18 @@ Object {
 
 exports[`User(login) CreateUser 1`] = `
 Object {
-  "data": Object {
-    "createUser": Object {
-      "__typename": "User",
-      "id": 2,
-      "info": "{}",
-      "name": "Test01",
-    },
-  },
+  "__typename": "User",
+  "id": 2,
+  "info": "{}",
+  "name": "Test01",
 }
 `;
 
 exports[`User(login) CurrentUser 1`] = `
 Object {
-  "data": Object {
-    "currentUser": Object {
-      "__typename": "Login",
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicGFzc3dvcmQiOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiaWF0IjoxNTkxMTcwOTY3LCJleHAiOjE1OTExNzY5Njd9.Zs16cNQLDV_D0XONnkdTYm6NaLo2B5zfW6i2Wv45aLw",
-      "user": Object {
-        "__typename": "User",
-        "info": "{}",
-        "name": "admin",
-      },
-    },
-  },
-  "loading": false,
-  "networkStatus": 7,
-  "stale": false,
+  "__typename": "User",
+  "info": "{}",
+  "name": "admin",
 }
 `;
 

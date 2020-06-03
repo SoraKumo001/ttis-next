@@ -25,13 +25,13 @@ export class FilesService {
   }
   async onModuleInit() {
     const { rep } = this;
-    await rep.count().then((count) => {
-      if (!count) {
-        return rep.save({ kind: 0, name: "[ROOT]" });
-      }
-    });
+   // await rep.count().then((count) => {
+      // if (!count) {
+      //   return rep.save({ kind: 0, name: "[ROOT]" });
+      // }
+    //});
   }
-  public async _getDirList() {
+  public async getDirList() {
     const { rep } = this;
 
     const result = (await rep

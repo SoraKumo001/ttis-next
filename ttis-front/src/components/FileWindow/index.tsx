@@ -1,19 +1,12 @@
 import { SplitView } from "@jswf/react";
-import {
-  JSWindow,
-  TreeView,
-  ListView,
-  TreeItem,
-  ListHeaders,
-  ListHeader,
-} from "@jswf/react";
+import { JSWindow, ListView, ListHeaders, ListHeader } from "@jswf/react";
+import { DirTreeView } from "./dirTree";
+
 export const FileWindow = () => {
   return (
     <JSWindow title="File Window" width={640}>
       <SplitView type="we">
-        <TreeView>
-          <TreeItem label="Root" />
-        </TreeView>
+        <DirTreeView />
         <ListView>
           <ListHeaders>
             <ListHeader width={200}>File Name</ListHeader>

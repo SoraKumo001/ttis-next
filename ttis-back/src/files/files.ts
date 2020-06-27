@@ -9,7 +9,7 @@ import {
   TreeParent,
   Index,
 } from 'typeorm';
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 
 @ObjectType()
 @Entity()
@@ -19,7 +19,7 @@ export class Files {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-  @Field()
+  @Field(() => Int)
   @Column({ default: 0 })
   kind!: number;
   @Field()
@@ -34,7 +34,7 @@ export class Files {
   @Field(() => [Files], { nullable: true })
   @TreeChildren()
   children?: Files[];
-  @Field()
+  @Field(() => Int)
   size!: number;
   @Column({ type: 'bytea', nullable: true })
   value?: Buffer;

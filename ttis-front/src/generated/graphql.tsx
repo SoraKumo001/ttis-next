@@ -17,7 +17,7 @@ export type Scalars = {
 };
 
 export type Contents = {
-   __typename?: 'Contents';
+  __typename?: 'Contents';
   id: Scalars['ID'];
   priority: Scalars['Float'];
   visible?: Maybe<Scalars['Boolean']>;
@@ -41,14 +41,27 @@ export enum ContentsVector {
 }
 
 
+export type Files = {
+  __typename?: 'Files';
+  id: Scalars['ID'];
+  kind: Scalars['Int'];
+  name: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
+  parent?: Maybe<Files>;
+  children?: Maybe<Array<Files>>;
+  size: Scalars['Int'];
+  createAt: Scalars['DateTime'];
+  updateAt: Scalars['DateTime'];
+};
+
 export type Login = {
-   __typename?: 'Login';
+  __typename?: 'Login';
   token: Scalars['String'];
   user: User;
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
   deleteContents: Array<Scalars['ID']>;
@@ -58,6 +71,9 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   deleteUsers: Scalars['Boolean'];
   login?: Maybe<Login>;
+  createDir?: Maybe<Files>;
+  renameFile?: Maybe<Files>;
+  moveFile?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -126,13 +142,32 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
+
+export type MutationCreateDirArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationRenameFileArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationMoveFileArgs = {
+  id: Scalars['ID'];
+  targetId: Scalars['ID'];
+};
+
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   contentsTree: Contents;
   contentsList: Array<Contents>;
   contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<Login>;
+  dirTree?: Maybe<Array<Files>>;
 };
 
 
@@ -157,7 +192,7 @@ export type QueryContentsArgs = {
 };
 
 export type User = {
-   __typename?: 'User';
+  __typename?: 'User';
   id: Scalars['Int'];
   enable: Scalars['Boolean'];
   name: Scalars['String'];
@@ -263,6 +298,56 @@ export type ContentsPageQuery = (
     { __typename?: 'Contents' }
     & FragmentContentsFragment
   )> }
+);
+
+export type DirTreeQueryVariables = {};
+
+
+export type DirTreeQuery = (
+  { __typename?: 'Query' }
+  & { dirTree?: Maybe<Array<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )>> }
+);
+
+export type CreateDirMutationVariables = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+
+export type CreateDirMutation = (
+  { __typename?: 'Mutation' }
+  & { createDir?: Maybe<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )> }
+);
+
+export type RenameFileMutationVariables = {
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
+
+export type RenameFileMutation = (
+  { __typename?: 'Mutation' }
+  & { renameFile?: Maybe<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )> }
+);
+
+export type MoveFileMutationVariables = {
+  targetId: Scalars['ID'];
+  id: Scalars['ID'];
+};
+
+
+export type MoveFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'moveFile'>
 );
 
 export type UsersQueryVariables = {};
@@ -571,6 +656,136 @@ export function withContentsPage<TProps, TChildProps = {}, TDataName extends str
     });
 };
 export type ContentsPageQueryResult = ApolloReactCommon.QueryResult<ContentsPageQuery, ContentsPageQueryVariables>;
+export const DirTreeDocument = gql`
+    query dirTree {
+  dirTree {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+export type DirTreeComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<DirTreeQuery, DirTreeQueryVariables>, 'query'>;
+
+    export const DirTreeComponent = (props: DirTreeComponentProps) => (
+      <ApolloReactComponents.Query<DirTreeQuery, DirTreeQueryVariables> query={DirTreeDocument} {...props} />
+    );
+    
+export type DirTreeProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<DirTreeQuery, DirTreeQueryVariables>
+    } & TChildProps;
+export function withDirTree<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DirTreeQuery,
+  DirTreeQueryVariables,
+  DirTreeProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, DirTreeQuery, DirTreeQueryVariables, DirTreeProps<TChildProps, TDataName>>(DirTreeDocument, {
+      alias: 'dirTree',
+      ...operationOptions
+    });
+};
+export type DirTreeQueryResult = ApolloReactCommon.QueryResult<DirTreeQuery, DirTreeQueryVariables>;
+export const CreateDirDocument = gql`
+    mutation createDir($id: ID!, $name: String!) {
+  createDir(id: $id, name: $name) {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+export type CreateDirMutationFn = ApolloReactCommon.MutationFunction<CreateDirMutation, CreateDirMutationVariables>;
+export type CreateDirComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateDirMutation, CreateDirMutationVariables>, 'mutation'>;
+
+    export const CreateDirComponent = (props: CreateDirComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateDirMutation, CreateDirMutationVariables> mutation={CreateDirDocument} {...props} />
+    );
+    
+export type CreateDirProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateDirMutation, CreateDirMutationVariables>
+    } & TChildProps;
+export function withCreateDir<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateDirMutation,
+  CreateDirMutationVariables,
+  CreateDirProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateDirMutation, CreateDirMutationVariables, CreateDirProps<TChildProps, TDataName>>(CreateDirDocument, {
+      alias: 'createDir',
+      ...operationOptions
+    });
+};
+export type CreateDirMutationResult = ApolloReactCommon.MutationResult<CreateDirMutation>;
+export type CreateDirMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateDirMutation, CreateDirMutationVariables>;
+export const RenameFileDocument = gql`
+    mutation renameFile($id: ID!, $name: String!) {
+  renameFile(id: $id, name: $name) {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+export type RenameFileMutationFn = ApolloReactCommon.MutationFunction<RenameFileMutation, RenameFileMutationVariables>;
+export type RenameFileComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<RenameFileMutation, RenameFileMutationVariables>, 'mutation'>;
+
+    export const RenameFileComponent = (props: RenameFileComponentProps) => (
+      <ApolloReactComponents.Mutation<RenameFileMutation, RenameFileMutationVariables> mutation={RenameFileDocument} {...props} />
+    );
+    
+export type RenameFileProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<RenameFileMutation, RenameFileMutationVariables>
+    } & TChildProps;
+export function withRenameFile<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  RenameFileMutation,
+  RenameFileMutationVariables,
+  RenameFileProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, RenameFileMutation, RenameFileMutationVariables, RenameFileProps<TChildProps, TDataName>>(RenameFileDocument, {
+      alias: 'renameFile',
+      ...operationOptions
+    });
+};
+export type RenameFileMutationResult = ApolloReactCommon.MutationResult<RenameFileMutation>;
+export type RenameFileMutationOptions = ApolloReactCommon.BaseMutationOptions<RenameFileMutation, RenameFileMutationVariables>;
+export const MoveFileDocument = gql`
+    mutation moveFile($targetId: ID!, $id: ID!) {
+  moveFile(targetId: $targetId, id: $id)
+}
+    `;
+export type MoveFileMutationFn = ApolloReactCommon.MutationFunction<MoveFileMutation, MoveFileMutationVariables>;
+export type MoveFileComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<MoveFileMutation, MoveFileMutationVariables>, 'mutation'>;
+
+    export const MoveFileComponent = (props: MoveFileComponentProps) => (
+      <ApolloReactComponents.Mutation<MoveFileMutation, MoveFileMutationVariables> mutation={MoveFileDocument} {...props} />
+    );
+    
+export type MoveFileProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<MoveFileMutation, MoveFileMutationVariables>
+    } & TChildProps;
+export function withMoveFile<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  MoveFileMutation,
+  MoveFileMutationVariables,
+  MoveFileProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, MoveFileMutation, MoveFileMutationVariables, MoveFileProps<TChildProps, TDataName>>(MoveFileDocument, {
+      alias: 'moveFile',
+      ...operationOptions
+    });
+};
+export type MoveFileMutationResult = ApolloReactCommon.MutationResult<MoveFileMutation>;
+export type MoveFileMutationOptions = ApolloReactCommon.BaseMutationOptions<MoveFileMutation, MoveFileMutationVariables>;
 export const UsersDocument = gql`
     query Users {
   users {

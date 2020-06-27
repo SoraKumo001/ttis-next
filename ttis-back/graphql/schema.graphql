@@ -32,12 +32,12 @@ scalar DateTime
 
 type Files {
   id: ID!
-  kind: Float!
+  kind: Int!
   name: String!
   parentId: String
   parent: Files
   children: [Files!]
-  size: Float!
+  size: Int!
   createAt: DateTime!
   updateAt: DateTime!
 }
@@ -57,6 +57,9 @@ type Mutation {
   deleteUser(id: Int!): Boolean!
   deleteUsers(ids: [Int!]!): Boolean!
   login(password: String!, name: String!): Login
+  createDir(name: String!, id: ID!): Files
+  renameFile(name: String!, id: ID!): Files
+  moveFile(id: ID!, targetId: ID!): Boolean
 }
 
 type Query {
@@ -65,6 +68,7 @@ type Query {
   contents(id: ID): Contents
   users: [User!]
   currentUser: Login
+  dirTree: [Files!]
 }
 
 type User {

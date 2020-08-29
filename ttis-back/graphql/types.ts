@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -8,10 +9,12 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type Contents = {
-   __typename?: 'Contents';
+  __typename?: 'Contents';
   id: Scalars['ID'];
   priority: Scalars['Float'];
   visible?: Maybe<Scalars['Boolean']>;
@@ -35,14 +38,27 @@ export enum ContentsVector {
 }
 
 
+export type Files = {
+  __typename?: 'Files';
+  id: Scalars['ID'];
+  kind: Scalars['Int'];
+  name: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
+  parent?: Maybe<Files>;
+  children?: Maybe<Array<Files>>;
+  size: Scalars['Int'];
+  createAt: Scalars['DateTime'];
+  updateAt: Scalars['DateTime'];
+};
+
 export type Login = {
-   __typename?: 'Login';
+  __typename?: 'Login';
   token: Scalars['String'];
   user: User;
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
   deleteContents: Array<Scalars['ID']>;
@@ -52,6 +68,10 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   deleteUsers: Scalars['Boolean'];
   login?: Maybe<Login>;
+  createDir?: Maybe<Files>;
+  renameFile?: Maybe<Files>;
+  moveFile?: Maybe<Scalars['Boolean']>;
+  uploadFile?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -120,13 +140,37 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
+
+export type MutationCreateDirArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationRenameFileArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationMoveFileArgs = {
+  id: Scalars['ID'];
+  targetId: Scalars['ID'];
+};
+
+
+export type MutationUploadFileArgs = {
+  file: Scalars['Upload'];
+};
+
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   contentsTree: Contents;
   contentsList: Array<Contents>;
   contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<Login>;
+  dirTree?: Maybe<Array<Files>>;
 };
 
 
@@ -150,8 +194,9 @@ export type QueryContentsArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
+
 export type User = {
-   __typename?: 'User';
+  __typename?: 'User';
   id: Scalars['Int'];
   enable: Scalars['Boolean'];
   name: Scalars['String'];
@@ -163,11 +208,11 @@ export type FragmentContentsFragment = (
   & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
 );
 
-export type ContentsListQueryVariables = {
+export type ContentsListQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
-};
+}>;
 
 
 export type ContentsListQuery = (
@@ -178,9 +223,9 @@ export type ContentsListQuery = (
   )> }
 );
 
-export type ContentsQueryVariables = {
+export type ContentsQueryVariables = Exact<{
   id: Scalars['ID'];
-};
+}>;
 
 
 export type ContentsQuery = (
@@ -191,7 +236,7 @@ export type ContentsQuery = (
   )> }
 );
 
-export type CreateContentsMutationVariables = {
+export type CreateContentsMutationVariables = Exact<{
   parent?: Maybe<Scalars['ID']>;
   vector?: Maybe<ContentsVector>;
   page?: Maybe<Scalars['Boolean']>;
@@ -200,7 +245,7 @@ export type CreateContentsMutationVariables = {
   title?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type CreateContentsMutation = (
@@ -211,7 +256,7 @@ export type CreateContentsMutation = (
   )> }
 );
 
-export type UpdateContentsMutationVariables = {
+export type UpdateContentsMutationVariables = Exact<{
   id: Scalars['ID'];
   page?: Maybe<Scalars['Boolean']>;
   visible?: Maybe<Scalars['Boolean']>;
@@ -220,7 +265,7 @@ export type UpdateContentsMutationVariables = {
   parent?: Maybe<Scalars['ID']>;
   value_type?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type UpdateContentsMutation = (
@@ -231,10 +276,10 @@ export type UpdateContentsMutation = (
   )> }
 );
 
-export type LoginMutationVariables = {
+export type LoginMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
-};
+}>;
 
 
 export type LoginMutation = (
@@ -249,7 +294,7 @@ export type LoginMutation = (
   )> }
 );
 
-export type CurrentUserQueryVariables = {};
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CurrentUserQuery = (
@@ -264,7 +309,7 @@ export type CurrentUserQuery = (
   )> }
 );
 
-export type UsersQueryVariables = {};
+export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UsersQuery = (
@@ -275,11 +320,11 @@ export type UsersQuery = (
   )>> }
 );
 
-export type CreateUserMutationVariables = {
+export type CreateUserMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
   info?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type CreateUserMutation = (
@@ -290,12 +335,12 @@ export type CreateUserMutation = (
   )> }
 );
 
-export type UpdateUserMutationVariables = {
+export type UpdateUserMutationVariables = Exact<{
   id: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
   info?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type UpdateUserMutation = (
@@ -306,9 +351,9 @@ export type UpdateUserMutation = (
   )> }
 );
 
-export type DeleteUsersMutationVariables = {
+export type DeleteUsersMutationVariables = Exact<{
   ids: Array<Scalars['Int']>;
-};
+}>;
 
 
 export type DeleteUsersMutation = (

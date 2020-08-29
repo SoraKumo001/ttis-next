@@ -1,5 +1,18 @@
 import React from "react";
 import NextApp, { AppContext, createUrl } from "next/app";
+
+export type NextWebVitalsMetrics = {
+  id: string;
+  label: string;
+  name: string;
+  startTime: number;
+  value: number;
+}
+
+export function reportWebVitals(metric:NextWebVitalsMetrics) {
+  console.log(metric)
+}
+
 import {
   ApolloClient,
   HttpLink,
@@ -80,7 +93,9 @@ export interface Props {
   pageProps: PagesProps;
 }
 let ssrClient: CustomApolloClient;
+
 export default class App extends NextApp<{ session: SessionType }> {
+
   static async getInitialProps({ ctx, Component, router }: AppContext) {
     //セッション情報の初期化(SPA時にはundefined)
     const session = (ctx?.req as undefined | { session?: SessionType })
@@ -96,7 +111,6 @@ export default class App extends NextApp<{ session: SessionType }> {
       Component.getInitialProps && (await Component.getInitialProps(context));
 
     const sessionProps = createSessionProps(session, SessionFilter);
-
     //SSR用GraphQLデータキャッシュの作成
     if (!IS_BROWSER) {
       //getMarkupFromTreeの中ではuseRouterが使えないので強制フック

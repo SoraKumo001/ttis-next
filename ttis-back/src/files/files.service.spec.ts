@@ -20,4 +20,14 @@ describe('FileService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  it('Create dir', async () => {
+    const dir = await service.createDir(undefined,"test");
+    expect(dir).toBeDefined();
+    const dir2 = await service.createDir(undefined,"test");
+    expect(dir2).toEqual(false);
+  });
+  it('List Contents first', async () => {
+    const list = await service.getDirList();
+    expect(list).toMatchSnapshot();
+  });
 });

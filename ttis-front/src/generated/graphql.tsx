@@ -1,10 +1,7 @@
-import gql from 'graphql-tag';
-import * as React from 'react';
-import * as ApolloReactCommon from '@apollo/react-common';
-import * as ApolloReactComponents from '@apollo/react-components';
-import * as ApolloReactHoc from '@apollo/react-hoc';
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -14,10 +11,12 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type Contents = {
-   __typename?: 'Contents';
+  __typename?: 'Contents';
   id: Scalars['ID'];
   priority: Scalars['Float'];
   visible?: Maybe<Scalars['Boolean']>;
@@ -41,14 +40,27 @@ export enum ContentsVector {
 }
 
 
+export type Files = {
+  __typename?: 'Files';
+  id: Scalars['ID'];
+  kind: Scalars['Int'];
+  name: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
+  parent?: Maybe<Files>;
+  children?: Maybe<Array<Files>>;
+  size: Scalars['Int'];
+  createAt: Scalars['DateTime'];
+  updateAt: Scalars['DateTime'];
+};
+
 export type Login = {
-   __typename?: 'Login';
+  __typename?: 'Login';
   token: Scalars['String'];
   user: User;
 };
 
 export type Mutation = {
-   __typename?: 'Mutation';
+  __typename?: 'Mutation';
   createContents?: Maybe<Contents>;
   updateContents?: Maybe<Contents>;
   deleteContents: Array<Scalars['ID']>;
@@ -58,6 +70,10 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   deleteUsers: Scalars['Boolean'];
   login?: Maybe<Login>;
+  createDir?: Maybe<Files>;
+  renameFile?: Maybe<Files>;
+  moveFile?: Maybe<Scalars['Boolean']>;
+  uploadFile?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -126,13 +142,37 @@ export type MutationLoginArgs = {
   name: Scalars['String'];
 };
 
+
+export type MutationCreateDirArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationRenameFileArgs = {
+  name: Scalars['String'];
+  id: Scalars['ID'];
+};
+
+
+export type MutationMoveFileArgs = {
+  id: Scalars['ID'];
+  targetId: Scalars['ID'];
+};
+
+
+export type MutationUploadFileArgs = {
+  file: Scalars['Upload'];
+};
+
 export type Query = {
-   __typename?: 'Query';
+  __typename?: 'Query';
   contentsTree: Contents;
   contentsList: Array<Contents>;
   contents?: Maybe<Contents>;
   users?: Maybe<Array<User>>;
   currentUser?: Maybe<Login>;
+  dirTree?: Maybe<Array<Files>>;
 };
 
 
@@ -156,17 +196,18 @@ export type QueryContentsArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
+
 export type User = {
-   __typename?: 'User';
+  __typename?: 'User';
   id: Scalars['Int'];
   enable: Scalars['Boolean'];
   name: Scalars['String'];
   info: Scalars['String'];
 };
 
-export type ContentsQueryVariables = {
+export type ContentsQueryVariables = Exact<{
   id: Scalars['ID'];
-};
+}>;
 
 
 export type ContentsQuery = (
@@ -177,7 +218,7 @@ export type ContentsQuery = (
   )> }
 );
 
-export type UpdateContentsMutationVariables = {
+export type UpdateContentsMutationVariables = Exact<{
   id: Scalars['ID'];
   page?: Maybe<Scalars['Boolean']>;
   visible?: Maybe<Scalars['Boolean']>;
@@ -186,7 +227,7 @@ export type UpdateContentsMutationVariables = {
   parent?: Maybe<Scalars['ID']>;
   value_type?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type UpdateContentsMutation = (
@@ -197,7 +238,7 @@ export type UpdateContentsMutation = (
   )> }
 );
 
-export type CreateContentsMutationVariables = {
+export type CreateContentsMutationVariables = Exact<{
   parent?: Maybe<Scalars['ID']>;
   vector?: Maybe<ContentsVector>;
   page?: Maybe<Scalars['Boolean']>;
@@ -206,7 +247,7 @@ export type CreateContentsMutationVariables = {
   title?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type CreateContentsMutation = (
@@ -217,9 +258,9 @@ export type CreateContentsMutation = (
   )> }
 );
 
-export type DeleteContentsMutationVariables = {
+export type DeleteContentsMutationVariables = Exact<{
   id: Scalars['ID'];
-};
+}>;
 
 
 export type DeleteContentsMutation = (
@@ -227,10 +268,10 @@ export type DeleteContentsMutation = (
   & Pick<Mutation, 'deleteContents'>
 );
 
-export type VectorContentsMutationVariables = {
+export type VectorContentsMutationVariables = Exact<{
   id: Scalars['ID'];
   vector: Scalars['Int'];
-};
+}>;
 
 
 export type VectorContentsMutation = (
@@ -241,7 +282,7 @@ export type VectorContentsMutation = (
   )> }
 );
 
-export type ContentsListQueryVariables = {};
+export type ContentsListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ContentsListQuery = (
@@ -252,9 +293,9 @@ export type ContentsListQuery = (
   )> }
 );
 
-export type ContentsPageQueryVariables = {
+export type ContentsPageQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
-};
+}>;
 
 
 export type ContentsPageQuery = (
@@ -265,7 +306,67 @@ export type ContentsPageQuery = (
   )> }
 );
 
-export type UsersQueryVariables = {};
+export type DirTreeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DirTreeQuery = (
+  { __typename?: 'Query' }
+  & { dirTree?: Maybe<Array<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )>> }
+);
+
+export type CreateDirMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+}>;
+
+
+export type CreateDirMutation = (
+  { __typename?: 'Mutation' }
+  & { createDir?: Maybe<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )> }
+);
+
+export type RenameFileMutationVariables = Exact<{
+  id: Scalars['ID'];
+  name: Scalars['String'];
+}>;
+
+
+export type RenameFileMutation = (
+  { __typename?: 'Mutation' }
+  & { renameFile?: Maybe<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )> }
+);
+
+export type MoveFileMutationVariables = Exact<{
+  targetId: Scalars['ID'];
+  id: Scalars['ID'];
+}>;
+
+
+export type MoveFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'moveFile'>
+);
+
+export type UploadFileMutationVariables = Exact<{
+  file: Scalars['Upload'];
+}>;
+
+
+export type UploadFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'uploadFile'>
+);
+
+export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UsersQuery = (
@@ -276,7 +377,7 @@ export type UsersQuery = (
   )>> }
 );
 
-export type CurrentUserQueryVariables = {};
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CurrentUserQuery = (
@@ -291,10 +392,10 @@ export type CurrentUserQuery = (
   )> }
 );
 
-export type LoginMutationVariables = {
+export type LoginMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
-};
+}>;
 
 
 export type LoginMutation = (
@@ -309,11 +410,11 @@ export type LoginMutation = (
   )> }
 );
 
-export type CreateUserMutationVariables = {
+export type CreateUserMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
   info?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type CreateUserMutation = (
@@ -324,12 +425,12 @@ export type CreateUserMutation = (
   )> }
 );
 
-export type UpdateUserMutationVariables = {
+export type UpdateUserMutationVariables = Exact<{
   id: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
   info?: Maybe<Scalars['String']>;
-};
+}>;
 
 
 export type UpdateUserMutation = (
@@ -340,9 +441,9 @@ export type UpdateUserMutation = (
   )> }
 );
 
-export type DeleteUsersMutationVariables = {
+export type DeleteUsersMutationVariables = Exact<{
   ids: Array<Scalars['Int']>;
-};
+}>;
 
 
 export type DeleteUsersMutation = (
@@ -377,26 +478,32 @@ export const ContentsDocument = gql`
   }
 }
     ${FragmentContentsFragmentDoc}`;
-export type ContentsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsQuery, ContentsQueryVariables>, 'query'> & ({ variables: ContentsQueryVariables; skip?: boolean; } | { skip: boolean; });
 
-    export const ContentsComponent = (props: ContentsComponentProps) => (
-      <ApolloReactComponents.Query<ContentsQuery, ContentsQueryVariables> query={ContentsDocument} {...props} />
-    );
-    
-export type ContentsProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<ContentsQuery, ContentsQueryVariables>
-    } & TChildProps;
-export function withContents<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  ContentsQuery,
-  ContentsQueryVariables,
-  ContentsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, ContentsQuery, ContentsQueryVariables, ContentsProps<TChildProps, TDataName>>(ContentsDocument, {
-      alias: 'contents',
-      ...operationOptions
-    });
-};
-export type ContentsQueryResult = ApolloReactCommon.QueryResult<ContentsQuery, ContentsQueryVariables>;
+/**
+ * __useContentsQuery__
+ *
+ * To run a query within a React component, call `useContentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContentsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useContentsQuery(baseOptions?: Apollo.QueryHookOptions<ContentsQuery, ContentsQueryVariables>) {
+        return Apollo.useQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
+      }
+export function useContentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsQuery, ContentsQueryVariables>) {
+          return Apollo.useLazyQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
+        }
+export type ContentsQueryHookResult = ReturnType<typeof useContentsQuery>;
+export type ContentsLazyQueryHookResult = ReturnType<typeof useContentsLazyQuery>;
+export type ContentsQueryResult = Apollo.QueryResult<ContentsQuery, ContentsQueryVariables>;
 export const UpdateContentsDocument = gql`
     mutation updateContents($id: ID!, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $parent: ID, $value_type: String, $value: String) {
   updateContents(id: $id, page: $page, visible: $visible, title_type: $title_type, title: $title, parent: $parent, value_type: $value_type, value: $value) {
@@ -404,28 +511,38 @@ export const UpdateContentsDocument = gql`
   }
 }
     ${FragmentContentsFragmentDoc}`;
-export type UpdateContentsMutationFn = ApolloReactCommon.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>;
-export type UpdateContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateContentsMutation, UpdateContentsMutationVariables>, 'mutation'>;
+export type UpdateContentsMutationFn = Apollo.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>;
 
-    export const UpdateContentsComponent = (props: UpdateContentsComponentProps) => (
-      <ApolloReactComponents.Mutation<UpdateContentsMutation, UpdateContentsMutationVariables> mutation={UpdateContentsDocument} {...props} />
-    );
-    
-export type UpdateContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>
-    } & TChildProps;
-export function withUpdateContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  UpdateContentsMutation,
-  UpdateContentsMutationVariables,
-  UpdateContentsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, UpdateContentsMutation, UpdateContentsMutationVariables, UpdateContentsProps<TChildProps, TDataName>>(UpdateContentsDocument, {
-      alias: 'updateContents',
-      ...operationOptions
-    });
-};
-export type UpdateContentsMutationResult = ApolloReactCommon.MutationResult<UpdateContentsMutation>;
-export type UpdateContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateContentsMutation, UpdateContentsMutationVariables>;
+/**
+ * __useUpdateContentsMutation__
+ *
+ * To run a mutation, you first call `useUpdateContentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateContentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateContentsMutation, { data, loading, error }] = useUpdateContentsMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      page: // value for 'page'
+ *      visible: // value for 'visible'
+ *      title_type: // value for 'title_type'
+ *      title: // value for 'title'
+ *      parent: // value for 'parent'
+ *      value_type: // value for 'value_type'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUpdateContentsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateContentsMutation, UpdateContentsMutationVariables>) {
+        return Apollo.useMutation<UpdateContentsMutation, UpdateContentsMutationVariables>(UpdateContentsDocument, baseOptions);
+      }
+export type UpdateContentsMutationHookResult = ReturnType<typeof useUpdateContentsMutation>;
+export type UpdateContentsMutationResult = Apollo.MutationResult<UpdateContentsMutation>;
+export type UpdateContentsMutationOptions = Apollo.BaseMutationOptions<UpdateContentsMutation, UpdateContentsMutationVariables>;
 export const CreateContentsDocument = gql`
     mutation createContents($parent: ID, $vector: ContentsVector, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $value_type: String, $value: String) {
   createContents(parent: $parent, vector: $vector, page: $page, visible: $visible, title_type: $title_type, title: $title, value_type: $value_type, value: $value) {
@@ -433,55 +550,68 @@ export const CreateContentsDocument = gql`
   }
 }
     ${FragmentContentsFragmentDoc}`;
-export type CreateContentsMutationFn = ApolloReactCommon.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>;
-export type CreateContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateContentsMutation, CreateContentsMutationVariables>, 'mutation'>;
+export type CreateContentsMutationFn = Apollo.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>;
 
-    export const CreateContentsComponent = (props: CreateContentsComponentProps) => (
-      <ApolloReactComponents.Mutation<CreateContentsMutation, CreateContentsMutationVariables> mutation={CreateContentsDocument} {...props} />
-    );
-    
-export type CreateContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>
-    } & TChildProps;
-export function withCreateContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  CreateContentsMutation,
-  CreateContentsMutationVariables,
-  CreateContentsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, CreateContentsMutation, CreateContentsMutationVariables, CreateContentsProps<TChildProps, TDataName>>(CreateContentsDocument, {
-      alias: 'createContents',
-      ...operationOptions
-    });
-};
-export type CreateContentsMutationResult = ApolloReactCommon.MutationResult<CreateContentsMutation>;
-export type CreateContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateContentsMutation, CreateContentsMutationVariables>;
+/**
+ * __useCreateContentsMutation__
+ *
+ * To run a mutation, you first call `useCreateContentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateContentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createContentsMutation, { data, loading, error }] = useCreateContentsMutation({
+ *   variables: {
+ *      parent: // value for 'parent'
+ *      vector: // value for 'vector'
+ *      page: // value for 'page'
+ *      visible: // value for 'visible'
+ *      title_type: // value for 'title_type'
+ *      title: // value for 'title'
+ *      value_type: // value for 'value_type'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useCreateContentsMutation(baseOptions?: Apollo.MutationHookOptions<CreateContentsMutation, CreateContentsMutationVariables>) {
+        return Apollo.useMutation<CreateContentsMutation, CreateContentsMutationVariables>(CreateContentsDocument, baseOptions);
+      }
+export type CreateContentsMutationHookResult = ReturnType<typeof useCreateContentsMutation>;
+export type CreateContentsMutationResult = Apollo.MutationResult<CreateContentsMutation>;
+export type CreateContentsMutationOptions = Apollo.BaseMutationOptions<CreateContentsMutation, CreateContentsMutationVariables>;
 export const DeleteContentsDocument = gql`
     mutation deleteContents($id: ID!) {
   deleteContents(id: $id)
 }
     `;
-export type DeleteContentsMutationFn = ApolloReactCommon.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>;
-export type DeleteContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteContentsMutation, DeleteContentsMutationVariables>, 'mutation'>;
+export type DeleteContentsMutationFn = Apollo.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>;
 
-    export const DeleteContentsComponent = (props: DeleteContentsComponentProps) => (
-      <ApolloReactComponents.Mutation<DeleteContentsMutation, DeleteContentsMutationVariables> mutation={DeleteContentsDocument} {...props} />
-    );
-    
-export type DeleteContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>
-    } & TChildProps;
-export function withDeleteContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  DeleteContentsMutation,
-  DeleteContentsMutationVariables,
-  DeleteContentsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, DeleteContentsMutation, DeleteContentsMutationVariables, DeleteContentsProps<TChildProps, TDataName>>(DeleteContentsDocument, {
-      alias: 'deleteContents',
-      ...operationOptions
-    });
-};
-export type DeleteContentsMutationResult = ApolloReactCommon.MutationResult<DeleteContentsMutation>;
-export type DeleteContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteContentsMutation, DeleteContentsMutationVariables>;
+/**
+ * __useDeleteContentsMutation__
+ *
+ * To run a mutation, you first call `useDeleteContentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteContentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteContentsMutation, { data, loading, error }] = useDeleteContentsMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteContentsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContentsMutation, DeleteContentsMutationVariables>) {
+        return Apollo.useMutation<DeleteContentsMutation, DeleteContentsMutationVariables>(DeleteContentsDocument, baseOptions);
+      }
+export type DeleteContentsMutationHookResult = ReturnType<typeof useDeleteContentsMutation>;
+export type DeleteContentsMutationResult = Apollo.MutationResult<DeleteContentsMutation>;
+export type DeleteContentsMutationOptions = Apollo.BaseMutationOptions<DeleteContentsMutation, DeleteContentsMutationVariables>;
 export const VectorContentsDocument = gql`
     mutation vectorContents($id: ID!, $vector: Int!) {
   vectorContents(id: $id, vector: $vector) {
@@ -490,28 +620,32 @@ export const VectorContentsDocument = gql`
   }
 }
     `;
-export type VectorContentsMutationFn = ApolloReactCommon.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>;
-export type VectorContentsComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<VectorContentsMutation, VectorContentsMutationVariables>, 'mutation'>;
+export type VectorContentsMutationFn = Apollo.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>;
 
-    export const VectorContentsComponent = (props: VectorContentsComponentProps) => (
-      <ApolloReactComponents.Mutation<VectorContentsMutation, VectorContentsMutationVariables> mutation={VectorContentsDocument} {...props} />
-    );
-    
-export type VectorContentsProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>
-    } & TChildProps;
-export function withVectorContents<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  VectorContentsMutation,
-  VectorContentsMutationVariables,
-  VectorContentsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, VectorContentsMutation, VectorContentsMutationVariables, VectorContentsProps<TChildProps, TDataName>>(VectorContentsDocument, {
-      alias: 'vectorContents',
-      ...operationOptions
-    });
-};
-export type VectorContentsMutationResult = ApolloReactCommon.MutationResult<VectorContentsMutation>;
-export type VectorContentsMutationOptions = ApolloReactCommon.BaseMutationOptions<VectorContentsMutation, VectorContentsMutationVariables>;
+/**
+ * __useVectorContentsMutation__
+ *
+ * To run a mutation, you first call `useVectorContentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVectorContentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [vectorContentsMutation, { data, loading, error }] = useVectorContentsMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      vector: // value for 'vector'
+ *   },
+ * });
+ */
+export function useVectorContentsMutation(baseOptions?: Apollo.MutationHookOptions<VectorContentsMutation, VectorContentsMutationVariables>) {
+        return Apollo.useMutation<VectorContentsMutation, VectorContentsMutationVariables>(VectorContentsDocument, baseOptions);
+      }
+export type VectorContentsMutationHookResult = ReturnType<typeof useVectorContentsMutation>;
+export type VectorContentsMutationResult = Apollo.MutationResult<VectorContentsMutation>;
+export type VectorContentsMutationOptions = Apollo.BaseMutationOptions<VectorContentsMutation, VectorContentsMutationVariables>;
 export const ContentsListDocument = gql`
     query contentsList {
   contentsList {
@@ -524,26 +658,31 @@ export const ContentsListDocument = gql`
   }
 }
     `;
-export type ContentsListComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsListQuery, ContentsListQueryVariables>, 'query'>;
 
-    export const ContentsListComponent = (props: ContentsListComponentProps) => (
-      <ApolloReactComponents.Query<ContentsListQuery, ContentsListQueryVariables> query={ContentsListDocument} {...props} />
-    );
-    
-export type ContentsListProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<ContentsListQuery, ContentsListQueryVariables>
-    } & TChildProps;
-export function withContentsList<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  ContentsListQuery,
-  ContentsListQueryVariables,
-  ContentsListProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, ContentsListQuery, ContentsListQueryVariables, ContentsListProps<TChildProps, TDataName>>(ContentsListDocument, {
-      alias: 'contentsList',
-      ...operationOptions
-    });
-};
-export type ContentsListQueryResult = ApolloReactCommon.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
+/**
+ * __useContentsListQuery__
+ *
+ * To run a query within a React component, call `useContentsListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContentsListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContentsListQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useContentsListQuery(baseOptions?: Apollo.QueryHookOptions<ContentsListQuery, ContentsListQueryVariables>) {
+        return Apollo.useQuery<ContentsListQuery, ContentsListQueryVariables>(ContentsListDocument, baseOptions);
+      }
+export function useContentsListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsListQuery, ContentsListQueryVariables>) {
+          return Apollo.useLazyQuery<ContentsListQuery, ContentsListQueryVariables>(ContentsListDocument, baseOptions);
+        }
+export type ContentsListQueryHookResult = ReturnType<typeof useContentsListQuery>;
+export type ContentsListLazyQueryHookResult = ReturnType<typeof useContentsListLazyQuery>;
+export type ContentsListQueryResult = Apollo.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
 export const ContentsPageDocument = gql`
     query contentsPage($id: ID) {
   contentsList(id: $id, page: true) {
@@ -551,26 +690,209 @@ export const ContentsPageDocument = gql`
   }
 }
     ${FragmentContentsFragmentDoc}`;
-export type ContentsPageComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ContentsPageQuery, ContentsPageQueryVariables>, 'query'>;
 
-    export const ContentsPageComponent = (props: ContentsPageComponentProps) => (
-      <ApolloReactComponents.Query<ContentsPageQuery, ContentsPageQueryVariables> query={ContentsPageDocument} {...props} />
-    );
-    
-export type ContentsPageProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<ContentsPageQuery, ContentsPageQueryVariables>
-    } & TChildProps;
-export function withContentsPage<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  ContentsPageQuery,
-  ContentsPageQueryVariables,
-  ContentsPageProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, ContentsPageQuery, ContentsPageQueryVariables, ContentsPageProps<TChildProps, TDataName>>(ContentsPageDocument, {
-      alias: 'contentsPage',
-      ...operationOptions
-    });
-};
-export type ContentsPageQueryResult = ApolloReactCommon.QueryResult<ContentsPageQuery, ContentsPageQueryVariables>;
+/**
+ * __useContentsPageQuery__
+ *
+ * To run a query within a React component, call `useContentsPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContentsPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContentsPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useContentsPageQuery(baseOptions?: Apollo.QueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>) {
+        return Apollo.useQuery<ContentsPageQuery, ContentsPageQueryVariables>(ContentsPageDocument, baseOptions);
+      }
+export function useContentsPageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>) {
+          return Apollo.useLazyQuery<ContentsPageQuery, ContentsPageQueryVariables>(ContentsPageDocument, baseOptions);
+        }
+export type ContentsPageQueryHookResult = ReturnType<typeof useContentsPageQuery>;
+export type ContentsPageLazyQueryHookResult = ReturnType<typeof useContentsPageLazyQuery>;
+export type ContentsPageQueryResult = Apollo.QueryResult<ContentsPageQuery, ContentsPageQueryVariables>;
+export const DirTreeDocument = gql`
+    query dirTree {
+  dirTree {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+
+/**
+ * __useDirTreeQuery__
+ *
+ * To run a query within a React component, call `useDirTreeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDirTreeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDirTreeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useDirTreeQuery(baseOptions?: Apollo.QueryHookOptions<DirTreeQuery, DirTreeQueryVariables>) {
+        return Apollo.useQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
+      }
+export function useDirTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DirTreeQuery, DirTreeQueryVariables>) {
+          return Apollo.useLazyQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
+        }
+export type DirTreeQueryHookResult = ReturnType<typeof useDirTreeQuery>;
+export type DirTreeLazyQueryHookResult = ReturnType<typeof useDirTreeLazyQuery>;
+export type DirTreeQueryResult = Apollo.QueryResult<DirTreeQuery, DirTreeQueryVariables>;
+export const CreateDirDocument = gql`
+    mutation createDir($id: ID!, $name: String!) {
+  createDir(id: $id, name: $name) {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+export type CreateDirMutationFn = Apollo.MutationFunction<CreateDirMutation, CreateDirMutationVariables>;
+
+/**
+ * __useCreateDirMutation__
+ *
+ * To run a mutation, you first call `useCreateDirMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDirMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDirMutation, { data, loading, error }] = useCreateDirMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateDirMutation(baseOptions?: Apollo.MutationHookOptions<CreateDirMutation, CreateDirMutationVariables>) {
+        return Apollo.useMutation<CreateDirMutation, CreateDirMutationVariables>(CreateDirDocument, baseOptions);
+      }
+export type CreateDirMutationHookResult = ReturnType<typeof useCreateDirMutation>;
+export type CreateDirMutationResult = Apollo.MutationResult<CreateDirMutation>;
+export type CreateDirMutationOptions = Apollo.BaseMutationOptions<CreateDirMutation, CreateDirMutationVariables>;
+export const RenameFileDocument = gql`
+    mutation renameFile($id: ID!, $name: String!) {
+  renameFile(id: $id, name: $name) {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+export type RenameFileMutationFn = Apollo.MutationFunction<RenameFileMutation, RenameFileMutationVariables>;
+
+/**
+ * __useRenameFileMutation__
+ *
+ * To run a mutation, you first call `useRenameFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameFileMutation, { data, loading, error }] = useRenameFileMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useRenameFileMutation(baseOptions?: Apollo.MutationHookOptions<RenameFileMutation, RenameFileMutationVariables>) {
+        return Apollo.useMutation<RenameFileMutation, RenameFileMutationVariables>(RenameFileDocument, baseOptions);
+      }
+export type RenameFileMutationHookResult = ReturnType<typeof useRenameFileMutation>;
+export type RenameFileMutationResult = Apollo.MutationResult<RenameFileMutation>;
+export type RenameFileMutationOptions = Apollo.BaseMutationOptions<RenameFileMutation, RenameFileMutationVariables>;
+export const MoveFileDocument = gql`
+    mutation moveFile($targetId: ID!, $id: ID!) {
+  moveFile(targetId: $targetId, id: $id)
+}
+    `;
+export type MoveFileMutationFn = Apollo.MutationFunction<MoveFileMutation, MoveFileMutationVariables>;
+
+/**
+ * __useMoveFileMutation__
+ *
+ * To run a mutation, you first call `useMoveFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveFileMutation, { data, loading, error }] = useMoveFileMutation({
+ *   variables: {
+ *      targetId: // value for 'targetId'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useMoveFileMutation(baseOptions?: Apollo.MutationHookOptions<MoveFileMutation, MoveFileMutationVariables>) {
+        return Apollo.useMutation<MoveFileMutation, MoveFileMutationVariables>(MoveFileDocument, baseOptions);
+      }
+export type MoveFileMutationHookResult = ReturnType<typeof useMoveFileMutation>;
+export type MoveFileMutationResult = Apollo.MutationResult<MoveFileMutation>;
+export type MoveFileMutationOptions = Apollo.BaseMutationOptions<MoveFileMutation, MoveFileMutationVariables>;
+export const UploadFileDocument = gql`
+    mutation uploadFile($file: Upload!) {
+  uploadFile(file: $file)
+}
+    `;
+export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
+
+/**
+ * __useUploadFileMutation__
+ *
+ * To run a mutation, you first call `useUploadFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadFileMutation, { data, loading, error }] = useUploadFileMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useUploadFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadFileMutation, UploadFileMutationVariables>) {
+        return Apollo.useMutation<UploadFileMutation, UploadFileMutationVariables>(UploadFileDocument, baseOptions);
+      }
+export type UploadFileMutationHookResult = ReturnType<typeof useUploadFileMutation>;
+export type UploadFileMutationResult = Apollo.MutationResult<UploadFileMutation>;
+export type UploadFileMutationOptions = Apollo.BaseMutationOptions<UploadFileMutation, UploadFileMutationVariables>;
 export const UsersDocument = gql`
     query Users {
   users {
@@ -580,26 +902,31 @@ export const UsersDocument = gql`
   }
 }
     `;
-export type UsersComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<UsersQuery, UsersQueryVariables>, 'query'>;
 
-    export const UsersComponent = (props: UsersComponentProps) => (
-      <ApolloReactComponents.Query<UsersQuery, UsersQueryVariables> query={UsersDocument} {...props} />
-    );
-    
-export type UsersProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<UsersQuery, UsersQueryVariables>
-    } & TChildProps;
-export function withUsers<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  UsersQuery,
-  UsersQueryVariables,
-  UsersProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, UsersQuery, UsersQueryVariables, UsersProps<TChildProps, TDataName>>(UsersDocument, {
-      alias: 'users',
-      ...operationOptions
-    });
-};
-export type UsersQueryResult = ApolloReactCommon.QueryResult<UsersQuery, UsersQueryVariables>;
+/**
+ * __useUsersQuery__
+ *
+ * To run a query within a React component, call `useUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUsersQuery(baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>) {
+        return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
+      }
+export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>) {
+          return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
+        }
+export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
+export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
+export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {
@@ -611,26 +938,31 @@ export const CurrentUserDocument = gql`
   }
 }
     `;
-export type CurrentUserComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<CurrentUserQuery, CurrentUserQueryVariables>, 'query'>;
 
-    export const CurrentUserComponent = (props: CurrentUserComponentProps) => (
-      <ApolloReactComponents.Query<CurrentUserQuery, CurrentUserQueryVariables> query={CurrentUserDocument} {...props} />
-    );
-    
-export type CurrentUserProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<CurrentUserQuery, CurrentUserQueryVariables>
-    } & TChildProps;
-export function withCurrentUser<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  CurrentUserQuery,
-  CurrentUserQueryVariables,
-  CurrentUserProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, CurrentUserQuery, CurrentUserQueryVariables, CurrentUserProps<TChildProps, TDataName>>(CurrentUserDocument, {
-      alias: 'currentUser',
-      ...operationOptions
-    });
-};
-export type CurrentUserQueryResult = ApolloReactCommon.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
+/**
+ * __useCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+        return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, baseOptions);
+      }
+export function useCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+          return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, baseOptions);
+        }
+export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
+export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
+export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($name: String!, $password: String!) {
   login(name: $name, password: $password) {
@@ -643,28 +975,32 @@ export const LoginDocument = gql`
   }
 }
     `;
-export type LoginMutationFn = ApolloReactCommon.MutationFunction<LoginMutation, LoginMutationVariables>;
-export type LoginComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<LoginMutation, LoginMutationVariables>, 'mutation'>;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
-    export const LoginComponent = (props: LoginComponentProps) => (
-      <ApolloReactComponents.Mutation<LoginMutation, LoginMutationVariables> mutation={LoginDocument} {...props} />
-    );
-    
-export type LoginProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<LoginMutation, LoginMutationVariables>
-    } & TChildProps;
-export function withLogin<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  LoginMutation,
-  LoginMutationVariables,
-  LoginProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, LoginMutation, LoginMutationVariables, LoginProps<TChildProps, TDataName>>(LoginDocument, {
-      alias: 'login',
-      ...operationOptions
-    });
-};
-export type LoginMutationResult = ApolloReactCommon.MutationResult<LoginMutation>;
-export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const CreateUserDocument = gql`
     mutation createUser($name: String!, $password: String!, $info: String) {
   createUser(name: $name, password: $password, info: $info) {
@@ -674,28 +1010,33 @@ export const CreateUserDocument = gql`
   }
 }
     `;
-export type CreateUserMutationFn = ApolloReactCommon.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
-export type CreateUserComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateUserMutation, CreateUserMutationVariables>, 'mutation'>;
+export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
 
-    export const CreateUserComponent = (props: CreateUserComponentProps) => (
-      <ApolloReactComponents.Mutation<CreateUserMutation, CreateUserMutationVariables> mutation={CreateUserDocument} {...props} />
-    );
-    
-export type CreateUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateUserMutation, CreateUserMutationVariables>
-    } & TChildProps;
-export function withCreateUser<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  CreateUserMutation,
-  CreateUserMutationVariables,
-  CreateUserProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, CreateUserMutation, CreateUserMutationVariables, CreateUserProps<TChildProps, TDataName>>(CreateUserDocument, {
-      alias: 'createUser',
-      ...operationOptions
-    });
-};
-export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      password: // value for 'password'
+ *      info: // value for 'info'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, baseOptions);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: Int!, $name: String, $password: String, $info: String) {
   updateUser(id: $id, name: $name, password: $password, info: $info) {
@@ -705,52 +1046,61 @@ export const UpdateUserDocument = gql`
   }
 }
     `;
-export type UpdateUserMutationFn = ApolloReactCommon.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
-export type UpdateUserComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateUserMutation, UpdateUserMutationVariables>, 'mutation'>;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
 
-    export const UpdateUserComponent = (props: UpdateUserComponentProps) => (
-      <ApolloReactComponents.Mutation<UpdateUserMutation, UpdateUserMutationVariables> mutation={UpdateUserDocument} {...props} />
-    );
-    
-export type UpdateUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>
-    } & TChildProps;
-export function withUpdateUser<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  UpdateUserMutation,
-  UpdateUserMutationVariables,
-  UpdateUserProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, UpdateUserMutation, UpdateUserMutationVariables, UpdateUserProps<TChildProps, TDataName>>(UpdateUserDocument, {
-      alias: 'updateUser',
-      ...operationOptions
-    });
-};
-export type UpdateUserMutationResult = ApolloReactCommon.MutationResult<UpdateUserMutation>;
-export type UpdateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      password: // value for 'password'
+ *      info: // value for 'info'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, baseOptions);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const DeleteUsersDocument = gql`
     mutation deleteUsers($ids: [Int!]!) {
   deleteUsers(ids: $ids)
 }
     `;
-export type DeleteUsersMutationFn = ApolloReactCommon.MutationFunction<DeleteUsersMutation, DeleteUsersMutationVariables>;
-export type DeleteUsersComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteUsersMutation, DeleteUsersMutationVariables>, 'mutation'>;
+export type DeleteUsersMutationFn = Apollo.MutationFunction<DeleteUsersMutation, DeleteUsersMutationVariables>;
 
-    export const DeleteUsersComponent = (props: DeleteUsersComponentProps) => (
-      <ApolloReactComponents.Mutation<DeleteUsersMutation, DeleteUsersMutationVariables> mutation={DeleteUsersDocument} {...props} />
-    );
-    
-export type DeleteUsersProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
-      [key in TDataName]: ApolloReactCommon.MutationFunction<DeleteUsersMutation, DeleteUsersMutationVariables>
-    } & TChildProps;
-export function withDeleteUsers<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  DeleteUsersMutation,
-  DeleteUsersMutationVariables,
-  DeleteUsersProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withMutation<TProps, DeleteUsersMutation, DeleteUsersMutationVariables, DeleteUsersProps<TChildProps, TDataName>>(DeleteUsersDocument, {
-      alias: 'deleteUsers',
-      ...operationOptions
-    });
-};
-export type DeleteUsersMutationResult = ApolloReactCommon.MutationResult<DeleteUsersMutation>;
-export type DeleteUsersMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteUsersMutation, DeleteUsersMutationVariables>;
+/**
+ * __useDeleteUsersMutation__
+ *
+ * To run a mutation, you first call `useDeleteUsersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUsersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUsersMutation, { data, loading, error }] = useDeleteUsersMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useDeleteUsersMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUsersMutation, DeleteUsersMutationVariables>) {
+        return Apollo.useMutation<DeleteUsersMutation, DeleteUsersMutationVariables>(DeleteUsersDocument, baseOptions);
+      }
+export type DeleteUsersMutationHookResult = ReturnType<typeof useDeleteUsersMutation>;
+export type DeleteUsersMutationResult = Apollo.MutationResult<DeleteUsersMutation>;
+export type DeleteUsersMutationOptions = Apollo.BaseMutationOptions<DeleteUsersMutation, DeleteUsersMutationVariables>;

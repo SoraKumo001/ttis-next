@@ -26,11 +26,11 @@ import {
   SessionType,
   createSessionProps,
 } from "../libs/next-express-session";
-import axios from "axios";
 import { Header } from "@components/Header";
 import * as nextRouter from "next/router";
 import { setContext } from "apollo-link-context";
 import { Footer } from "@components/Footer";
+import { createUploadLink, UploadLinkOptions } from "apollo-upload-client";
 const IS_BROWSER = !!process.browser;
 const IS_DOCKER =
   process.env.NODE_ENV === "production" &&
@@ -50,9 +50,10 @@ export interface AuthLink extends ApolloLink {
 }
 export const createAuthLink = (options: HttpLink.Options) => {
   let bearerToken: string;
+  const link = createUploadLink(options as UploadLinkOptions);
   const apolloLink = setContext((_, { headers }) => ({
     headers: { ...headers, authorization: `bearer ${bearerToken || ""}` },
-  })).concat(new HttpLink(options)) as AuthLink;
+  })).concat(link as any ) as AuthLink;
   apolloLink.setToken = (token) => {
     bearerToken = token || "";
   };

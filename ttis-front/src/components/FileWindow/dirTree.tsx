@@ -10,8 +10,6 @@ import {
   RenameFileMutationVariables,
 } from "@generated/graphql";
 import { InputWindow } from "./InputWindow";
-import { default } from '../../pages/api/token';
-
 
 type DirItem = NonNullable<DirTreeQuery["dirTree"]>[0] & {
   parent?: DirItem;
@@ -77,7 +75,7 @@ export const DirTreeView = () => {
             client.mutate<CreateDirMutation, CreateDirMutationVariables>({
               mutation: CREATE_DIR,
               variables: {
-                id: selectItem?.id,
+                id: selectItem?.id!,
                 name: input,
               },
               update: () => {

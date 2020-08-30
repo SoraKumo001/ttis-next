@@ -1,4 +1,12 @@
-import { Resolver, Args, Info, ID, Int, Query, Mutation } from '@nestjs/graphql';
+import {
+  Resolver,
+  Args,
+  Info,
+  ID,
+  Int,
+  Query,
+  Mutation,
+} from '@nestjs/graphql';
 import { FilesService } from './files.service';
 import { JwtAuthGuard, CurrentUser } from 'src/auth/auth.guard';
 import { UseGuards } from '@nestjs/common';
@@ -29,7 +37,7 @@ export class FilesResolver {
   ) {
     if (!user) return null;
     const { service } = this;
-    return service.createDir(id,name);
+    return service.createDir(id, name);
   }
   @UseGuards(JwtAuthGuard)
   @Mutation(() => Files, { nullable: true })
@@ -40,7 +48,7 @@ export class FilesResolver {
   ) {
     if (!user) return null;
     const { service } = this;
-    return service.rename(id,name);
+    return service.rename(id, name);
   }
   @UseGuards(JwtAuthGuard)
   @Mutation(() => Boolean, { nullable: true })
@@ -51,20 +59,20 @@ export class FilesResolver {
   ) {
     if (!user) return null;
     const { service } = this;
-    return service.move(targetId,id);
+    return service.move(targetId, id);
   }
 
   @Mutation(() => Boolean, { nullable: true })
-  async uploadFile(@Args({name: 'file', type: () => GraphQLUpload})
-  {
-      createReadStream,
-      filename
-  }: FileUpload): Promise<boolean> {
-      return new Promise(async (resolve, reject) => 
-          createReadStream()
-              .pipe(createWriteStream(`./uploads/${filename}`))
-              .on('finish', () => resolve(true))
-              .on('error', () => reject(false))
-      );
+  async uploadFile(
+    @Args({ name: 'file', type: () => GraphQLUpload })
+    { createReadStream, filename }: FileUpload,
+  ): Promise<boolean> {
+    console.log('upload');
+    return new Promise(async (resolve, reject) =>
+      createReadStream()
+        .pipe(createWriteStream(`./uploads/${filename}`))
+        .on('finish', () => resolve(true))
+        .on('error', () => reject(false)),
+    );
   }
 }

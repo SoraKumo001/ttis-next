@@ -60,7 +60,14 @@ type Mutation {
   createDir(name: String!, id: ID!): Files
   renameFile(name: String!, id: ID!): Files
   moveFile(id: ID!, targetId: ID!): Boolean
-  uploadFile(file: Upload!): Boolean
+
+  """ファイルのアップロード"""
+  uploadFile(
+    file: Upload!
+
+    """親ID"""
+    parentId: ID!
+  ): ID
 }
 
 type Query {

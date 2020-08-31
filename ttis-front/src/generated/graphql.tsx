@@ -73,7 +73,7 @@ export type Mutation = {
   createDir?: Maybe<Files>;
   renameFile?: Maybe<Files>;
   moveFile?: Maybe<Scalars['Boolean']>;
-  uploadFile?: Maybe<Scalars['Boolean']>;
+  uploadFile: Scalars['Boolean'];
 };
 
 
@@ -163,6 +163,7 @@ export type MutationMoveFileArgs = {
 
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
+  parentId: Scalars['ID'];
 };
 
 export type Query = {
@@ -357,6 +358,7 @@ export type MoveFileMutation = (
 );
 
 export type UploadFileMutationVariables = Exact<{
+  parentId: Scalars['ID'];
   file: Scalars['Upload'];
 }>;
 
@@ -864,8 +866,8 @@ export type MoveFileMutationHookResult = ReturnType<typeof useMoveFileMutation>;
 export type MoveFileMutationResult = Apollo.MutationResult<MoveFileMutation>;
 export type MoveFileMutationOptions = Apollo.BaseMutationOptions<MoveFileMutation, MoveFileMutationVariables>;
 export const UploadFileDocument = gql`
-    mutation uploadFile($file: Upload!) {
-  uploadFile(file: $file)
+    mutation uploadFile($parentId: ID!, $file: Upload!) {
+  uploadFile(parentId: $parentId, file: $file)
 }
     `;
 export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
@@ -883,6 +885,7 @@ export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, U
  * @example
  * const [uploadFileMutation, { data, loading, error }] = useUploadFileMutation({
  *   variables: {
+ *      parentId: // value for 'parentId'
  *      file: // value for 'file'
  *   },
  * });

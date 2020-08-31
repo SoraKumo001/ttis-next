@@ -92,4 +92,17 @@ export class FilesService {
     });
     return (await rep.save(list)) !== null;
   }
+
+  public async saveFile(parentId: string, name: string, buffer: Buffer) {
+    const { rep } = this;
+    const file = (
+      (await rep.save({
+        kind: 1,
+        name,
+        parent: { id: parentId },
+        value:buffer,
+      }))
+    );
+    return file?.id;
+  }
 }

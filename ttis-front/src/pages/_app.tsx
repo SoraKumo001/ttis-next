@@ -1,21 +1,8 @@
 import React from "react";
 import NextApp, { AppContext, createUrl } from "next/app";
 
-export type NextWebVitalsMetrics = {
-  id: string;
-  label: string;
-  name: string;
-  startTime: number;
-  value: number;
-}
-
-export function reportWebVitals(metric:NextWebVitalsMetrics) {
-  console.log(metric)
-}
-
 import {
   ApolloClient,
-  HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
   ApolloLink,
@@ -31,6 +18,19 @@ import * as nextRouter from "next/router";
 import { setContext } from "apollo-link-context";
 import { Footer } from "@components/Footer";
 import { createUploadLink, UploadLinkOptions } from "apollo-upload-client";
+
+export type NextWebVitalsMetrics = {
+  id: string;
+  label: string;
+  name: string;
+  startTime: number;
+  value: number;
+}
+
+export function reportWebVitals(metric:NextWebVitalsMetrics) {
+  console.log(metric)
+}
+
 const IS_BROWSER = !!process.browser;
 const IS_DOCKER =
   process.env.NODE_ENV === "production" &&
@@ -48,12 +48,12 @@ export interface AuthLink extends ApolloLink {
   setToken: (token?: string) => void;
   getToken: () => string;
 }
-export const createAuthLink = (options: HttpLink.Options) => {
+export const createAuthLink = (options: UploadLinkOptions) => {
   let bearerToken: string;
-  const link = createUploadLink(options as UploadLinkOptions);
+  const link = createUploadLink(options) as unknown as ApolloLink;
   const apolloLink = setContext((_, { headers }) => ({
     headers: { ...headers, authorization: `bearer ${bearerToken || ""}` },
-  })).concat(link as any ) as AuthLink;
+  })).concat(link) as AuthLink;
   apolloLink.setToken = (token) => {
     bearerToken = token || "";
   };

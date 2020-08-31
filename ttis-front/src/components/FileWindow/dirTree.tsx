@@ -16,7 +16,11 @@ type DirItem = NonNullable<DirTreeQuery["dirTree"]>[0] & {
   children?: DirItem[];
 };
 
-export const DirTreeView = () => {
+interface Props{
+  onSelect?:(id:string)=>void
+}
+
+export const DirTreeView = ({onSelect} : Props) => {
   const { data } = useQuery<DirTreeQuery>(QUERY_DIR);
   const treeViewRef = useRef<TreeView>(null);
 
@@ -59,7 +63,10 @@ export const DirTreeView = () => {
       </style>
       <div className="root">
         <TreeView ref={treeViewRef} onItemClick={item=>{
-          selectItemRef.current = item.getValue() as DirItem;
+          const dirItem = item.getValue() as DirItem;
+          selectItemRef.current = dirItem
+          if(onSelect)
+            onSelect(dirItem.id);
         }}>{tree && createTreeItem(tree)}</TreeView>
         <div className="panel">
           <button onClick={() => setCreateDir(true)}>Create</button>

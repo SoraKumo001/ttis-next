@@ -71,7 +71,8 @@ export type Mutation = {
   createDir?: Maybe<Files>;
   renameFile?: Maybe<Files>;
   moveFile?: Maybe<Scalars['Boolean']>;
-  uploadFile?: Maybe<Scalars['Boolean']>;
+  /** ファイルのアップロード */
+  uploadFile?: Maybe<Scalars['ID']>;
 };
 
 
@@ -161,6 +162,7 @@ export type MutationMoveFileArgs = {
 
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
+  parentId: Scalars['ID'];
 };
 
 export type Query = {

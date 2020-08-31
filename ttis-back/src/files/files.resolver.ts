@@ -11,10 +11,10 @@ import { FilesService } from './files.service';
 import { JwtAuthGuard, CurrentUser } from 'src/auth/auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { User } from '@graphql/types';
-import { GraphQLUpload, FileUpload } from 'graphql-upload';
-import { createWriteStream } from 'fs';
+import { GraphQLUpload } from 'apollo-server-express';
 
 import { Files } from './files';
+import { FileUpload } from 'graphql-upload';
 
 @Resolver('Files')
 export class FilesResolver {
@@ -61,17 +61,27 @@ export class FilesResolver {
     const { service } = this;
     return service.move(targetId, id);
   }
-
-  @Mutation(() => Boolean, { nullable: true })
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => ID,{ nullable: true ,description:"ファイルのアップロード"})
   async uploadFile(
+    @CurrentUser() user: User,
+    @Args({ name: 'parentId', type: () => ID ,description:"親ID"})
+    parentId: string,
     @Args({ name: 'file', type: () => GraphQLUpload })
-    { createReadStream, filename }: FileUpload,
-  ): Promise<boolean> {
-    console.log('upload');
+    file: FileUpload,
+  ): Promise<string|null> {
+    if (!user) return null;
+    let buffer = Buffer.alloc(0);
+    const { service } = this;
     return new Promise(async (resolve, reject) =>
-      createReadStream()
-        .pipe(createWriteStream(`./uploads/${filename}`))
-        .on('finish', () => resolve(true))
+      file
+        .createReadStream()
+        .on('data', (value) => {
+          buffer = Buffer.concat([buffer, value as Buffer]);
+        })
+        .on('end', () => {
+          resolve(service.saveFile(parentId,file.filename,buffer));
+        })
         .on('error', () => reject(false)),
     );
   }

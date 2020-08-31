@@ -47,7 +47,7 @@ export const MOVE_FILE = gql`
 `;
 
 export const UPLOAD_FILE = gql`
-  mutation uploadFile($file: Upload!) {
-    uploadFile(file: $file)
+  mutation uploadFile($parentId: ID!, $file: Upload!) {
+    uploadFile(parentId: $parentId, file: $file)
   }
 `;

@@ -62,14 +62,22 @@ export class FilesResolver {
     return service.move(targetId, id);
   }
   @UseGuards(JwtAuthGuard)
-  @Mutation(() => ID,{ nullable: true ,description:"ファイルのアップロード"})
+  @Mutation(() => ID, { nullable: true, description: 'ファイルのアップロード' })
   async uploadFile(
     @CurrentUser() user: User,
-    @Args({ name: 'parentId', type: () => ID ,description:"親ID"})
+    @Args({
+      name: 'parentId',
+      type: () => ID,
+      description: '親ディレクトリのID',
+    })
     parentId: string,
-    @Args({ name: 'file', type: () => GraphQLUpload })
+    @Args({
+      name: 'file',
+      type: () => GraphQLUpload,
+      description: 'graphql-uploadのファイルデータ',
+    })
     file: FileUpload,
-  ): Promise<string|null> {
+  ): Promise<string | null> {
     if (!user) return null;
     let buffer = Buffer.alloc(0);
     const { service } = this;
@@ -80,7 +88,7 @@ export class FilesResolver {
           buffer = Buffer.concat([buffer, value as Buffer]);
         })
         .on('end', () => {
-          resolve(service.saveFile(parentId,file.filename,buffer));
+          resolve(service.saveFile(parentId, file.filename, buffer));
         })
         .on('error', () => reject(false)),
     );

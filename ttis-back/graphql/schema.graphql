@@ -63,9 +63,10 @@ type Mutation {
 
   """ファイルのアップロード"""
   uploadFile(
+    """graphql-uploadのファイルデータ"""
     file: Upload!
 
-    """親ID"""
+    """親ディレクトリのID"""
     parentId: ID!
   ): ID
 }

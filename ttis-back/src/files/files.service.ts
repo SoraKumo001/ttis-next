@@ -95,14 +95,26 @@ export class FilesService {
 
   public async saveFile(parentId: string, name: string, buffer: Buffer) {
     const { rep } = this;
-    const file = (
-      (await rep.save({
-        kind: 1,
-        name,
-        parent: { id: parentId },
-        value:buffer,
-      }))
-    );
+    const file = await rep.save({
+      kind: 1,
+      name,
+      parent: { id: parentId },
+      value: buffer,
+    });
     return file?.id;
+  }
+  public async getFile(id: string) {
+    const { rep } = this;
+    const result = (await rep
+      .createQueryBuilder()
+      .select('name,octet_length(value) as size,"updateAt",value')
+      .where('id=:id and kind=1', { id })
+      .getRawOne()) as {
+      name: string;
+      size: number;
+      date: string;
+      value: Buffer;
+    };
+    return result;
   }
 }

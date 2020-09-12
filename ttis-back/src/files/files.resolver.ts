@@ -1,9 +1,7 @@
 import {
   Resolver,
   Args,
-  Info,
   ID,
-  Int,
   Query,
   Mutation,
 } from '@nestjs/graphql';

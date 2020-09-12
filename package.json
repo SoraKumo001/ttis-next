@@ -1,11 +1,11 @@
 {
   "name": "ttis",
   "scripts": {
+    "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
+    "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
     "test": "yarn --cwd ttis-back test",
     "test:snapshot": "yarn --cwd ttis-back test:snapshot",
     "generate": "npm-run-all -p generate:*",
-    "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
-    "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
     "start:dev:back": "yarn --cwd ttis-back start:dev",
     "start:dev:front": "yarn --cwd ttis-front dev",
     "start:prod:back": "yarn --cwd ttis-back build && yarn --cwd ttis-back start",

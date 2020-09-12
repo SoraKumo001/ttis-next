@@ -18,17 +18,22 @@ type Contents {
   updateAt: DateTime!
 }
 
-enum ContentsVector {
-  CHILD_FIRST
-  CHILD_LAST
-  BEFORE
-  NEXT
-}
-
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type User {
+  id: Int!
+  enable: Boolean!
+  name: String!
+  info: String!
+}
+
+type Login {
+  token: String!
+  user: User!
+}
 
 type Files {
   id: ID!
@@ -42,9 +47,13 @@ type Files {
   updateAt: DateTime!
 }
 
-type Login {
-  token: String!
-  user: User!
+type Query {
+  contentsTree(level: Int, visible: Boolean, page: Boolean, id: ID): Contents!
+  contentsList(level: Int, visible: Boolean, page: Boolean, id: ID): [Contents!]!
+  contents(id: ID): Contents
+  users: [User!]
+  currentUser: Login
+  dirTree: [Files!]
 }
 
 type Mutation {
@@ -71,21 +80,12 @@ type Mutation {
   ): ID
 }
 
-type Query {
-  contentsTree(level: Int, visible: Boolean, page: Boolean, id: ID): Contents!
-  contentsList(level: Int, visible: Boolean, page: Boolean, id: ID): [Contents!]!
-  contents(id: ID): Contents
-  users: [User!]
-  currentUser: Login
-  dirTree: [Files!]
+enum ContentsVector {
+  CHILD_FIRST
+  CHILD_LAST
+  BEFORE
+  NEXT
 }
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-type User {
-  id: Int!
-  enable: Boolean!
-  name: String!
-  info: String!
-}

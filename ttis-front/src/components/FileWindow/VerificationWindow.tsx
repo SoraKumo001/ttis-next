@@ -3,27 +3,24 @@ import { useEffect, useRef } from "react";
 
 interface Props {
   title: string;
+  message: string;
   onClose: () => void;
-  onEnter: (value: string) => {};
+  onEnter: (value: boolean) => void;
   defaultValue?: string;
 }
 
-export const InputWindow = ({
+export const VericationWindow = ({
   title,
+  message,
   onClose,
   onEnter,
-  defaultValue,
 }: Props) => {
-  const refInput = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    refInput.current!.focus();
-  }, []);
   return (
     <div className="root">
       <style jsx>{`
       .root{
         position: fixed;
-        z-index:1;
+        z-index: 1;
       }
       .client{
         margin: 16px 5%;
@@ -31,29 +28,28 @@ export const InputWindow = ({
         height:32px;
         position: absolute;
         display: flex;
+        flex-direction: column;
       }
-      input{
-        flex:1
+      .message{
+          margin-bottom: 16px; 
+      }
+      button{
+        border-radius: 4px;
+        margin: 4px;
+        padding: 2px;
       }
       }`}</style>
       <JSWindow
-        height={120}
+        height={200}
         title={title}
         onUpdate={(params) => {
           params.realWindowState === WindowState.HIDE && onClose();
         }}
       >
         <div className="client">
-          <input
-            ref={refInput}
-            defaultValue={defaultValue}
-            onKeyDown={(e) => {
-              if (e.keyCode === 0xa) {
-                onEnter(refInput.current!.value);
-              }
-            }}
-          />
-          <button onClick={() => onEnter(refInput.current!.value)}>Set</button>
+          <div className="message">{message}</div>
+          <button onClick={() => onEnter(true)}>OK</button>
+          <button onClick={() => onEnter(false)}>Cancel</button>
         </div>
       </JSWindow>
     </div>

@@ -30,13 +30,20 @@ export type Contents = {
   updateAt: Scalars['DateTime'];
 };
 
-export enum ContentsVector {
-  ChildFirst = 'CHILD_FIRST',
-  ChildLast = 'CHILD_LAST',
-  Before = 'BEFORE',
-  Next = 'NEXT'
-}
 
+export type User = {
+  __typename?: 'User';
+  id: Scalars['Int'];
+  enable: Scalars['Boolean'];
+  name: Scalars['String'];
+  info: Scalars['String'];
+};
+
+export type Login = {
+  __typename?: 'Login';
+  token: Scalars['String'];
+  user: User;
+};
 
 export type Files = {
   __typename?: 'Files';
@@ -51,10 +58,41 @@ export type Files = {
   updateAt: Scalars['DateTime'];
 };
 
-export type Login = {
-  __typename?: 'Login';
-  token: Scalars['String'];
-  user: User;
+export type Query = {
+  __typename?: 'Query';
+  contentsTree: Contents;
+  contentsList: Array<Contents>;
+  contents?: Maybe<Contents>;
+  users?: Maybe<Array<User>>;
+  currentUser?: Maybe<Login>;
+  dirTree?: Maybe<Array<Files>>;
+  dirFiles?: Maybe<Array<Files>>;
+};
+
+
+export type QueryContentsTreeArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsListArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryDirFilesArgs = {
+  id: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -70,6 +108,11 @@ export type Mutation = {
   login?: Maybe<Login>;
   createDir?: Maybe<Files>;
   renameFile?: Maybe<Files>;
+  /** 複数ファイルの削除 */
+  deleteFile?: Maybe<Scalars['Boolean']>;
+  /** 複数ファイルの削除 */
+  deleteFiles?: Maybe<Scalars['Boolean']>;
+  /** ファイルの移動 */
   moveFile?: Maybe<Scalars['Boolean']>;
   /** ファイルのアップロード */
   uploadFile?: Maybe<Scalars['ID']>;
@@ -154,6 +197,16 @@ export type MutationRenameFileArgs = {
 };
 
 
+export type MutationDeleteFileArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteFilesArgs = {
+  ids: Array<Scalars['ID']>;
+};
+
+
 export type MutationMoveFileArgs = {
   id: Scalars['ID'];
   targetId: Scalars['ID'];
@@ -165,45 +218,13 @@ export type MutationUploadFileArgs = {
   parentId: Scalars['ID'];
 };
 
-export type Query = {
-  __typename?: 'Query';
-  contentsTree: Contents;
-  contentsList: Array<Contents>;
-  contents?: Maybe<Contents>;
-  users?: Maybe<Array<User>>;
-  currentUser?: Maybe<Login>;
-  dirTree?: Maybe<Array<Files>>;
-};
+export enum ContentsVector {
+  ChildFirst = 'CHILD_FIRST',
+  ChildLast = 'CHILD_LAST',
+  Before = 'BEFORE',
+  Next = 'NEXT'
+}
 
-
-export type QueryContentsTreeArgs = {
-  level?: Maybe<Scalars['Int']>;
-  visible?: Maybe<Scalars['Boolean']>;
-  page?: Maybe<Scalars['Boolean']>;
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryContentsListArgs = {
-  level?: Maybe<Scalars['Int']>;
-  visible?: Maybe<Scalars['Boolean']>;
-  page?: Maybe<Scalars['Boolean']>;
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryContentsArgs = {
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type User = {
-  __typename?: 'User';
-  id: Scalars['Int'];
-  enable: Scalars['Boolean'];
-  name: Scalars['String'];
-  info: Scalars['String'];
-};
 
 export type FragmentContentsFragment = (
   { __typename?: 'Contents' }

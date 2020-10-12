@@ -14,6 +14,20 @@ export const QUERY_DIR = gql`
   }
 `;
 
+export const QUERY_FILES = gql`
+  query dirFiles($id: ID!) {
+    dirFiles(id: $id) {
+      id
+      kind
+      name
+      parentId
+      size
+      createAt
+      updateAt
+    }
+  }
+`;
+
 export const CREATE_DIR = gql`
   mutation createDir($id: ID!, $name: String!) {
     createDir(id: $id, name: $name) {
@@ -38,6 +52,16 @@ export const RENAME_FILE = gql`
       createAt
       updateAt
     }
+  }
+`;
+export const DELETE_FILE = gql`
+  mutation deleteFile($id: ID!) {
+    deleteFile(id: $id)
+  }
+`;
+export const DELETE_FILES = gql`
+  mutation deleteFiles($ids: [ID!]!) {
+    deleteFiles(ids: $ids)
   }
 `;
 export const MOVE_FILE = gql`

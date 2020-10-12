@@ -1,10 +1,4 @@
-import {
-  Resolver,
-  Args,
-  ID,
-  Query,
-  Mutation,
-} from '@nestjs/graphql';
+import { Resolver, Args, ID, Query, Mutation } from '@nestjs/graphql';
 import { FilesService } from './files.service';
 import { JwtAuthGuard, CurrentUser } from 'src/auth/auth.guard';
 import { UseGuards } from '@nestjs/common';
@@ -24,6 +18,16 @@ export class FilesResolver {
     if (!user) return null;
     const { service } = this;
     return service.getDirList();
+  }
+  @UseGuards(JwtAuthGuard)
+  @Query(() => [Files], { nullable: true })
+  async dirFiles(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID }) id: string,
+  ) {
+    if (!user) return null;
+    const { service } = this;
+    return service.getFileList(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,7 +53,34 @@ export class FilesResolver {
     return service.rename(id, name);
   }
   @UseGuards(JwtAuthGuard)
-  @Mutation(() => Boolean, { nullable: true })
+  @Mutation(() => Boolean, {
+    nullable: true,
+    description: '複数ファイルの削除',
+  })
+  async deleteFile(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID }) id: string,
+  ) {
+    if (!user) return null;
+    const { service } = this;
+    return service.deleteFile(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Boolean, {
+    nullable: true,
+    description: '複数ファイルの削除',
+  })
+  async deleteFiles(
+    @CurrentUser() user: User,
+    @Args('ids', { type: () => [ID] }) ids: string[],
+  ) {
+    if (!user) return null;
+    const { service } = this;
+    const result = ids.map((id) => service.deleteFile(id));
+    return (await Promise.all(result)).reduce((a, c) => a && c, true);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Boolean, { nullable: true, description: 'ファイルの移動' })
   async moveFile(
     @CurrentUser() user: User,
     @Args('targetId', { type: () => ID }) targetId: string,

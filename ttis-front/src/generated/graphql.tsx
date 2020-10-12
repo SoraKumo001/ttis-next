@@ -32,13 +32,20 @@ export type Contents = {
   updateAt: Scalars['DateTime'];
 };
 
-export enum ContentsVector {
-  ChildFirst = 'CHILD_FIRST',
-  ChildLast = 'CHILD_LAST',
-  Before = 'BEFORE',
-  Next = 'NEXT'
-}
 
+export type User = {
+  __typename?: 'User';
+  id: Scalars['Int'];
+  enable: Scalars['Boolean'];
+  name: Scalars['String'];
+  info: Scalars['String'];
+};
+
+export type Login = {
+  __typename?: 'Login';
+  token: Scalars['String'];
+  user: User;
+};
 
 export type Files = {
   __typename?: 'Files';
@@ -53,10 +60,41 @@ export type Files = {
   updateAt: Scalars['DateTime'];
 };
 
-export type Login = {
-  __typename?: 'Login';
-  token: Scalars['String'];
-  user: User;
+export type Query = {
+  __typename?: 'Query';
+  contentsTree: Contents;
+  contentsList: Array<Contents>;
+  contents?: Maybe<Contents>;
+  users?: Maybe<Array<User>>;
+  currentUser?: Maybe<Login>;
+  dirTree?: Maybe<Array<Files>>;
+  dirFiles?: Maybe<Array<Files>>;
+};
+
+
+export type QueryContentsTreeArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsListArgs = {
+  level?: Maybe<Scalars['Int']>;
+  visible?: Maybe<Scalars['Boolean']>;
+  page?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryContentsArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryDirFilesArgs = {
+  id: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -72,8 +110,14 @@ export type Mutation = {
   login?: Maybe<Login>;
   createDir?: Maybe<Files>;
   renameFile?: Maybe<Files>;
+  /** 複数ファイルの削除 */
+  deleteFile?: Maybe<Scalars['Boolean']>;
+  /** 複数ファイルの削除 */
+  deleteFiles?: Maybe<Scalars['Boolean']>;
+  /** ファイルの移動 */
   moveFile?: Maybe<Scalars['Boolean']>;
-  uploadFile: Scalars['Boolean'];
+  /** ファイルのアップロード */
+  uploadFile?: Maybe<Scalars['ID']>;
 };
 
 
@@ -155,6 +199,16 @@ export type MutationRenameFileArgs = {
 };
 
 
+export type MutationDeleteFileArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationDeleteFilesArgs = {
+  ids: Array<Scalars['ID']>;
+};
+
+
 export type MutationMoveFileArgs = {
   id: Scalars['ID'];
   targetId: Scalars['ID'];
@@ -166,45 +220,13 @@ export type MutationUploadFileArgs = {
   parentId: Scalars['ID'];
 };
 
-export type Query = {
-  __typename?: 'Query';
-  contentsTree: Contents;
-  contentsList: Array<Contents>;
-  contents?: Maybe<Contents>;
-  users?: Maybe<Array<User>>;
-  currentUser?: Maybe<Login>;
-  dirTree?: Maybe<Array<Files>>;
-};
+export enum ContentsVector {
+  ChildFirst = 'CHILD_FIRST',
+  ChildLast = 'CHILD_LAST',
+  Before = 'BEFORE',
+  Next = 'NEXT'
+}
 
-
-export type QueryContentsTreeArgs = {
-  level?: Maybe<Scalars['Int']>;
-  visible?: Maybe<Scalars['Boolean']>;
-  page?: Maybe<Scalars['Boolean']>;
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryContentsListArgs = {
-  level?: Maybe<Scalars['Int']>;
-  visible?: Maybe<Scalars['Boolean']>;
-  page?: Maybe<Scalars['Boolean']>;
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type QueryContentsArgs = {
-  id?: Maybe<Scalars['ID']>;
-};
-
-
-export type User = {
-  __typename?: 'User';
-  id: Scalars['Int'];
-  enable: Scalars['Boolean'];
-  name: Scalars['String'];
-  info: Scalars['String'];
-};
 
 export type ContentsQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -318,6 +340,19 @@ export type DirTreeQuery = (
   )>> }
 );
 
+export type DirFilesQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DirFilesQuery = (
+  { __typename?: 'Query' }
+  & { dirFiles?: Maybe<Array<(
+    { __typename?: 'Files' }
+    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
+  )>> }
+);
+
 export type CreateDirMutationVariables = Exact<{
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -344,6 +379,26 @@ export type RenameFileMutation = (
     { __typename?: 'Files' }
     & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
   )> }
+);
+
+export type DeleteFileMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteFile'>
+);
+
+export type DeleteFilesMutationVariables = Exact<{
+  ids: Array<Scalars['ID']>;
+}>;
+
+
+export type DeleteFilesMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteFiles'>
 );
 
 export type MoveFileMutationVariables = Exact<{
@@ -756,6 +811,45 @@ export function useDirTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Di
 export type DirTreeQueryHookResult = ReturnType<typeof useDirTreeQuery>;
 export type DirTreeLazyQueryHookResult = ReturnType<typeof useDirTreeLazyQuery>;
 export type DirTreeQueryResult = Apollo.QueryResult<DirTreeQuery, DirTreeQueryVariables>;
+export const DirFilesDocument = gql`
+    query dirFiles($id: ID!) {
+  dirFiles(id: $id) {
+    id
+    kind
+    name
+    parentId
+    size
+    createAt
+    updateAt
+  }
+}
+    `;
+
+/**
+ * __useDirFilesQuery__
+ *
+ * To run a query within a React component, call `useDirFilesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDirFilesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDirFilesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDirFilesQuery(baseOptions?: Apollo.QueryHookOptions<DirFilesQuery, DirFilesQueryVariables>) {
+        return Apollo.useQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
+      }
+export function useDirFilesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DirFilesQuery, DirFilesQueryVariables>) {
+          return Apollo.useLazyQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
+        }
+export type DirFilesQueryHookResult = ReturnType<typeof useDirFilesQuery>;
+export type DirFilesLazyQueryHookResult = ReturnType<typeof useDirFilesLazyQuery>;
+export type DirFilesQueryResult = Apollo.QueryResult<DirFilesQuery, DirFilesQueryVariables>;
 export const CreateDirDocument = gql`
     mutation createDir($id: ID!, $name: String!) {
   createDir(id: $id, name: $name) {
@@ -834,6 +928,66 @@ export function useRenameFileMutation(baseOptions?: Apollo.MutationHookOptions<R
 export type RenameFileMutationHookResult = ReturnType<typeof useRenameFileMutation>;
 export type RenameFileMutationResult = Apollo.MutationResult<RenameFileMutation>;
 export type RenameFileMutationOptions = Apollo.BaseMutationOptions<RenameFileMutation, RenameFileMutationVariables>;
+export const DeleteFileDocument = gql`
+    mutation deleteFile($id: ID!) {
+  deleteFile(id: $id)
+}
+    `;
+export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, DeleteFileMutationVariables>;
+
+/**
+ * __useDeleteFileMutation__
+ *
+ * To run a mutation, you first call `useDeleteFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFileMutation, { data, loading, error }] = useDeleteFileMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteFileMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFileMutation, DeleteFileMutationVariables>) {
+        return Apollo.useMutation<DeleteFileMutation, DeleteFileMutationVariables>(DeleteFileDocument, baseOptions);
+      }
+export type DeleteFileMutationHookResult = ReturnType<typeof useDeleteFileMutation>;
+export type DeleteFileMutationResult = Apollo.MutationResult<DeleteFileMutation>;
+export type DeleteFileMutationOptions = Apollo.BaseMutationOptions<DeleteFileMutation, DeleteFileMutationVariables>;
+export const DeleteFilesDocument = gql`
+    mutation deleteFiles($ids: [ID!]!) {
+  deleteFiles(ids: $ids)
+}
+    `;
+export type DeleteFilesMutationFn = Apollo.MutationFunction<DeleteFilesMutation, DeleteFilesMutationVariables>;
+
+/**
+ * __useDeleteFilesMutation__
+ *
+ * To run a mutation, you first call `useDeleteFilesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFilesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFilesMutation, { data, loading, error }] = useDeleteFilesMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useDeleteFilesMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFilesMutation, DeleteFilesMutationVariables>) {
+        return Apollo.useMutation<DeleteFilesMutation, DeleteFilesMutationVariables>(DeleteFilesDocument, baseOptions);
+      }
+export type DeleteFilesMutationHookResult = ReturnType<typeof useDeleteFilesMutation>;
+export type DeleteFilesMutationResult = Apollo.MutationResult<DeleteFilesMutation>;
+export type DeleteFilesMutationOptions = Apollo.BaseMutationOptions<DeleteFilesMutation, DeleteFilesMutationVariables>;
 export const MoveFileDocument = gql`
     mutation moveFile($targetId: ID!, $id: ID!) {
   moveFile(targetId: $targetId, id: $id)

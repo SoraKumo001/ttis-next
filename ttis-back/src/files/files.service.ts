@@ -42,6 +42,18 @@ export class FilesService {
       .where(id ? { id, ...whereDir } : { parent: null })
       .getRawOne()) as Files | null;
   }
+  public async getFileList(id: string) {
+    const { rep } = this;
+    const result = (await rep
+      .createQueryBuilder()
+      .select(
+        `id,"parentId",kind,name,"createAt","updateAt",coalesce(octet_length(value),0) as size`,
+      )
+      .where('"parentId" = :id', { id })
+      .orderBy('kind,"parentId" desc,name')
+      .getRawMany()) as Files[];
+    return result;
+  }
   public async createDir(
     parentId: undefined | string,
     name: string,
@@ -75,33 +87,57 @@ export class FilesService {
     res.name = name;
     return rep.save(res);
   }
+  public async deleteFile(id: string) {
+    const { rep } = this;
+    const res = await this.getFileInfo(id);
+    if (!res || !res.parentId) return false;
+    if (res.kind !== 0) {
+      return (await rep.delete(id)) !== null;
+    }
+    const children = await rep.getChildren(res, {
+      order: ['mpath', 'DESC', 'NULLS FIRST'],
+    });
+    if (!children) return true;
+    const ids = children.map((child) => child.id);
+    return (await rep.delete(ids)) !== null;
+  }
   public async move(targetId: string, id: string) {
     const { rep } = this;
     //移動元存在確認
     const src = await this.getFileInfo(id);
     if (!src || !src.parentId) return false;
-    //親ディレクトリ存在確認
-    const parent = await this.getFileInfo(src.parentId);
-    if (!parent) return false;
-    src.parent = parent;
-
+    //ターゲットディレクトリ存在確認
+    const target = await this.getFileInfo(targetId);
+    if (!target) return false;
+    //ツリー構造の修正
     const list = await rep.getChildren(src, { select: ['id'] });
     if (!list) return false;
     list.forEach((file) => {
-      if (file.id === id) file.parent = parent;
+      if (file.id === id) file.parent = target;
     });
     return (await rep.save(list)) !== null;
   }
 
   public async saveFile(parentId: string, name: string, buffer: Buffer) {
     const { rep } = this;
-    const file = await rep.save({
-      kind: 1,
-      name,
-      parent: { id: parentId },
-      value: buffer,
+    const cur = await rep.findOne({
+      select: ['id', 'kind'],
+      where: { parentId, name },
     });
-    return file?.id;
+    if (cur) {
+      if (cur.kind !== 1) return null;
+      cur.value = buffer;
+      rep.save(cur);
+      return cur.id;
+    } else {
+      const file = await rep.save({
+        kind: 1,
+        name,
+        parent: { id: parentId },
+        value: buffer,
+      });
+      return file?.id;
+    }
   }
   public async getFile(id: string) {
     const { rep } = this;

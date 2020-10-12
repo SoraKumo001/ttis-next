@@ -24,7 +24,7 @@ describe('FileService', () => {
     const dir = await service.createDir(undefined,"test");
     expect(dir).toBeDefined();
     const dir2 = await service.createDir(undefined,"test");
-    expect(dir2).toEqual(false);
+    expect(dir2).toEqual(null);
   });
   it('List Contents first', async () => {
     const list = await service.getDirList();

@@ -54,6 +54,7 @@ type Query {
   users: [User!]
   currentUser: Login
   dirTree: [Files!]
+  dirFiles(id: ID!): [Files!]
 }
 
 type Mutation {
@@ -68,6 +69,14 @@ type Mutation {
   login(password: String!, name: String!): Login
   createDir(name: String!, id: ID!): Files
   renameFile(name: String!, id: ID!): Files
+
+  """複数ファイルの削除"""
+  deleteFile(id: ID!): Boolean
+
+  """複数ファイルの削除"""
+  deleteFiles(ids: [ID!]!): Boolean
+
+  """ファイルの移動"""
   moveFile(id: ID!, targetId: ID!): Boolean
 
   """ファイルのアップロード"""

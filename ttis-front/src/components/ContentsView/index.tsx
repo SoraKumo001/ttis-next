@@ -8,7 +8,6 @@ import {
   FragmentContentsFragment,
   ContentsPageQueryVariables,
 } from "../../generated/graphql";
-import { getNullableType } from "graphql";
 
 type ContentsItem = FragmentContentsFragment & {
   children?: ContentsItem[];

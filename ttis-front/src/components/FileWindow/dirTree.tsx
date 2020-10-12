@@ -2,48 +2,53 @@ import { useQuery, useApolloClient } from "react-apollo";
 import { TreeView, TreeItem } from "@jswf/react";
 import { QUERY_DIR, CREATE_DIR, RENAME_FILE } from "./graphql";
 import { useMemo, useState, useRef, useEffect } from "react";
-import {
-  DirTreeQuery,
-  CreateDirMutation,
-  CreateDirMutationVariables,
-  RenameFileMutation,
-  RenameFileMutationVariables,
-} from "@generated/graphql";
-import { InputWindow } from "./InputWindow";
+import { DirTreeQuery } from "@generated/graphql";
 
 type DirItem = NonNullable<DirTreeQuery["dirTree"]>[0] & {
   parent?: DirItem;
   children?: DirItem[];
 };
 
-interface Props{
-  onSelect?:(id:string)=>void
+interface Props {
+  dragString: string;
+  dirId?: string;
+  onSelect?: (id: string) => void;
+  onDirCreate: (id: string) => void;
+  onFileRename: (id: string, name: string) => void;
+  onFileDelete: (id: string) => void;
+  onItemDrop: (id: string, value: string) => void;
 }
 
-export const DirTreeView = ({onSelect} : Props) => {
+export const DirTreeView = ({
+  onSelect,
+  dirId,
+  onDirCreate,
+  onFileRename,
+  onFileDelete,
+  onItemDrop,
+  dragString,
+}: Props) => {
   const { data } = useQuery<DirTreeQuery>(QUERY_DIR);
   const treeViewRef = useRef<TreeView>(null);
-
-  const tree = useMemo(() => data && createTree(data.dirTree), [data]);
-  const [createDir, setCreateDir] = useState<boolean>(false);
-  const [renameFile, setRenameFile] = useState<boolean>(false);
-  let selectItemRef = useRef<DirItem>();
-  const selectItem = selectItemRef.current;
-
-  const client = useApolloClient();
+  const treeMap = useMemo(() => data && createTree(data.dirTree), [data]);
 
   useEffect(() => {
     const treeView = treeViewRef.current;
-    if (!treeView!.getSelectItem()) {
-      const item = treeView?.getItem();
-      if(item){
+    if (dirId) {
+      const item = treeView?.findItem(dirId);
+      if (item && item !== treeView?.getItem()) {
         item.select();
-        selectItemRef.current = item.getValue() as DirItem;
       }
-   }
-  }, []);
+    } else if (!treeView!.getSelectItem()) {
+      const item = treeView?.getItem();
+      if (item) {
+        item.select();
+        onSelect?.(item.getValue() as string);
+      }
+    }
+  }, [data, dirId]);
   return (
-    <>
+    <div className="root">
       <style jsx>
         {`
           .root {
@@ -61,59 +66,37 @@ export const DirTreeView = ({onSelect} : Props) => {
           }
         `}
       </style>
-      <div className="root">
-        <TreeView ref={treeViewRef} onItemClick={item=>{
-          const dirItem = item.getValue() as DirItem;
-          selectItemRef.current = dirItem
-          if(onSelect)
-            onSelect(dirItem.id);
-        }}>{tree && createTreeItem(tree)}</TreeView>
-        <div className="panel">
-          <button onClick={() => setCreateDir(true)}>Create</button>
-          <button onClick={() => setRenameFile(true)}>Rename</button>
-          <button>Delete</button>
-        </div>
+      <TreeView
+        ref={treeViewRef}
+        draggable={true}
+        onItemClick={(item) => {
+          const id = item.getValue() as string;
+          if (id !== dirId) onSelect?.(id);
+        }}
+        onItemDrop={(e, item) => {
+          const data = e.dataTransfer.getData("text/plain");
+          onItemDrop(item.getValue() as string, data);
+        }}
+        onItemDragStart={(e, item) => {
+          const id = item.getValue();
+          const value = { type: dragString, id };
+          e.dataTransfer.setData("text/plain", JSON.stringify(value));
+        }}
+      >
+        {createTreeItem(treeMap?.get(data?.dirTree?.[0]?.id as string))}
+      </TreeView>
+      <div className="panel">
+        <button onClick={() => dirId && onDirCreate?.(dirId)}>Create</button>
+        <button
+          onClick={() =>
+            dirId && onFileRename?.(dirId, treeMap?.get(dirId)?.name as string)
+          }
+        >
+          Rename
+        </button>
+        <button onClick={() => dirId && onFileDelete?.(dirId)}>Delete</button>
       </div>
-      {createDir && (
-        <InputWindow
-          title="Create Dir"
-          onClose={() => setCreateDir(false)}
-          onEnter={(input) =>
-            client.mutate<CreateDirMutation, CreateDirMutationVariables>({
-              mutation: CREATE_DIR,
-              variables: {
-                id: selectItem?.id!,
-                name: input,
-              },
-              update: () => {
-                setCreateDir(false);
-                client.query({ query: QUERY_DIR, fetchPolicy: "network-only" });
-              },
-            })
-          }
-        />
-      )}
-      {renameFile && (
-        <InputWindow
-          title="Rename"
-          defaultValue={selectItem?.name}
-          onClose={() => setRenameFile(false)}
-          onEnter={(input) =>
-            client.mutate<RenameFileMutation, RenameFileMutationVariables>({
-              mutation: RENAME_FILE,
-              variables: {
-                id: selectItem?.id as string,
-                name: input
-              },
-              update: () => {
-                setRenameFile(false);
-                // client.query({ query: QUERY_DIR, fetchPolicy: "network-only" });
-              },
-            })
-          }
-        />
-      )}
-    </>
+    </div>
   );
 
   function createTree(list: DirItem[] | null | undefined) {
@@ -132,13 +115,14 @@ export const DirTreeView = ({onSelect} : Props) => {
       }
     });
     idMap.forEach((c) => {
-      c.children?.sort((a, b) => (a.name > b.name ? -1 : 1));
+      c.children?.sort((a, b) => (a.name < b.name ? -1 : 1));
     });
-    return idMap.get(list[0].id);
+    return idMap;
   }
-  function createTreeItem(item: DirItem) {
+  function createTreeItem(item?: DirItem) {
+    if (!item) return null;
     return (
-      <TreeItem key={item.id} label={item.name} value={item}>
+      <TreeItem key={item.id} label={item.name} value={item.id}>
         {item.children?.map((item) => createTreeItem(item))}
       </TreeItem>
     );

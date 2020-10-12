@@ -3,22 +3,13 @@
 exports[`FileService List Contents first 1`] = `
 Array [
   Object {
-    "createAt": 2020-06-04T17:47:24.903Z,
-    "id": "fa2354cd-934e-458b-bd87-6bcaaee50ae3",
+    "createAt": 2020-09-12T14:10:56.704Z,
+    "id": "86686943-d8d3-4e89-b494-5690679b834e",
     "kind": 0,
     "name": "[ROOT]",
     "parentId": null,
-    "size": null,
-    "updateAt": 2020-06-04T17:47:24.903Z,
-  },
-  Object {
-    "createAt": 2020-06-04T17:47:24.926Z,
-    "id": "4d8ab2b5-24f3-4d77-aa8e-fbb23e8c14a6",
-    "kind": 0,
-    "name": "test",
-    "parentId": "fa2354cd-934e-458b-bd87-6bcaaee50ae3",
-    "size": null,
-    "updateAt": 2020-06-04T17:47:24.926Z,
+    "size": 0,
+    "updateAt": 2020-09-12T14:10:56.704Z,
   },
 ]
 `;

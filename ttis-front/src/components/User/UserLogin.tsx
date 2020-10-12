@@ -13,7 +13,7 @@ export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
   const [login, { loading }] = useMutation<LoginMutation>(QUERY_LOGIN);
   const [title, setTitle] = useState("Login");
   const [name, setName] = useState(
-    (typeof window !== "undefined" && localStorage.getItem("lastUser")) || ""
+    (typeof window !== "undefined" && localStorage.getItem("lastUser")) || "admin"
   );
   const [password, setPassword] = useState("");
   return (

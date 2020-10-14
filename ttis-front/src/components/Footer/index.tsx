@@ -2,13 +2,12 @@ import { useRouter, NextRouter } from "next/router";
 import { UserList } from "../User/UserList";
 import { WindowState, WindowInfo } from "@jswf/react";
 import { UserLogin } from "@components/User/UserLogin";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import imgLoginId from "../../images/login_id.svg";
 import { CurrentUserQuery } from "@generated/graphql";
 import { QUERY_CURRENT_USER } from "@components/User/graphql";
 import { removeRouterQuery } from "@libs/CustomRouter";
-import * as Url from "url";
 import { getRouterQuery } from '../../libs/CustomRouter';
 
 

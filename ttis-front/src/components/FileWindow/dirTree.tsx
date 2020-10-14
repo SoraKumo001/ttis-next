@@ -1,4 +1,4 @@
-import { useQuery, useApolloClient } from "react-apollo";
+import { useQuery, useApolloClient } from "@apollo/client";
 import { TreeView, TreeItem } from "@jswf/react";
 import { QUERY_DIR, CREATE_DIR, RENAME_FILE } from "./graphql";
 import { useMemo, useState, useRef, useEffect } from "react";

@@ -11,7 +11,7 @@ import {
   QUERY_FILES,
   DELETE_FILES,
 } from "./graphql";
-import { useApolloClient } from "react-apollo";
+import { useApolloClient } from "@apollo/client";
 import { VericationWindow } from "./VerificationWindow";
 import { MOVE_FILE } from "./graphql";
 import {

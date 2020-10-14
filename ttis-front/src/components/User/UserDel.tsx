@@ -1,6 +1,6 @@
 import { JSWindow } from "@jswf/react";
 import { AutoCloseProps } from "@components/Footer";
-import { useMutation } from "react-apollo";
+import { useMutation } from "@apollo/client";
 import { QUERY_USERS, MUTATION_DELETE_USERS } from "./graphql";
 import { UsersQuery } from "../../generated/graphql";
 

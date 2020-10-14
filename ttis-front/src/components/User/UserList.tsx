@@ -10,7 +10,7 @@ import { AutoClose, createAutoClose } from "@components/Footer";
 import { useRouter } from "next/router";
 import { UserEdit } from "./UserEdit";
 
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import React, { useRef, useState } from "react";
 import { QUERY_USERS } from "./graphql";
 import { UsersQuery } from "../../generated/graphql";

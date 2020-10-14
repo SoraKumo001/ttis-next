@@ -2,7 +2,7 @@ import { JSWindow } from "@jswf/react";
 import { AutoCloseProps } from "@components/Footer";
 import imageLoginId from "./images/login_id.svg";
 import imageLoginPass from "./images/login_pass.svg";
-import { useMutation } from "react-apollo";
+import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import { QUERY_USERS, MUTATION_CREATE_USER } from "./graphql";
 import { UsersQuery } from "@generated/graphql";

@@ -17,9 +17,9 @@
     "storybook": "start-storybook"
   },
   "dependencies": {
+    "@apollo/client": "^3.2.4",
+    "@apollo/react-ssr": "^4.0.0",
     "@types/dateformat": "^3.0.1",
-    "apollo-boost": "^0.4.9",
-    "apollo-link-context": "^1.0.20",
     "axios": "^0.20.0",
     "connect-redis": "^5.0.0",
     "cross-env": "^7.0.2",
@@ -29,7 +29,6 @@
     "graphql": "^15.3.0",
     "next": "^9.5.5",
     "react": "^16.13.1",
-    "react-apollo": "^3.1.5",
     "react-dom": "^16.13.1",
     "redis": "^3.0.2",
     "ts-node": "^9.0.0"

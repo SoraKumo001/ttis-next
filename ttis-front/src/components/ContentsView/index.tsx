@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { getRoutePath, addRouterQuery } from "../../libs/CustomRouter";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import { QUERY_CONTENTS_PAGE } from "./graphql";
 import dateFormat from "dateformat";
 import {

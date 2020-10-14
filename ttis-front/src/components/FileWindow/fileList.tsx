@@ -5,7 +5,7 @@ import {
   ListHeaders,
   ListHeader,
 } from "@jswf/react";
-import { useApolloClient, useQuery } from "react-apollo";
+import { useApolloClient, useQuery } from "@apollo/client";
 import {
   DirFilesQuery,
   DirFilesQueryVariables,

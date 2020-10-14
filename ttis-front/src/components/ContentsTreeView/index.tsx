@@ -1,5 +1,5 @@
 import { TreeView, TreeItem } from "@jswf/react";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import { CONTENTS_TREE } from "./graphql";
 import { ContentsListQuery } from "../../generated/graphql";
 import { useRouter } from "next/router";

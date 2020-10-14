@@ -2,7 +2,7 @@ import { JSWindow } from "@jswf/react";
 import { HtmlEditableView } from "./EditableView";
 import { useRef } from "react";
 import { useRouter } from "next/router";
-import { useQuery, useApolloClient } from "react-apollo";
+import { useQuery, useApolloClient } from "@apollo/client";
 import {
   QUERY_CONTENTS,
   UPDATE_CONTENTS,
@@ -17,10 +17,8 @@ import {
   UpdateContentsMutationVariables,
   CreateContentsMutation,
   CreateContentsMutationVariables,
-  ContentsListQuery,
   DeleteContentsMutation,
   DeleteContentsMutationVariables,
-  Contents,
   ContentsVector,
   VectorContentsMutation,
   VectorContentsMutationVariables,
@@ -29,14 +27,9 @@ import {
   getRouterQuery,
   addRouterQuery,
   setRouterPath,
-  removeRouterQuery,
 } from "../../libs/CustomRouter";
 import { createAutoClose } from "@components/Footer";
 import dateFormat from "dateformat";
-import { CONTENTS_TREE } from "@components/ContentsTreeView/graphql";
-import { ContentsPageQuery } from "../../generated/graphql";
-import { QUERY_CONTENTS_PAGE } from "@components/ContentsView/graphql";
-
 interface Property {
   value: string;
 }

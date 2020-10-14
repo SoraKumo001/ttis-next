@@ -2,12 +2,14 @@ import React from "react";
 import NextApp, { AppContext, createUrl } from "next/app";
 
 import {
+  ApolloProvider,
   ApolloClient,
   InMemoryCache,
   NormalizedCacheObject,
-  ApolloLink,
-} from "apollo-boost";
-import { ApolloProvider, getMarkupFromTree } from "react-apollo";
+  ApolloLink
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { getMarkupFromTree } from "@apollo/react-ssr";
 import {
   initProps,
   SessionType,
@@ -15,7 +17,6 @@ import {
 } from "../libs/next-express-session";
 import { Header } from "@components/Header";
 import * as nextRouter from "next/router";
-import { setContext } from "apollo-link-context";
 import { Footer } from "@components/Footer";
 import { createUploadLink, UploadLinkOptions } from "apollo-upload-client";
 
@@ -25,10 +26,10 @@ export type NextWebVitalsMetrics = {
   name: string;
   startTime: number;
   value: number;
-}
+};
 
-export function reportWebVitals(metric:NextWebVitalsMetrics) {
-  console.log(metric)
+export function reportWebVitals(metric: NextWebVitalsMetrics) {
+  console.log(metric);
 }
 
 const IS_BROWSER = !!process.browser;
@@ -50,7 +51,7 @@ export interface AuthLink extends ApolloLink {
 }
 export const createAuthLink = (options: UploadLinkOptions) => {
   let bearerToken: string;
-  const link = createUploadLink(options) as unknown as ApolloLink;
+  const link = (createUploadLink(options) as unknown) as ApolloLink;
   const apolloLink = setContext((_, { headers }) => ({
     headers: { ...headers, authorization: `bearer ${bearerToken || ""}` },
   })).concat(link) as AuthLink;
@@ -96,7 +97,6 @@ export interface Props {
 let ssrClient: CustomApolloClient;
 
 export default class App extends NextApp<{ session: SessionType }> {
-
   static async getInitialProps({ ctx, Component, router }: AppContext) {
     //セッション情報の初期化(SPA時にはundefined)
     const session = (ctx?.req as undefined | { session?: SessionType })

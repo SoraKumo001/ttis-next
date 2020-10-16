@@ -8,8 +8,9 @@ import imgLoginId from "../../images/login_id.svg";
 import { CurrentUserQuery } from "@generated/graphql";
 import { QUERY_CURRENT_USER } from "@components/User/graphql";
 import { removeRouterQuery } from "@libs/CustomRouter";
-import { getRouterQuery } from '../../libs/CustomRouter';
-
+import { getRouterQuery } from "../../libs/CustomRouter";
+import React from "react";
+import { FileWindow } from "@components/FileWindow";
 
 export const createAutoClose = (router: NextRouter, queryKey: string) => {
   {
@@ -31,7 +32,7 @@ export const Footer = () => {
   );
   const user = data?.currentUser?.user;
   const router = useRouter();
-  const { userList, login } = getRouterQuery(router);
+  const { userList, login, file } = getRouterQuery(router);
   return (
     <>
       <style jsx>{`
@@ -83,12 +84,18 @@ export const Footer = () => {
             </Link>
           </>
         )}
+        <Link href={router.pathname + "?file"} as="?file">
+          <div className="button">FileEdit</div>
+        </Link>
       </div>
       {userList !== undefined && (
         <UserList autoClose={createAutoClose(router, "userList")} />
       )}
       {login !== undefined && (
         <UserLogin autoClose={createAutoClose(router, "login")} />
+      )}
+      {file !== undefined && (
+        <FileWindow autoClose={createAutoClose(router, "file")} />
       )}
     </>
   );

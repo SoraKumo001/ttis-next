@@ -2,44 +2,24 @@ version: "3.7"
 services:
   nginx:
     container_name: web-server
-    image: nginx:latest
+    build: 
+      context: "."
+      dockerfile: "./Dockerfile_nginx"   
     ports:
       - "80:80"
     volumes:
-      - ./etc/nginx:/etc/nginx/conf.d
       - socket-vol:/var/run/socks
-    restart: always
+    # restart: always
   redis:
     container_name: redis-server
-    image: "redis:latest"
+    build: 
+      context: "."
+      dockerfile: "./Dockerfile_redis"      
     volumes:
-      - ./etc/redis/redis.conf:/etc/redis.conf
       - redis-vol:/data
       - socket-vol:/var/run/socks
-    restart: always
+    # restart: always
     command: redis-server /etc/redis.conf
-  ttis-back:
-    container_name: ttis-back
-    image: node:latest
-    volumes:
-      - ../ttis-back:/src
-      - socket-vol:/var/run/socks
-      - node_modules-back-vol:/src/node_modules
-    restart: always
-    working_dir: /src
-    command: >
-      bash -c "yarn && yarn build && yarn start"
-  ttis-front:
-    container_name: ttis-front
-    image: node:latest
-    volumes:
-      - ../ttis-front:/src
-      - socket-vol:/var/run/socks
-      - node_modules-front-vol:/src/node_modules
-    restart: always
-    working_dir: /src
-    command: >
-      bash -c "yarn && yarn build && yarn start"
   postgres:
     container_name: postgresql-server
     image: postgres:latest
@@ -50,9 +30,29 @@ services:
     volumes:
       - postgresql-vol:/var/lib/postgresql/data
       - socket-vol:/var/run/postgresql
-    ports:
-      - 5432:5432
-    restart: always
+    # ports:
+    #   - 5432:5432
+    # restart: always
+  ttis-back:
+    container_name: ttis-back
+    build:
+      context: "../ttis-back"
+      dockerfile: "../docker/Dockerfile_back"
+    depends_on:
+      - "postgres"
+    volumes:
+      - socket-vol:/var/run/socks
+    # restart: always
+  ttis-front:
+    container_name: ttis-front
+    build:
+      context: "../ttis-front"
+      dockerfile: "../docker/Dockerfile_front"
+    depends_on:
+      - "redis"
+    volumes:
+      - socket-vol:/var/run/socks
+  #   # restart: always
 volumes:
   postgresql-vol:
   redis-vol:

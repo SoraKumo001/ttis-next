@@ -1,4 +1,4 @@
-import { gql } from "apollo-boost";
+import { gql } from "@apollo/client";
 import { FRAGMENT_CONTENTS } from "src/graphql";
 
 export const QUERY_CONTENTS_PAGE = gql`

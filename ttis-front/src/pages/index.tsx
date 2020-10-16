@@ -33,7 +33,6 @@ export default () => {
     <>
       <MainView />
       <ContentsEditWindow />
-      <FileWindow/>
     </>
   );
 };

@@ -1,0 +1,7 @@
+FROM node:latest
+WORKDIR /app
+COPY . .
+RUN yarn --network-timeout 1000000 && yarn cache clean
+RUN yarn build
+EXPOSE 80
+CMD ["yarn","start"]

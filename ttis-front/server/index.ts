@@ -39,15 +39,23 @@ app.prepare().then(() => {
     handle(req, res, parse(req.url, true));
   });
   if (socket) {
-    server.listen(sock_path).on("error", (err) => {
-      if (err) throw err;
-      fs.chmodSync(sock_path, "666");
-      console.log(`> Ready on unix:${sock_path}`);
-    });
+    server
+      .listen(sock_path)
+      .on("listening", () => {
+        fs.chmodSync(sock_path, "666");
+        console.log(`> Ready on unix:${sock_path}`);
+      })
+      .on("error", (err) => {
+        if (err) throw err;
+      });
   } else {
-    server.listen(port_number).on("error", (err: any) => {
-      if (err) throw err;
-      console.log(`> Ready on http://localhost:${port_number}/`);
-    });
+    server
+      .listen(port_number)
+      .on("listening", () => {
+        console.log(`> Ready on http://localhost:${port_number}/`);
+      })
+      .on("error", (err: any) => {
+        if (err) throw err;
+      });
   }
 });

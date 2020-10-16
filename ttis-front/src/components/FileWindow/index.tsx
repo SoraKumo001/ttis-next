@@ -30,11 +30,12 @@ import {
   RenameFileMutation,
   RenameFileMutationVariables,
 } from "@generated/graphql";
+import { AutoClose } from "@components/Footer";
 
 const DRAG_STRING = "__FILE_DRAG__";
 const DRAG_DIR_STRING = "__DIR_DRAG__";
 
-export const FileWindow = () => {
+export const FileWindow = ({ autoClose }: { autoClose?: AutoClose }) => {
   const [dirId, setDirId] = useState("");
   const [createDir, setCreateDir] = useState<boolean>(false);
   const [renameFile, setRenameFile] = useState<{
@@ -49,7 +50,7 @@ export const FileWindow = () => {
   const client = useApolloClient();
 
   return (
-    <JSWindow title="File Window" width={640}>
+    <JSWindow onUpdate={autoClose} title="File Window" width={640}>
       <SplitView type="we">
         <DirTreeView
           dragString={DRAG_DIR_STRING}
@@ -155,7 +156,10 @@ export const FileWindow = () => {
           onEnter={(value) => {
             if (value) {
               if (Array.isArray(deleteFile.id)) {
-                client.mutate<DeleteFilesMutation, DeleteFilesMutationVariables>({
+                client.mutate<
+                  DeleteFilesMutation,
+                  DeleteFilesMutationVariables
+                >({
                   mutation: DELETE_FILES,
                   variables: {
                     ids: deleteFile.id as string[],

@@ -10,8 +10,8 @@
     "start:dev:front": "yarn --cwd ttis-front dev",
     "start:prod:back": "yarn --cwd ttis-back build && yarn --cwd ttis-back start",
     "start:prod:front": "yarn --cwd ttis-front build && yarn --cwd ttis-front start",
-    "start:docker": "docker-compose -f docker/docker-compose.yml up ",
-    "deploy": "bash docker/deploy.sh",
+    "start:docker": "docker-compose -f docker/docker-compose.yml build --parallel && docker-compose -f docker/docker-compose.yml up",
+    "start:server:docker": "docker-compose -H localhost:2375 -f docker/docker-compose.yml build --parallel && docker-compose -H localhost:2375 -f docker/docker-compose.yml up",
     "generate:back": "yarn --cwd ttis-back generate",
     "generate:front": "yarn --cwd ttis-front generate"
   },

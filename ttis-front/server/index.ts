@@ -20,7 +20,9 @@ const session = expressSession({
   resave: false,
   saveUninitialized: false,
   store: new (redisStore(expressSession))({
-    client: socket ? redis.createClient(redis_path) : redis.createClient(),
+    client: socket
+      ? redis.createClient(redis_path).on("error", (err) => console.error(err))
+      : redis.createClient(),
   }),
 });
 

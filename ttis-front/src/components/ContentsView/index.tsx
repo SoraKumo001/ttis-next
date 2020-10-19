@@ -40,7 +40,7 @@ export const ContentsView = () => {
     }
   );
   const contents = data && createTree(data.contentsList);
-  return contents ? (
+  return (
     <>
       <style jsx>
         {`
@@ -54,14 +54,17 @@ export const ContentsView = () => {
           }
         `}
       </style>
-      <div className="root">{drawContents(contents)}</div>
+      <div className="root">{contents && drawContents(contents)}</div>
     </>
-  ) : null;
+  );
   function drawContents(contents: ContentsItem) {
     return (
       <div key={contents.id}>
         <style jsx>
           {`
+            .contents{
+              animation: fadeIn 0.5s normal;
+            }
             .body {
               margin-left: 1em;
             }
@@ -80,10 +83,26 @@ export const ContentsView = () => {
             .date {
               text-align: right;
             }
+            @keyframes fadeIn {
+              0% {
+                opacity: 0;
+              }
+  
+              100% {
+                opacity: 1;
+              }
+            }
           `}
         </style>
         <div className="contents">
-          <div className="title" id={"t" + contents.title_type} onDoubleClick={onDoubleClick}>
+          <div
+            className="title"
+            id={"t" + contents.title_type}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              if (contents) addRouterQuery(router, { edit: contents.id });
+            }}
+          >
             {contents.title}
           </div>
           <div className="date">
@@ -102,9 +121,5 @@ export const ContentsView = () => {
         </div>
       </div>
     );
-  }
-  function onDoubleClick() {
-    if(contents)
-      addRouterQuery(router, { edit: contents.id });
   }
 };

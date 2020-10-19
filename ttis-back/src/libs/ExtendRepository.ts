@@ -7,7 +7,6 @@ import {
   EntityRepository,
   ObjectLiteral,
   SelectQueryBuilder,
-  Entity,
 } from 'typeorm';
 import * as typeorm from 'typeorm';
 import { AbstractSqliteDriver } from 'typeorm/driver/sqlite-abstract/AbstractSqliteDriver';

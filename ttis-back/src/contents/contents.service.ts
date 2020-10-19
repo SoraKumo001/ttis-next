@@ -85,19 +85,17 @@ export class ContentsService implements OnModuleInit {
     if (visible) {
       rootWhere['visible'] = true;
     }
-    let root = await expRep.findOne({ select: ['id'], where: rootWhere });
+    let root = await expRep.findOne({ where: rootWhere });
     if (!root) return null;
-
     //ページコンテンツを探す
     if (page && !root.page) {
-      const nodes = await expRep.findAncestors(root);
-      if (nodes) {
-        for (const n of nodes) {
-          if (n.page) {
-            root = n;
-            break;
-          }
+      let node:Contents|undefined = await expRep.findAncestorsTree(root);
+      while (node) {
+        if (node.page) {
+          root = node;
+          break;
         }
+        node = node.parent;
       }
     }
 
@@ -159,17 +157,17 @@ export class ContentsService implements OnModuleInit {
     const { expRep } = this;
     const target = await expRep.findOne({ select: ['id'], where: { id } });
     if (!target) return null;
-    const con = await expRep.getChildrenTree(target, { select: ['id','parentId'] });
+    const con = await expRep.getChildrenTree(target, {
+      select: ['id', 'parentId'],
+    });
     if (!con) return null;
     const list: string[] = [];
     const delList = (contents: Contents) => {
       contents.children?.forEach(delList);
-      if(contents.parentId)
-        list.push(contents.id);
+      if (contents.parentId) list.push(contents.id);
     };
     delList(con);
-    if(list.length)
-      await expRep.delete(list);
+    if (list.length) await expRep.delete(list);
     return list;
   }
   async moveVector(id: string, vector: number) {

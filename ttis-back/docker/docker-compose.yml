@@ -1,8 +1,8 @@
 version: "3.7"
 services:
   postgres:
-    container_name: postgres
-    image: postgres:latest
+    container_name: ttis-postgres-dev
+    image: postgres:alpine
     environment:
       POSTGRES_DB: ttis
       POSTGRES_USER: ttis
@@ -13,15 +13,15 @@ services:
     ports:
       - 5432:5432
   nginx:
-    container_name: nginx
-    image: nginx:latest
+    container_name: ttis-nginx-dev
+    image: nginx:alpine
     ports:
       - 80:80
     volumes:
       - ./etc/nginx/conf.d:/etc/nginx/conf.d
   redis:
-    container_name: redis
-    image: "redis:latest"
+    container_name: ttis-redis-dev
+    image: "redis:alpine"
     ports:
       - "6379:6379"
     volumes:

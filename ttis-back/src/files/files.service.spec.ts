@@ -2,6 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FilesService } from './files.service';
 import { DBModule2 } from 'src/db.module';
 import { FilesModule } from './files.module';
+import { ObjectMask } from '@test/testTools';
+
+const masks = {
+  id: '',
+  parentId: '',
+  createAt: '',
+  updateAt: '',
+};
 
 describe('FileService', () => {
   let service: FilesService;
@@ -28,6 +36,6 @@ describe('FileService', () => {
   });
   it('List Contents first', async () => {
     const list = await service.getDirList();
-    expect(list).toMatchSnapshot();
+    expect(ObjectMask(list, masks)).toMatchSnapshot();
   });
 });

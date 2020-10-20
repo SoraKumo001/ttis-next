@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FileService List Contents first 1`] = `
-Array [
-  Object {
-    "createAt": 2020-09-12T14:10:56.704Z,
-    "id": "86686943-d8d3-4e89-b494-5690679b834e",
+Object {
+  "0": Object {
+    "createAt": "",
+    "id": "",
     "kind": 0,
     "name": "[ROOT]",
-    "parentId": null,
+    "parentId": "",
     "size": 0,
-    "updateAt": 2020-09-12T14:10:56.704Z,
+    "updateAt": "",
   },
-]
+}
 `;

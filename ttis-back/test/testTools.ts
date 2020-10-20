@@ -1,18 +1,30 @@
-import { ApolloLink, HttpLink, ApolloClient, InMemoryCache, NormalizedCacheObject } from 'apollo-boost';
+
+import {
+  ApolloLink,
+  HttpLink,
+  ApolloClient,
+  InMemoryCache,
+  NormalizedCacheObject,
+} from 'apollo-boost';
 import { setContext } from 'apollo-link-context';
 import fetch from 'isomorphic-unfetch';
 import * as types from '@graphql/types';
 import * as querys from '../src/user/user.resolver.graphql';
 
-export const ObjectMask = (obj: object|null|undefined, mask: { [key: string]: unknown }) => {
+export const ObjectMask = (
+  obj: unknown,
+  mask: { [key: string]: unknown },
+) => {
   if (!obj) return obj;
-  const newObj:{[key:string]:unknown} = { ...obj };
+  if(typeof obj !== "object")
+    return obj;
+  const newObj: { [key: string]: unknown } = { ...obj };
   for (const [key, value] of Object.entries(newObj)) {
     const maskValue = mask[key];
     if (maskValue !== undefined) {
       newObj[key] = mask[key];
     } else if (typeof value === 'object' && value) {
-      newObj[key] = ObjectMask(value, mask);
+      newObj[key] = ObjectMask(value as { [key: string]: unknown }, mask);
     }
   }
   return newObj;
@@ -27,14 +39,13 @@ export const createAuthLink = (options: HttpLink.Options) => {
     headers: { ...headers, authorization: `bearer ${bearerToken || ''}` },
   })).concat(new HttpLink(options)) as AuthLink;
   apolloLink.setToken = (token) => {
-    bearerToken = token||'';
+    bearerToken = token || '';
   };
   return apolloLink;
 };
 
-
 export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
-  static port:number;
+  static port: number;
   link: AuthLink;
   constructor() {
     const link: AuthLink = createAuthLink({
@@ -47,7 +58,7 @@ export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
   setToken(token?: string) {
     this.link.setToken(token);
   }
-  static setPort(port:number){
+  static setPort(port: number) {
     CustomApolloClient.port = port;
   }
 }

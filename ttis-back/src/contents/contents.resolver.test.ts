@@ -66,6 +66,7 @@ describe('Contens(Login)', () => {
     return result.data;
   });
   const task2 = testAsync('Create & update', async () => {
+    await task1;
     const client = await createClient();
     client.setToken(await token);
     const result = await createContents(client, {
@@ -73,7 +74,7 @@ describe('Contens(Login)', () => {
       page: true,
     });
     const updateResult = await updateContents(client, {
-      id: result?.data?.createContents?.id!,
+      id: result?.data?.createContents?.id as string,
       title: 'UpdateTest',
       title_type: 2,
       value_type: 'TEXT',
@@ -83,6 +84,7 @@ describe('Contens(Login)', () => {
     return updateResult.data;
   });
   const task3 = testAsync('Levels', async () => {
+    await task2;
     const client = await createClient();
     client.setToken(await token);
     const result = await createContents(client, {
@@ -90,7 +92,7 @@ describe('Contens(Login)', () => {
       page: true,
     });
     const updateResult = await updateContents(client, {
-      id: result?.data?.createContents?.id!,
+      id: result?.data?.createContents?.id as string,
       title: 'UpdateTest',
       title_type: 2,
       value_type: 'TEXT',

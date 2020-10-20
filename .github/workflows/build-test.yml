@@ -6,7 +6,7 @@ jobs:
     name: frontend test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: ttis-front:Cache node modules(yarn.lock)
         id: cache
         uses: actions/cache@v1
@@ -23,7 +23,7 @@ jobs:
     name: backend test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: ttis-back:Cache node modules(yarn.lock)
         id: ttis-back-cache
         uses: actions/cache@v1
@@ -38,3 +38,23 @@ jobs:
         run: yarn --cwd ttis-back build
       - name: ttis-back:test
         run: yarn --cwd ttis-back test
+  deploy:
+    name: Docker deploy
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v2
+      - name: ssh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          echo "$SSH_KEY" > .ssh_key
+          chmod 0600 ssh_key
+          ssh -o StrictHostKeyChecking=no -i .ssh_key $SSH_USER -L 2375:localhost:2375 -N -f
+      - name: docker build
+        run: docker-compose -f docker/docker-compose.yml build --parallel
+      - name: docker deploy
+        run: docker save ttis-redis ttis-nginx ttis-front ttis-back | docker -H localhost load
+      - name: docker start
+        run: docker-compose -H localhost:2375 -f docker/docker-compose.yml up -d

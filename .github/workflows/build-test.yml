@@ -50,7 +50,7 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           echo "$SSH_KEY" > .ssh_key
-          chmod 0600 ssh_key
+          chmod 0600 .ssh_key
           ssh -o StrictHostKeyChecking=no -i .ssh_key $SSH_USER -L 2375:localhost:2375 -N -f
       - name: docker build
         run: docker-compose -f docker/docker-compose.yml build --parallel

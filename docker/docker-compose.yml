@@ -10,7 +10,7 @@ services:
       - "127.0.0.1:8080:80"
     volumes:
       - socket-vol:/var/run/socks
-    # restart: always
+    restart: always
   redis:
     container_name: ttis-redis
     image: ttis-redis
@@ -20,7 +20,7 @@ services:
     volumes:
       - socket-vol:/data
       - socket-vol:/var/run/socks
-    # restart: always
+    restart: always
   postgres:
     container_name: ttis-postgresql
     image: postgres:alpine
@@ -33,7 +33,7 @@ services:
       - socket-vol:/var/run/postgresql
     # ports:
     #   - 5432:5432
-    # restart: always
+    restart: always
   ttis-back:
     image: ttis-back
     container_name: ttis-back
@@ -44,7 +44,7 @@ services:
       - "postgres"
     volumes:
       - socket-vol:/var/run/socks
-    # restart: always
+    restart: always
   ttis-front:
     image: ttis-front
     container_name: ttis-front
@@ -57,7 +57,7 @@ services:
       - /var/share/nginx:/var/share/nginx
       - socket-vol:/var/run/socks
     command: sh -c "cp -rf .next/static /var/share/nginx && yarn start" 
-  #   # restart: always
+    restart: always
 volumes:
   socket-vol:
   postgresql-vol:

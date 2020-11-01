@@ -1,13 +1,10 @@
-import { JSWindow } from "@jswf/react";
-import { AutoCloseProps } from "@components/Footer";
-import { useMutation } from "@apollo/client";
-import { QUERY_USERS, MUTATION_DELETE_USERS } from "./graphql";
-import { UsersQuery } from "../../generated/graphql";
+import { JSWindow } from '@jswf/react';
+import { AutoCloseProps } from '@components/Footer';
+import { useMutation } from '@apollo/client';
+import { QUERY_USERS, MUTATION_DELETE_USERS } from './graphql';
+import { UsersQuery } from '../../generated/graphql';
 
-export const UserDel = ({
-  autoClose,
-  ids,
-}: AutoCloseProps & { ids: number[] }) => {
+export const UserDel = ({ autoClose, ids }: AutoCloseProps & { ids: number[] }) => {
   const [deleteUsers] = useMutation(MUTATION_DELETE_USERS);
   return (
     <JSWindow title="Delete User" onUpdate={autoClose}>

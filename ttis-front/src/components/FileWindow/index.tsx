@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { JSWindow, ListViewDragData, SplitView } from "@jswf/react";
-import { DirTreeView } from "./dirTree";
-import { FileListView } from "./fileList";
-import { InputWindow } from "./InputWindow";
+import React, { useState } from 'react';
+import { JSWindow, ListViewDragData, SplitView } from '@jswf/react';
+import { DirTreeView } from './dirTree';
+import { FileListView } from './fileList';
+import { InputWindow } from './InputWindow';
 import {
   QUERY_DIR,
   CREATE_DIR,
@@ -10,16 +10,16 @@ import {
   DELETE_FILE,
   QUERY_FILES,
   DELETE_FILES,
-} from "./graphql";
-import { useApolloClient } from "@apollo/client";
-import { VericationWindow } from "./VerificationWindow";
-import { MOVE_FILE } from "./graphql";
+} from './graphql';
+import { useApolloClient } from '@apollo/client';
+import { VericationWindow } from './VerificationWindow';
+import { MOVE_FILE } from './graphql';
 import {
   DeleteFilesMutation,
   DeleteFilesMutationVariables,
   MoveFileMutation,
   MoveFileMutationVariables,
-} from "../../generated/graphql";
+} from '../../generated/graphql';
 import {
   CreateDirMutation,
   CreateDirMutationVariables,
@@ -29,14 +29,14 @@ import {
   DirFilesQueryVariables,
   RenameFileMutation,
   RenameFileMutationVariables,
-} from "@generated/graphql";
-import { AutoClose } from "@components/Footer";
+} from '@generated/graphql';
+import { AutoClose } from '@components/Footer';
 
-const DRAG_STRING = "__FILE_DRAG__";
-const DRAG_DIR_STRING = "__DIR_DRAG__";
+const DRAG_STRING = '__FILE_DRAG__';
+const DRAG_DIR_STRING = '__DIR_DRAG__';
 
 export const FileWindow = ({ autoClose }: { autoClose?: AutoClose }) => {
-  const [dirId, setDirId] = useState("");
+  const [dirId, setDirId] = useState('');
   const [createDir, setCreateDir] = useState<boolean>(false);
   const [renameFile, setRenameFile] = useState<{
     open: boolean;
@@ -79,12 +79,12 @@ export const FileWindow = ({ autoClose }: { autoClose?: AutoClose }) => {
                     client.query<DirFilesQuery, DirFilesQueryVariables>({
                       query: QUERY_FILES,
                       variables: { id: dirId },
-                      fetchPolicy: "network-only",
+                      fetchPolicy: 'network-only',
                     });
                     client.query<DirFilesQuery, DirFilesQueryVariables>({
                       query: QUERY_FILES,
                       variables: { id: id },
-                      fetchPolicy: "network-only",
+                      fetchPolicy: 'network-only',
                     });
                   },
                 });
@@ -119,11 +119,11 @@ export const FileWindow = ({ autoClose }: { autoClose?: AutoClose }) => {
               },
               update: () => {
                 setCreateDir(false);
-                client.query({ query: QUERY_DIR, fetchPolicy: "network-only" });
+                client.query({ query: QUERY_DIR, fetchPolicy: 'network-only' });
                 client.query<DirFilesQuery, DirFilesQueryVariables>({
                   query: QUERY_FILES,
                   variables: { id: dirId },
-                  fetchPolicy: "network-only",
+                  fetchPolicy: 'network-only',
                 });
               },
             })
@@ -156,10 +156,7 @@ export const FileWindow = ({ autoClose }: { autoClose?: AutoClose }) => {
           onEnter={(value) => {
             if (value) {
               if (Array.isArray(deleteFile.id)) {
-                client.mutate<
-                  DeleteFilesMutation,
-                  DeleteFilesMutationVariables
-                >({
+                client.mutate<DeleteFilesMutation, DeleteFilesMutationVariables>({
                   mutation: DELETE_FILES,
                   variables: {
                     ids: deleteFile.id as string[],

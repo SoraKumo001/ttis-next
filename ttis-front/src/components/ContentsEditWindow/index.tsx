@@ -1,15 +1,15 @@
-import { JSWindow } from "@jswf/react";
-import { HtmlEditableView } from "./EditableView";
-import { useRef } from "react";
-import { useRouter } from "next/router";
-import { useQuery, useApolloClient } from "@apollo/client";
+import { JSWindow } from '@jswf/react';
+import { HtmlEditableView } from './EditableView';
+import { useRef } from 'react';
+import { useRouter } from 'next/router';
+import { useQuery, useApolloClient } from '@apollo/client';
 import {
   QUERY_CONTENTS,
   UPDATE_CONTENTS,
   CREATE_CONTENTS,
   DELETE_CONTENTS,
   VECTOR_CONTENTS,
-} from "./graphql";
+} from './graphql';
 import {
   ContentsQueryVariables,
   ContentsQuery,
@@ -22,30 +22,23 @@ import {
   ContentsVector,
   VectorContentsMutation,
   VectorContentsMutationVariables,
-} from "@generated/graphql";
-import {
-  getRouterQuery,
-  addRouterQuery,
-  setRouterPath,
-} from "../../libs/CustomRouter";
-import { createAutoClose } from "@components/Footer";
-import dateFormat from "dateformat";
-interface Property {
-  value: string;
-}
+} from '@generated/graphql';
+import { getRouterQuery, addRouterQuery, setRouterPath } from '../../libs/CustomRouter';
+import { createAutoClose } from '@components/Footer';
+import dateFormat from 'dateformat';
+
 export const ContentsEditWindow = () => {
   const router = useRouter();
   const { edit } = getRouterQuery(router);
 
-  const { loading, data } = useQuery<ContentsQuery, ContentsQueryVariables>(
-    QUERY_CONTENTS,
-    { variables: { id: edit?.toString() || "" } }
-  );
+  const { loading, data } = useQuery<ContentsQuery, ContentsQueryVariables>(QUERY_CONTENTS, {
+    variables: { id: edit?.toString() || '' },
+  });
 
   const client = useApolloClient();
   const contents = data?.contents;
-  const This = useRef({ value: "" }).current;
-  const message = loading ? "Loading" : contents?.id;
+  const This = useRef({ value: '' }).current;
+  const message = loading ? 'Loading' : contents?.id;
   const refVisible = useRef<HTMLInputElement>(null);
   const refTitle = useRef<HTMLInputElement>(null);
   const refTitleType = useRef<HTMLSelectElement>(null);
@@ -93,7 +86,7 @@ export const ContentsEditWindow = () => {
         width={600}
         height={500}
         title="ContentsEdit"
-        onUpdate={createAutoClose(router, "edit")}
+        onUpdate={createAutoClose(router, 'edit')}
       >
         <div className="root" key={contents?.id || 0}>
           <div className="panel">
@@ -108,15 +101,12 @@ export const ContentsEditWindow = () => {
               />
             </label>
 
-            <div>{dateFormat(contents?.updateAt, "yyyy年mm月dd日")}</div>
-            <div>{dateFormat(contents?.updateAt, "HH時MM分ss秒")}</div>
+            <div>{dateFormat(contents?.updateAt, 'yyyy年mm月dd日')}</div>
+            <div>{dateFormat(contents?.updateAt, 'HH時MM分ss秒')}</div>
             <button onClick={onDelete}>Delete</button>
           </div>
           <div className="panel">
-            <select
-              ref={refPage}
-              defaultValue={contents?.page ? "true" : "false"}
-            >
+            <select ref={refPage} defaultValue={contents?.page ? 'true' : 'false'}>
               <option value="true">Page</option>
               <option value="false">Item</option>
             </select>
@@ -131,11 +121,7 @@ export const ContentsEditWindow = () => {
               <option value="2">Normal</option>
               <option value="3">Small</option>
             </select>
-            <input
-              ref={refTitle}
-              style={{ flex: 1 }}
-              defaultValue={contents?.title}
-            />
+            <input ref={refTitle} style={{ flex: 1 }} defaultValue={contents?.title} />
           </div>
           <div className="panel">
             <button onClick={onCreateNext}>Create Next</button>
@@ -160,7 +146,7 @@ export const ContentsEditWindow = () => {
       mutation: UPDATE_CONTENTS,
       variables: {
         id: contents.id,
-        page: refPage.current?.value === "true",
+        page: refPage.current?.value === 'true',
         visible: refVisible.current!.checked,
         title_type: parseInt(refTitleType.current!.value),
         title: refTitle.current!.value,
@@ -222,7 +208,7 @@ export const ContentsEditWindow = () => {
         vector: ContentsVector.Next,
         page: false,
         title_type: Math.min(parseInt(refTitleType.current!.value) + 1, 2),
-        title: "New",
+        title: 'New',
       },
       update: (_, result) => {
         client.resetStore();
@@ -240,7 +226,7 @@ export const ContentsEditWindow = () => {
         vector: ContentsVector.ChildLast,
         page: false,
         title_type: Math.min(parseInt(refTitleType.current!.value) + 1, 2),
-        title: "New",
+        title: 'New',
       },
       update: (_, result) => {
         client.resetStore();

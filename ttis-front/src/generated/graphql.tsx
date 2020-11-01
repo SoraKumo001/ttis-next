@@ -32,7 +32,6 @@ export type Contents = {
   updateAt: Scalars['DateTime'];
 };
 
-
 export type User = {
   __typename?: 'User';
   id: Scalars['Int'];
@@ -71,14 +70,12 @@ export type Query = {
   dirFiles?: Maybe<Array<Files>>;
 };
 
-
 export type QueryContentsTreeArgs = {
   level?: Maybe<Scalars['Int']>;
   visible?: Maybe<Scalars['Boolean']>;
   page?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['ID']>;
 };
-
 
 export type QueryContentsListArgs = {
   level?: Maybe<Scalars['Int']>;
@@ -87,11 +84,9 @@ export type QueryContentsListArgs = {
   id?: Maybe<Scalars['ID']>;
 };
 
-
 export type QueryContentsArgs = {
   id?: Maybe<Scalars['ID']>;
 };
-
 
 export type QueryDirFilesArgs = {
   id: Scalars['ID'];
@@ -120,7 +115,6 @@ export type Mutation = {
   uploadFile?: Maybe<Scalars['ID']>;
 };
 
-
 export type MutationCreateContentsArgs = {
   value?: Maybe<Scalars['String']>;
   value_type?: Maybe<Scalars['String']>;
@@ -131,7 +125,6 @@ export type MutationCreateContentsArgs = {
   vector?: Maybe<ContentsVector>;
   parent?: Maybe<Scalars['ID']>;
 };
-
 
 export type MutationUpdateContentsArgs = {
   value?: Maybe<Scalars['String']>;
@@ -144,24 +137,20 @@ export type MutationUpdateContentsArgs = {
   id: Scalars['ID'];
 };
 
-
 export type MutationDeleteContentsArgs = {
   id: Scalars['ID'];
 };
-
 
 export type MutationVectorContentsArgs = {
   vector: Scalars['Int'];
   id: Scalars['ID'];
 };
 
-
 export type MutationCreateUserArgs = {
   info?: Maybe<Scalars['String']>;
   password: Scalars['String'];
   name: Scalars['String'];
 };
-
 
 export type MutationUpdateUserArgs = {
   info?: Maybe<Scalars['String']>;
@@ -170,50 +159,41 @@ export type MutationUpdateUserArgs = {
   id: Scalars['Int'];
 };
 
-
 export type MutationDeleteUserArgs = {
   id: Scalars['Int'];
 };
 
-
 export type MutationDeleteUsersArgs = {
   ids: Array<Scalars['Int']>;
 };
-
 
 export type MutationLoginArgs = {
   password: Scalars['String'];
   name: Scalars['String'];
 };
 
-
 export type MutationCreateDirArgs = {
   name: Scalars['String'];
   id: Scalars['ID'];
 };
-
 
 export type MutationRenameFileArgs = {
   name: Scalars['String'];
   id: Scalars['ID'];
 };
 
-
 export type MutationDeleteFileArgs = {
   id: Scalars['ID'];
 };
-
 
 export type MutationDeleteFilesArgs = {
   ids: Array<Scalars['ID']>;
 };
 
-
 export type MutationMoveFileArgs = {
   id: Scalars['ID'];
   targetId: Scalars['ID'];
 };
-
 
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
@@ -224,22 +204,16 @@ export enum ContentsVector {
   ChildFirst = 'CHILD_FIRST',
   ChildLast = 'CHILD_LAST',
   Before = 'BEFORE',
-  Next = 'NEXT'
+  Next = 'NEXT',
 }
-
 
 export type ContentsQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type ContentsQuery = (
-  { __typename?: 'Query' }
-  & { contents?: Maybe<(
-    { __typename?: 'Contents' }
-    & FragmentContentsFragment
-  )> }
-);
+export type ContentsQuery = { __typename?: 'Query' } & {
+  contents?: Maybe<{ __typename?: 'Contents' } & FragmentContentsFragment>;
+};
 
 export type UpdateContentsMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -252,14 +226,9 @@ export type UpdateContentsMutationVariables = Exact<{
   value?: Maybe<Scalars['String']>;
 }>;
 
-
-export type UpdateContentsMutation = (
-  { __typename?: 'Mutation' }
-  & { updateContents?: Maybe<(
-    { __typename?: 'Contents' }
-    & FragmentContentsFragment
-  )> }
-);
+export type UpdateContentsMutation = { __typename?: 'Mutation' } & {
+  updateContents?: Maybe<{ __typename?: 'Contents' } & FragmentContentsFragment>;
+};
 
 export type CreateContentsMutationVariables = Exact<{
   parent?: Maybe<Scalars['ID']>;
@@ -272,200 +241,154 @@ export type CreateContentsMutationVariables = Exact<{
   value?: Maybe<Scalars['String']>;
 }>;
 
-
-export type CreateContentsMutation = (
-  { __typename?: 'Mutation' }
-  & { createContents?: Maybe<(
-    { __typename?: 'Contents' }
-    & FragmentContentsFragment
-  )> }
-);
+export type CreateContentsMutation = { __typename?: 'Mutation' } & {
+  createContents?: Maybe<{ __typename?: 'Contents' } & FragmentContentsFragment>;
+};
 
 export type DeleteContentsMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type DeleteContentsMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteContents'>
-);
+export type DeleteContentsMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'deleteContents'>;
 
 export type VectorContentsMutationVariables = Exact<{
   id: Scalars['ID'];
   vector: Scalars['Int'];
 }>;
 
+export type VectorContentsMutation = { __typename?: 'Mutation' } & {
+  vectorContents: Array<{ __typename?: 'Contents' } & Pick<Contents, 'id' | 'priority'>>;
+};
 
-export type VectorContentsMutation = (
-  { __typename?: 'Mutation' }
-  & { vectorContents: Array<(
-    { __typename?: 'Contents' }
-    & Pick<Contents, 'id' | 'priority'>
-  )> }
-);
+export type ContentsListQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ContentsListQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ContentsListQuery = (
-  { __typename?: 'Query' }
-  & { contentsList: Array<(
-    { __typename?: 'Contents' }
-    & Pick<Contents, 'id' | 'visible' | 'priority' | 'title' | 'page' | 'parentId'>
-  )> }
-);
+export type ContentsListQuery = { __typename?: 'Query' } & {
+  contentsList: Array<
+    { __typename?: 'Contents' } & Pick<
+      Contents,
+      'id' | 'visible' | 'priority' | 'title' | 'page' | 'parentId'
+    >
+  >;
+};
 
 export type ContentsPageQueryVariables = Exact<{
   id?: Maybe<Scalars['ID']>;
 }>;
 
+export type ContentsPageQuery = { __typename?: 'Query' } & {
+  contentsList: Array<{ __typename?: 'Contents' } & FragmentContentsFragment>;
+};
 
-export type ContentsPageQuery = (
-  { __typename?: 'Query' }
-  & { contentsList: Array<(
-    { __typename?: 'Contents' }
-    & FragmentContentsFragment
-  )> }
-);
+export type DirTreeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type DirTreeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DirTreeQuery = (
-  { __typename?: 'Query' }
-  & { dirTree?: Maybe<Array<(
-    { __typename?: 'Files' }
-    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
-  )>> }
-);
+export type DirTreeQuery = { __typename?: 'Query' } & {
+  dirTree?: Maybe<
+    Array<
+      { __typename?: 'Files' } & Pick<
+        Files,
+        'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'
+      >
+    >
+  >;
+};
 
 export type DirFilesQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type DirFilesQuery = (
-  { __typename?: 'Query' }
-  & { dirFiles?: Maybe<Array<(
-    { __typename?: 'Files' }
-    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
-  )>> }
-);
+export type DirFilesQuery = { __typename?: 'Query' } & {
+  dirFiles?: Maybe<
+    Array<
+      { __typename?: 'Files' } & Pick<
+        Files,
+        'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'
+      >
+    >
+  >;
+};
 
 export type CreateDirMutationVariables = Exact<{
   id: Scalars['ID'];
   name: Scalars['String'];
 }>;
 
-
-export type CreateDirMutation = (
-  { __typename?: 'Mutation' }
-  & { createDir?: Maybe<(
-    { __typename?: 'Files' }
-    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
-  )> }
-);
+export type CreateDirMutation = { __typename?: 'Mutation' } & {
+  createDir?: Maybe<
+    { __typename?: 'Files' } & Pick<
+      Files,
+      'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'
+    >
+  >;
+};
 
 export type RenameFileMutationVariables = Exact<{
   id: Scalars['ID'];
   name: Scalars['String'];
 }>;
 
-
-export type RenameFileMutation = (
-  { __typename?: 'Mutation' }
-  & { renameFile?: Maybe<(
-    { __typename?: 'Files' }
-    & Pick<Files, 'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'>
-  )> }
-);
+export type RenameFileMutation = { __typename?: 'Mutation' } & {
+  renameFile?: Maybe<
+    { __typename?: 'Files' } & Pick<
+      Files,
+      'id' | 'kind' | 'name' | 'parentId' | 'size' | 'createAt' | 'updateAt'
+    >
+  >;
+};
 
 export type DeleteFileMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
-
-export type DeleteFileMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteFile'>
-);
+export type DeleteFileMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'deleteFile'>;
 
 export type DeleteFilesMutationVariables = Exact<{
   ids: Array<Scalars['ID']>;
 }>;
 
-
-export type DeleteFilesMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteFiles'>
-);
+export type DeleteFilesMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'deleteFiles'>;
 
 export type MoveFileMutationVariables = Exact<{
   targetId: Scalars['ID'];
   id: Scalars['ID'];
 }>;
 
-
-export type MoveFileMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'moveFile'>
-);
+export type MoveFileMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'moveFile'>;
 
 export type UploadFileMutationVariables = Exact<{
   parentId: Scalars['ID'];
   file: Scalars['Upload'];
 }>;
 
+export type UploadFileMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'uploadFile'>;
 
-export type UploadFileMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'uploadFile'>
-);
+export type UsersQueryVariables = Exact<{ [key: string]: never }>;
 
-export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+export type UsersQuery = { __typename?: 'Query' } & {
+  users?: Maybe<Array<{ __typename?: 'User' } & Pick<User, 'id' | 'name' | 'info'>>>;
+};
 
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type UsersQuery = (
-  { __typename?: 'Query' }
-  & { users?: Maybe<Array<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name' | 'info'>
-  )>> }
-);
-
-export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CurrentUserQuery = (
-  { __typename?: 'Query' }
-  & { currentUser?: Maybe<(
-    { __typename?: 'Login' }
-    & Pick<Login, 'token'>
-    & { user: (
-      { __typename?: 'User' }
-      & Pick<User, 'name' | 'info'>
-    ) }
-  )> }
-);
+export type CurrentUserQuery = { __typename?: 'Query' } & {
+  currentUser?: Maybe<
+    { __typename?: 'Login' } & Pick<Login, 'token'> & {
+        user: { __typename?: 'User' } & Pick<User, 'name' | 'info'>;
+      }
+  >;
+};
 
 export type LoginMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
 }>;
 
-
-export type LoginMutation = (
-  { __typename?: 'Mutation' }
-  & { login?: Maybe<(
-    { __typename?: 'Login' }
-    & Pick<Login, 'token'>
-    & { user: (
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'name' | 'info'>
-    ) }
-  )> }
-);
+export type LoginMutation = { __typename?: 'Mutation' } & {
+  login?: Maybe<
+    { __typename?: 'Login' } & Pick<Login, 'token'> & {
+        user: { __typename?: 'User' } & Pick<User, 'id' | 'name' | 'info'>;
+      }
+  >;
+};
 
 export type CreateUserMutationVariables = Exact<{
   name: Scalars['String'];
@@ -473,14 +396,9 @@ export type CreateUserMutationVariables = Exact<{
   info?: Maybe<Scalars['String']>;
 }>;
 
-
-export type CreateUserMutation = (
-  { __typename?: 'Mutation' }
-  & { createUser?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name' | 'info'>
-  )> }
-);
+export type CreateUserMutation = { __typename?: 'Mutation' } & {
+  createUser?: Maybe<{ __typename?: 'User' } & Pick<User, 'id' | 'name' | 'info'>>;
+};
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -489,52 +407,54 @@ export type UpdateUserMutationVariables = Exact<{
   info?: Maybe<Scalars['String']>;
 }>;
 
-
-export type UpdateUserMutation = (
-  { __typename?: 'Mutation' }
-  & { updateUser?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name' | 'info'>
-  )> }
-);
+export type UpdateUserMutation = { __typename?: 'Mutation' } & {
+  updateUser?: Maybe<{ __typename?: 'User' } & Pick<User, 'id' | 'name' | 'info'>>;
+};
 
 export type DeleteUsersMutationVariables = Exact<{
   ids: Array<Scalars['Int']>;
 }>;
 
+export type DeleteUsersMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'deleteUsers'>;
 
-export type DeleteUsersMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'deleteUsers'>
-);
-
-export type FragmentContentsFragment = (
-  { __typename?: 'Contents' }
-  & Pick<Contents, 'id' | 'priority' | 'visible' | 'page' | 'title_type' | 'title' | 'value_type' | 'value' | 'parentId' | 'createAt' | 'updateAt'>
-);
+export type FragmentContentsFragment = { __typename?: 'Contents' } & Pick<
+  Contents,
+  | 'id'
+  | 'priority'
+  | 'visible'
+  | 'page'
+  | 'title_type'
+  | 'title'
+  | 'value_type'
+  | 'value'
+  | 'parentId'
+  | 'createAt'
+  | 'updateAt'
+>;
 
 export const FragmentContentsFragmentDoc = gql`
-    fragment FragmentContents on Contents {
-  id
-  priority
-  visible
-  page
-  title_type
-  title
-  value_type
-  value
-  parentId
-  createAt
-  updateAt
-}
-    `;
-export const ContentsDocument = gql`
-    query contents($id: ID!) {
-  contents(id: $id) {
-    ...FragmentContents
+  fragment FragmentContents on Contents {
+    id
+    priority
+    visible
+    page
+    title_type
+    title
+    value_type
+    value
+    parentId
+    createAt
+    updateAt
   }
-}
-    ${FragmentContentsFragmentDoc}`;
+`;
+export const ContentsDocument = gql`
+  query contents($id: ID!) {
+    contents(id: $id) {
+      ...FragmentContents
+    }
+  }
+  ${FragmentContentsFragmentDoc}
+`;
 
 /**
  * __useContentsQuery__
@@ -552,23 +472,49 @@ export const ContentsDocument = gql`
  *   },
  * });
  */
-export function useContentsQuery(baseOptions?: Apollo.QueryHookOptions<ContentsQuery, ContentsQueryVariables>) {
-        return Apollo.useQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
-      }
-export function useContentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsQuery, ContentsQueryVariables>) {
-          return Apollo.useLazyQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
-        }
+export function useContentsQuery(
+  baseOptions?: Apollo.QueryHookOptions<ContentsQuery, ContentsQueryVariables>
+) {
+  return Apollo.useQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
+}
+export function useContentsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ContentsQuery, ContentsQueryVariables>
+) {
+  return Apollo.useLazyQuery<ContentsQuery, ContentsQueryVariables>(ContentsDocument, baseOptions);
+}
 export type ContentsQueryHookResult = ReturnType<typeof useContentsQuery>;
 export type ContentsLazyQueryHookResult = ReturnType<typeof useContentsLazyQuery>;
 export type ContentsQueryResult = Apollo.QueryResult<ContentsQuery, ContentsQueryVariables>;
 export const UpdateContentsDocument = gql`
-    mutation updateContents($id: ID!, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $parent: ID, $value_type: String, $value: String) {
-  updateContents(id: $id, page: $page, visible: $visible, title_type: $title_type, title: $title, parent: $parent, value_type: $value_type, value: $value) {
-    ...FragmentContents
+  mutation updateContents(
+    $id: ID!
+    $page: Boolean
+    $visible: Boolean
+    $title_type: Int
+    $title: String
+    $parent: ID
+    $value_type: String
+    $value: String
+  ) {
+    updateContents(
+      id: $id
+      page: $page
+      visible: $visible
+      title_type: $title_type
+      title: $title
+      parent: $parent
+      value_type: $value_type
+      value: $value
+    ) {
+      ...FragmentContents
+    }
   }
-}
-    ${FragmentContentsFragmentDoc}`;
-export type UpdateContentsMutationFn = Apollo.MutationFunction<UpdateContentsMutation, UpdateContentsMutationVariables>;
+  ${FragmentContentsFragmentDoc}
+`;
+export type UpdateContentsMutationFn = Apollo.MutationFunction<
+  UpdateContentsMutation,
+  UpdateContentsMutationVariables
+>;
 
 /**
  * __useUpdateContentsMutation__
@@ -594,20 +540,50 @@ export type UpdateContentsMutationFn = Apollo.MutationFunction<UpdateContentsMut
  *   },
  * });
  */
-export function useUpdateContentsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateContentsMutation, UpdateContentsMutationVariables>) {
-        return Apollo.useMutation<UpdateContentsMutation, UpdateContentsMutationVariables>(UpdateContentsDocument, baseOptions);
-      }
+export function useUpdateContentsMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateContentsMutation, UpdateContentsMutationVariables>
+) {
+  return Apollo.useMutation<UpdateContentsMutation, UpdateContentsMutationVariables>(
+    UpdateContentsDocument,
+    baseOptions
+  );
+}
 export type UpdateContentsMutationHookResult = ReturnType<typeof useUpdateContentsMutation>;
 export type UpdateContentsMutationResult = Apollo.MutationResult<UpdateContentsMutation>;
-export type UpdateContentsMutationOptions = Apollo.BaseMutationOptions<UpdateContentsMutation, UpdateContentsMutationVariables>;
+export type UpdateContentsMutationOptions = Apollo.BaseMutationOptions<
+  UpdateContentsMutation,
+  UpdateContentsMutationVariables
+>;
 export const CreateContentsDocument = gql`
-    mutation createContents($parent: ID, $vector: ContentsVector, $page: Boolean, $visible: Boolean, $title_type: Int, $title: String, $value_type: String, $value: String) {
-  createContents(parent: $parent, vector: $vector, page: $page, visible: $visible, title_type: $title_type, title: $title, value_type: $value_type, value: $value) {
-    ...FragmentContents
+  mutation createContents(
+    $parent: ID
+    $vector: ContentsVector
+    $page: Boolean
+    $visible: Boolean
+    $title_type: Int
+    $title: String
+    $value_type: String
+    $value: String
+  ) {
+    createContents(
+      parent: $parent
+      vector: $vector
+      page: $page
+      visible: $visible
+      title_type: $title_type
+      title: $title
+      value_type: $value_type
+      value: $value
+    ) {
+      ...FragmentContents
+    }
   }
-}
-    ${FragmentContentsFragmentDoc}`;
-export type CreateContentsMutationFn = Apollo.MutationFunction<CreateContentsMutation, CreateContentsMutationVariables>;
+  ${FragmentContentsFragmentDoc}
+`;
+export type CreateContentsMutationFn = Apollo.MutationFunction<
+  CreateContentsMutation,
+  CreateContentsMutationVariables
+>;
 
 /**
  * __useCreateContentsMutation__
@@ -633,18 +609,29 @@ export type CreateContentsMutationFn = Apollo.MutationFunction<CreateContentsMut
  *   },
  * });
  */
-export function useCreateContentsMutation(baseOptions?: Apollo.MutationHookOptions<CreateContentsMutation, CreateContentsMutationVariables>) {
-        return Apollo.useMutation<CreateContentsMutation, CreateContentsMutationVariables>(CreateContentsDocument, baseOptions);
-      }
+export function useCreateContentsMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateContentsMutation, CreateContentsMutationVariables>
+) {
+  return Apollo.useMutation<CreateContentsMutation, CreateContentsMutationVariables>(
+    CreateContentsDocument,
+    baseOptions
+  );
+}
 export type CreateContentsMutationHookResult = ReturnType<typeof useCreateContentsMutation>;
 export type CreateContentsMutationResult = Apollo.MutationResult<CreateContentsMutation>;
-export type CreateContentsMutationOptions = Apollo.BaseMutationOptions<CreateContentsMutation, CreateContentsMutationVariables>;
+export type CreateContentsMutationOptions = Apollo.BaseMutationOptions<
+  CreateContentsMutation,
+  CreateContentsMutationVariables
+>;
 export const DeleteContentsDocument = gql`
-    mutation deleteContents($id: ID!) {
-  deleteContents(id: $id)
-}
-    `;
-export type DeleteContentsMutationFn = Apollo.MutationFunction<DeleteContentsMutation, DeleteContentsMutationVariables>;
+  mutation deleteContents($id: ID!) {
+    deleteContents(id: $id)
+  }
+`;
+export type DeleteContentsMutationFn = Apollo.MutationFunction<
+  DeleteContentsMutation,
+  DeleteContentsMutationVariables
+>;
 
 /**
  * __useDeleteContentsMutation__
@@ -663,21 +650,32 @@ export type DeleteContentsMutationFn = Apollo.MutationFunction<DeleteContentsMut
  *   },
  * });
  */
-export function useDeleteContentsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContentsMutation, DeleteContentsMutationVariables>) {
-        return Apollo.useMutation<DeleteContentsMutation, DeleteContentsMutationVariables>(DeleteContentsDocument, baseOptions);
-      }
+export function useDeleteContentsMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteContentsMutation, DeleteContentsMutationVariables>
+) {
+  return Apollo.useMutation<DeleteContentsMutation, DeleteContentsMutationVariables>(
+    DeleteContentsDocument,
+    baseOptions
+  );
+}
 export type DeleteContentsMutationHookResult = ReturnType<typeof useDeleteContentsMutation>;
 export type DeleteContentsMutationResult = Apollo.MutationResult<DeleteContentsMutation>;
-export type DeleteContentsMutationOptions = Apollo.BaseMutationOptions<DeleteContentsMutation, DeleteContentsMutationVariables>;
+export type DeleteContentsMutationOptions = Apollo.BaseMutationOptions<
+  DeleteContentsMutation,
+  DeleteContentsMutationVariables
+>;
 export const VectorContentsDocument = gql`
-    mutation vectorContents($id: ID!, $vector: Int!) {
-  vectorContents(id: $id, vector: $vector) {
-    id
-    priority
+  mutation vectorContents($id: ID!, $vector: Int!) {
+    vectorContents(id: $id, vector: $vector) {
+      id
+      priority
+    }
   }
-}
-    `;
-export type VectorContentsMutationFn = Apollo.MutationFunction<VectorContentsMutation, VectorContentsMutationVariables>;
+`;
+export type VectorContentsMutationFn = Apollo.MutationFunction<
+  VectorContentsMutation,
+  VectorContentsMutationVariables
+>;
 
 /**
  * __useVectorContentsMutation__
@@ -697,24 +695,32 @@ export type VectorContentsMutationFn = Apollo.MutationFunction<VectorContentsMut
  *   },
  * });
  */
-export function useVectorContentsMutation(baseOptions?: Apollo.MutationHookOptions<VectorContentsMutation, VectorContentsMutationVariables>) {
-        return Apollo.useMutation<VectorContentsMutation, VectorContentsMutationVariables>(VectorContentsDocument, baseOptions);
-      }
+export function useVectorContentsMutation(
+  baseOptions?: Apollo.MutationHookOptions<VectorContentsMutation, VectorContentsMutationVariables>
+) {
+  return Apollo.useMutation<VectorContentsMutation, VectorContentsMutationVariables>(
+    VectorContentsDocument,
+    baseOptions
+  );
+}
 export type VectorContentsMutationHookResult = ReturnType<typeof useVectorContentsMutation>;
 export type VectorContentsMutationResult = Apollo.MutationResult<VectorContentsMutation>;
-export type VectorContentsMutationOptions = Apollo.BaseMutationOptions<VectorContentsMutation, VectorContentsMutationVariables>;
+export type VectorContentsMutationOptions = Apollo.BaseMutationOptions<
+  VectorContentsMutation,
+  VectorContentsMutationVariables
+>;
 export const ContentsListDocument = gql`
-    query contentsList {
-  contentsList {
-    id
-    visible
-    priority
-    title
-    page
-    parentId
+  query contentsList {
+    contentsList {
+      id
+      visible
+      priority
+      title
+      page
+      parentId
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useContentsListQuery__
@@ -731,22 +737,36 @@ export const ContentsListDocument = gql`
  *   },
  * });
  */
-export function useContentsListQuery(baseOptions?: Apollo.QueryHookOptions<ContentsListQuery, ContentsListQueryVariables>) {
-        return Apollo.useQuery<ContentsListQuery, ContentsListQueryVariables>(ContentsListDocument, baseOptions);
-      }
-export function useContentsListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsListQuery, ContentsListQueryVariables>) {
-          return Apollo.useLazyQuery<ContentsListQuery, ContentsListQueryVariables>(ContentsListDocument, baseOptions);
-        }
+export function useContentsListQuery(
+  baseOptions?: Apollo.QueryHookOptions<ContentsListQuery, ContentsListQueryVariables>
+) {
+  return Apollo.useQuery<ContentsListQuery, ContentsListQueryVariables>(
+    ContentsListDocument,
+    baseOptions
+  );
+}
+export function useContentsListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ContentsListQuery, ContentsListQueryVariables>
+) {
+  return Apollo.useLazyQuery<ContentsListQuery, ContentsListQueryVariables>(
+    ContentsListDocument,
+    baseOptions
+  );
+}
 export type ContentsListQueryHookResult = ReturnType<typeof useContentsListQuery>;
 export type ContentsListLazyQueryHookResult = ReturnType<typeof useContentsListLazyQuery>;
-export type ContentsListQueryResult = Apollo.QueryResult<ContentsListQuery, ContentsListQueryVariables>;
+export type ContentsListQueryResult = Apollo.QueryResult<
+  ContentsListQuery,
+  ContentsListQueryVariables
+>;
 export const ContentsPageDocument = gql`
-    query contentsPage($id: ID) {
-  contentsList(id: $id, page: true) {
-    ...FragmentContents
+  query contentsPage($id: ID) {
+    contentsList(id: $id, page: true) {
+      ...FragmentContents
+    }
   }
-}
-    ${FragmentContentsFragmentDoc}`;
+  ${FragmentContentsFragmentDoc}
+`;
 
 /**
  * __useContentsPageQuery__
@@ -764,28 +784,41 @@ export const ContentsPageDocument = gql`
  *   },
  * });
  */
-export function useContentsPageQuery(baseOptions?: Apollo.QueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>) {
-        return Apollo.useQuery<ContentsPageQuery, ContentsPageQueryVariables>(ContentsPageDocument, baseOptions);
-      }
-export function useContentsPageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>) {
-          return Apollo.useLazyQuery<ContentsPageQuery, ContentsPageQueryVariables>(ContentsPageDocument, baseOptions);
-        }
+export function useContentsPageQuery(
+  baseOptions?: Apollo.QueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>
+) {
+  return Apollo.useQuery<ContentsPageQuery, ContentsPageQueryVariables>(
+    ContentsPageDocument,
+    baseOptions
+  );
+}
+export function useContentsPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ContentsPageQuery, ContentsPageQueryVariables>
+) {
+  return Apollo.useLazyQuery<ContentsPageQuery, ContentsPageQueryVariables>(
+    ContentsPageDocument,
+    baseOptions
+  );
+}
 export type ContentsPageQueryHookResult = ReturnType<typeof useContentsPageQuery>;
 export type ContentsPageLazyQueryHookResult = ReturnType<typeof useContentsPageLazyQuery>;
-export type ContentsPageQueryResult = Apollo.QueryResult<ContentsPageQuery, ContentsPageQueryVariables>;
+export type ContentsPageQueryResult = Apollo.QueryResult<
+  ContentsPageQuery,
+  ContentsPageQueryVariables
+>;
 export const DirTreeDocument = gql`
-    query dirTree {
-  dirTree {
-    id
-    kind
-    name
-    parentId
-    size
-    createAt
-    updateAt
+  query dirTree {
+    dirTree {
+      id
+      kind
+      name
+      parentId
+      size
+      createAt
+      updateAt
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useDirTreeQuery__
@@ -802,28 +835,32 @@ export const DirTreeDocument = gql`
  *   },
  * });
  */
-export function useDirTreeQuery(baseOptions?: Apollo.QueryHookOptions<DirTreeQuery, DirTreeQueryVariables>) {
-        return Apollo.useQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
-      }
-export function useDirTreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DirTreeQuery, DirTreeQueryVariables>) {
-          return Apollo.useLazyQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
-        }
+export function useDirTreeQuery(
+  baseOptions?: Apollo.QueryHookOptions<DirTreeQuery, DirTreeQueryVariables>
+) {
+  return Apollo.useQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
+}
+export function useDirTreeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DirTreeQuery, DirTreeQueryVariables>
+) {
+  return Apollo.useLazyQuery<DirTreeQuery, DirTreeQueryVariables>(DirTreeDocument, baseOptions);
+}
 export type DirTreeQueryHookResult = ReturnType<typeof useDirTreeQuery>;
 export type DirTreeLazyQueryHookResult = ReturnType<typeof useDirTreeLazyQuery>;
 export type DirTreeQueryResult = Apollo.QueryResult<DirTreeQuery, DirTreeQueryVariables>;
 export const DirFilesDocument = gql`
-    query dirFiles($id: ID!) {
-  dirFiles(id: $id) {
-    id
-    kind
-    name
-    parentId
-    size
-    createAt
-    updateAt
+  query dirFiles($id: ID!) {
+    dirFiles(id: $id) {
+      id
+      kind
+      name
+      parentId
+      size
+      createAt
+      updateAt
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useDirFilesQuery__
@@ -841,29 +878,36 @@ export const DirFilesDocument = gql`
  *   },
  * });
  */
-export function useDirFilesQuery(baseOptions?: Apollo.QueryHookOptions<DirFilesQuery, DirFilesQueryVariables>) {
-        return Apollo.useQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
-      }
-export function useDirFilesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DirFilesQuery, DirFilesQueryVariables>) {
-          return Apollo.useLazyQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
-        }
+export function useDirFilesQuery(
+  baseOptions?: Apollo.QueryHookOptions<DirFilesQuery, DirFilesQueryVariables>
+) {
+  return Apollo.useQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
+}
+export function useDirFilesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DirFilesQuery, DirFilesQueryVariables>
+) {
+  return Apollo.useLazyQuery<DirFilesQuery, DirFilesQueryVariables>(DirFilesDocument, baseOptions);
+}
 export type DirFilesQueryHookResult = ReturnType<typeof useDirFilesQuery>;
 export type DirFilesLazyQueryHookResult = ReturnType<typeof useDirFilesLazyQuery>;
 export type DirFilesQueryResult = Apollo.QueryResult<DirFilesQuery, DirFilesQueryVariables>;
 export const CreateDirDocument = gql`
-    mutation createDir($id: ID!, $name: String!) {
-  createDir(id: $id, name: $name) {
-    id
-    kind
-    name
-    parentId
-    size
-    createAt
-    updateAt
+  mutation createDir($id: ID!, $name: String!) {
+    createDir(id: $id, name: $name) {
+      id
+      kind
+      name
+      parentId
+      size
+      createAt
+      updateAt
+    }
   }
-}
-    `;
-export type CreateDirMutationFn = Apollo.MutationFunction<CreateDirMutation, CreateDirMutationVariables>;
+`;
+export type CreateDirMutationFn = Apollo.MutationFunction<
+  CreateDirMutation,
+  CreateDirMutationVariables
+>;
 
 /**
  * __useCreateDirMutation__
@@ -883,26 +927,37 @@ export type CreateDirMutationFn = Apollo.MutationFunction<CreateDirMutation, Cre
  *   },
  * });
  */
-export function useCreateDirMutation(baseOptions?: Apollo.MutationHookOptions<CreateDirMutation, CreateDirMutationVariables>) {
-        return Apollo.useMutation<CreateDirMutation, CreateDirMutationVariables>(CreateDirDocument, baseOptions);
-      }
+export function useCreateDirMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateDirMutation, CreateDirMutationVariables>
+) {
+  return Apollo.useMutation<CreateDirMutation, CreateDirMutationVariables>(
+    CreateDirDocument,
+    baseOptions
+  );
+}
 export type CreateDirMutationHookResult = ReturnType<typeof useCreateDirMutation>;
 export type CreateDirMutationResult = Apollo.MutationResult<CreateDirMutation>;
-export type CreateDirMutationOptions = Apollo.BaseMutationOptions<CreateDirMutation, CreateDirMutationVariables>;
+export type CreateDirMutationOptions = Apollo.BaseMutationOptions<
+  CreateDirMutation,
+  CreateDirMutationVariables
+>;
 export const RenameFileDocument = gql`
-    mutation renameFile($id: ID!, $name: String!) {
-  renameFile(id: $id, name: $name) {
-    id
-    kind
-    name
-    parentId
-    size
-    createAt
-    updateAt
+  mutation renameFile($id: ID!, $name: String!) {
+    renameFile(id: $id, name: $name) {
+      id
+      kind
+      name
+      parentId
+      size
+      createAt
+      updateAt
+    }
   }
-}
-    `;
-export type RenameFileMutationFn = Apollo.MutationFunction<RenameFileMutation, RenameFileMutationVariables>;
+`;
+export type RenameFileMutationFn = Apollo.MutationFunction<
+  RenameFileMutation,
+  RenameFileMutationVariables
+>;
 
 /**
  * __useRenameFileMutation__
@@ -922,18 +977,29 @@ export type RenameFileMutationFn = Apollo.MutationFunction<RenameFileMutation, R
  *   },
  * });
  */
-export function useRenameFileMutation(baseOptions?: Apollo.MutationHookOptions<RenameFileMutation, RenameFileMutationVariables>) {
-        return Apollo.useMutation<RenameFileMutation, RenameFileMutationVariables>(RenameFileDocument, baseOptions);
-      }
+export function useRenameFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<RenameFileMutation, RenameFileMutationVariables>
+) {
+  return Apollo.useMutation<RenameFileMutation, RenameFileMutationVariables>(
+    RenameFileDocument,
+    baseOptions
+  );
+}
 export type RenameFileMutationHookResult = ReturnType<typeof useRenameFileMutation>;
 export type RenameFileMutationResult = Apollo.MutationResult<RenameFileMutation>;
-export type RenameFileMutationOptions = Apollo.BaseMutationOptions<RenameFileMutation, RenameFileMutationVariables>;
+export type RenameFileMutationOptions = Apollo.BaseMutationOptions<
+  RenameFileMutation,
+  RenameFileMutationVariables
+>;
 export const DeleteFileDocument = gql`
-    mutation deleteFile($id: ID!) {
-  deleteFile(id: $id)
-}
-    `;
-export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, DeleteFileMutationVariables>;
+  mutation deleteFile($id: ID!) {
+    deleteFile(id: $id)
+  }
+`;
+export type DeleteFileMutationFn = Apollo.MutationFunction<
+  DeleteFileMutation,
+  DeleteFileMutationVariables
+>;
 
 /**
  * __useDeleteFileMutation__
@@ -952,18 +1018,29 @@ export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, D
  *   },
  * });
  */
-export function useDeleteFileMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFileMutation, DeleteFileMutationVariables>) {
-        return Apollo.useMutation<DeleteFileMutation, DeleteFileMutationVariables>(DeleteFileDocument, baseOptions);
-      }
+export function useDeleteFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteFileMutation, DeleteFileMutationVariables>
+) {
+  return Apollo.useMutation<DeleteFileMutation, DeleteFileMutationVariables>(
+    DeleteFileDocument,
+    baseOptions
+  );
+}
 export type DeleteFileMutationHookResult = ReturnType<typeof useDeleteFileMutation>;
 export type DeleteFileMutationResult = Apollo.MutationResult<DeleteFileMutation>;
-export type DeleteFileMutationOptions = Apollo.BaseMutationOptions<DeleteFileMutation, DeleteFileMutationVariables>;
+export type DeleteFileMutationOptions = Apollo.BaseMutationOptions<
+  DeleteFileMutation,
+  DeleteFileMutationVariables
+>;
 export const DeleteFilesDocument = gql`
-    mutation deleteFiles($ids: [ID!]!) {
-  deleteFiles(ids: $ids)
-}
-    `;
-export type DeleteFilesMutationFn = Apollo.MutationFunction<DeleteFilesMutation, DeleteFilesMutationVariables>;
+  mutation deleteFiles($ids: [ID!]!) {
+    deleteFiles(ids: $ids)
+  }
+`;
+export type DeleteFilesMutationFn = Apollo.MutationFunction<
+  DeleteFilesMutation,
+  DeleteFilesMutationVariables
+>;
 
 /**
  * __useDeleteFilesMutation__
@@ -982,18 +1059,29 @@ export type DeleteFilesMutationFn = Apollo.MutationFunction<DeleteFilesMutation,
  *   },
  * });
  */
-export function useDeleteFilesMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFilesMutation, DeleteFilesMutationVariables>) {
-        return Apollo.useMutation<DeleteFilesMutation, DeleteFilesMutationVariables>(DeleteFilesDocument, baseOptions);
-      }
+export function useDeleteFilesMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteFilesMutation, DeleteFilesMutationVariables>
+) {
+  return Apollo.useMutation<DeleteFilesMutation, DeleteFilesMutationVariables>(
+    DeleteFilesDocument,
+    baseOptions
+  );
+}
 export type DeleteFilesMutationHookResult = ReturnType<typeof useDeleteFilesMutation>;
 export type DeleteFilesMutationResult = Apollo.MutationResult<DeleteFilesMutation>;
-export type DeleteFilesMutationOptions = Apollo.BaseMutationOptions<DeleteFilesMutation, DeleteFilesMutationVariables>;
+export type DeleteFilesMutationOptions = Apollo.BaseMutationOptions<
+  DeleteFilesMutation,
+  DeleteFilesMutationVariables
+>;
 export const MoveFileDocument = gql`
-    mutation moveFile($targetId: ID!, $id: ID!) {
-  moveFile(targetId: $targetId, id: $id)
-}
-    `;
-export type MoveFileMutationFn = Apollo.MutationFunction<MoveFileMutation, MoveFileMutationVariables>;
+  mutation moveFile($targetId: ID!, $id: ID!) {
+    moveFile(targetId: $targetId, id: $id)
+  }
+`;
+export type MoveFileMutationFn = Apollo.MutationFunction<
+  MoveFileMutation,
+  MoveFileMutationVariables
+>;
 
 /**
  * __useMoveFileMutation__
@@ -1013,18 +1101,29 @@ export type MoveFileMutationFn = Apollo.MutationFunction<MoveFileMutation, MoveF
  *   },
  * });
  */
-export function useMoveFileMutation(baseOptions?: Apollo.MutationHookOptions<MoveFileMutation, MoveFileMutationVariables>) {
-        return Apollo.useMutation<MoveFileMutation, MoveFileMutationVariables>(MoveFileDocument, baseOptions);
-      }
+export function useMoveFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<MoveFileMutation, MoveFileMutationVariables>
+) {
+  return Apollo.useMutation<MoveFileMutation, MoveFileMutationVariables>(
+    MoveFileDocument,
+    baseOptions
+  );
+}
 export type MoveFileMutationHookResult = ReturnType<typeof useMoveFileMutation>;
 export type MoveFileMutationResult = Apollo.MutationResult<MoveFileMutation>;
-export type MoveFileMutationOptions = Apollo.BaseMutationOptions<MoveFileMutation, MoveFileMutationVariables>;
+export type MoveFileMutationOptions = Apollo.BaseMutationOptions<
+  MoveFileMutation,
+  MoveFileMutationVariables
+>;
 export const UploadFileDocument = gql`
-    mutation uploadFile($parentId: ID!, $file: Upload!) {
-  uploadFile(parentId: $parentId, file: $file)
-}
-    `;
-export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
+  mutation uploadFile($parentId: ID!, $file: Upload!) {
+    uploadFile(parentId: $parentId, file: $file)
+  }
+`;
+export type UploadFileMutationFn = Apollo.MutationFunction<
+  UploadFileMutation,
+  UploadFileMutationVariables
+>;
 
 /**
  * __useUploadFileMutation__
@@ -1044,21 +1143,29 @@ export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, U
  *   },
  * });
  */
-export function useUploadFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadFileMutation, UploadFileMutationVariables>) {
-        return Apollo.useMutation<UploadFileMutation, UploadFileMutationVariables>(UploadFileDocument, baseOptions);
-      }
+export function useUploadFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<UploadFileMutation, UploadFileMutationVariables>
+) {
+  return Apollo.useMutation<UploadFileMutation, UploadFileMutationVariables>(
+    UploadFileDocument,
+    baseOptions
+  );
+}
 export type UploadFileMutationHookResult = ReturnType<typeof useUploadFileMutation>;
 export type UploadFileMutationResult = Apollo.MutationResult<UploadFileMutation>;
-export type UploadFileMutationOptions = Apollo.BaseMutationOptions<UploadFileMutation, UploadFileMutationVariables>;
+export type UploadFileMutationOptions = Apollo.BaseMutationOptions<
+  UploadFileMutation,
+  UploadFileMutationVariables
+>;
 export const UsersDocument = gql`
-    query Users {
-  users {
-    id
-    name
-    info
+  query Users {
+    users {
+      id
+      name
+      info
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useUsersQuery__
@@ -1075,26 +1182,30 @@ export const UsersDocument = gql`
  *   },
  * });
  */
-export function useUsersQuery(baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>) {
-        return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
-      }
-export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>) {
-          return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
-        }
+export function useUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>
+) {
+  return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
+}
+export function useUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>
+) {
+  return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, baseOptions);
+}
 export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
 export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
 export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;
 export const CurrentUserDocument = gql`
-    query CurrentUser {
-  currentUser {
-    token
-    user {
-      name
-      info
+  query CurrentUser {
+    currentUser {
+      token
+      user {
+        name
+        info
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useCurrentUserQuery__
@@ -1111,27 +1222,40 @@ export const CurrentUserDocument = gql`
  *   },
  * });
  */
-export function useCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
-        return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, baseOptions);
-      }
-export function useCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
-          return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, baseOptions);
-        }
+export function useCurrentUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>
+) {
+  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    baseOptions
+  );
+}
+export function useCurrentUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>
+) {
+  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    baseOptions
+  );
+}
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
-export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
+export type CurrentUserQueryResult = Apollo.QueryResult<
+  CurrentUserQuery,
+  CurrentUserQueryVariables
+>;
 export const LoginDocument = gql`
-    mutation Login($name: String!, $password: String!) {
-  login(name: $name, password: $password) {
-    token
-    user {
-      id
-      name
-      info
+  mutation Login($name: String!, $password: String!) {
+    login(name: $name, password: $password) {
+      token
+      user {
+        id
+        name
+        info
+      }
     }
   }
-}
-    `;
+`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -1152,22 +1276,30 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>
+) {
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
 export const CreateUserDocument = gql`
-    mutation createUser($name: String!, $password: String!, $info: String) {
-  createUser(name: $name, password: $password, info: $info) {
-    id
-    name
-    info
+  mutation createUser($name: String!, $password: String!, $info: String) {
+    createUser(name: $name, password: $password, info: $info) {
+      id
+      name
+      info
+    }
   }
-}
-    `;
-export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+`;
+export type CreateUserMutationFn = Apollo.MutationFunction<
+  CreateUserMutation,
+  CreateUserMutationVariables
+>;
 
 /**
  * __useCreateUserMutation__
@@ -1188,22 +1320,33 @@ export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, C
  *   },
  * });
  */
-export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
-        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, baseOptions);
-      }
+export function useCreateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>
+) {
+  return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(
+    CreateUserDocument,
+    baseOptions
+  );
+}
 export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
 export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<
+  CreateUserMutation,
+  CreateUserMutationVariables
+>;
 export const UpdateUserDocument = gql`
-    mutation updateUser($id: Int!, $name: String, $password: String, $info: String) {
-  updateUser(id: $id, name: $name, password: $password, info: $info) {
-    id
-    name
-    info
+  mutation updateUser($id: Int!, $name: String, $password: String, $info: String) {
+    updateUser(id: $id, name: $name, password: $password, info: $info) {
+      id
+      name
+      info
+    }
   }
-}
-    `;
-export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
 
 /**
  * __useUpdateUserMutation__
@@ -1225,18 +1368,29 @@ export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, U
  *   },
  * });
  */
-export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
-        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, baseOptions);
-      }
+export function useUpdateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>
+) {
+  return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    UpdateUserDocument,
+    baseOptions
+  );
+}
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
-export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
 export const DeleteUsersDocument = gql`
-    mutation deleteUsers($ids: [Int!]!) {
-  deleteUsers(ids: $ids)
-}
-    `;
-export type DeleteUsersMutationFn = Apollo.MutationFunction<DeleteUsersMutation, DeleteUsersMutationVariables>;
+  mutation deleteUsers($ids: [Int!]!) {
+    deleteUsers(ids: $ids)
+  }
+`;
+export type DeleteUsersMutationFn = Apollo.MutationFunction<
+  DeleteUsersMutation,
+  DeleteUsersMutationVariables
+>;
 
 /**
  * __useDeleteUsersMutation__
@@ -1255,9 +1409,17 @@ export type DeleteUsersMutationFn = Apollo.MutationFunction<DeleteUsersMutation,
  *   },
  * });
  */
-export function useDeleteUsersMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUsersMutation, DeleteUsersMutationVariables>) {
-        return Apollo.useMutation<DeleteUsersMutation, DeleteUsersMutationVariables>(DeleteUsersDocument, baseOptions);
-      }
+export function useDeleteUsersMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteUsersMutation, DeleteUsersMutationVariables>
+) {
+  return Apollo.useMutation<DeleteUsersMutation, DeleteUsersMutationVariables>(
+    DeleteUsersDocument,
+    baseOptions
+  );
+}
 export type DeleteUsersMutationHookResult = ReturnType<typeof useDeleteUsersMutation>;
 export type DeleteUsersMutationResult = Apollo.MutationResult<DeleteUsersMutation>;
-export type DeleteUsersMutationOptions = Apollo.BaseMutationOptions<DeleteUsersMutation, DeleteUsersMutationVariables>;
+export type DeleteUsersMutationOptions = Apollo.BaseMutationOptions<
+  DeleteUsersMutation,
+  DeleteUsersMutationVariables
+>;

@@ -3,6 +3,8 @@
   "scripts": {
     "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
     "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
+    "deploy": "docker-compose -f docker/docker-compose.yml build --parallel && docker save ttis-redis ttis-front ttis-back | docker --tls -H test.croud.jp load && docker-compose --env-file .env-deploy -f docker/docker-compose.yml up -d",
+    "deploy:log":"docker --tls -H test.croud.jp logs -f ttis-back",
     "test": "yarn --cwd ttis-back test",
     "test:snapshot": "yarn --cwd ttis-back test:snapshot",
     "generate": "npm-run-all -p generate:*",
@@ -11,7 +13,6 @@
     "start:prod:back": "yarn --cwd ttis-back build && yarn --cwd ttis-back start",
     "start:prod:front": "yarn --cwd ttis-front build && yarn --cwd ttis-front start",
     "start:docker": "docker-compose -f docker/docker-compose.yml build --compress --parallel && docker-compose -f docker/docker-compose.yml down && docker-compose -f docker/docker-compose.yml up",
-    "start:server:docker": "docker-compose -f docker/docker-compose.yml build --parallel && docker save ttis-redis ttis-nginx ttis-front ttis-back | docker -H localhost load && docker-compose -H localhost:2375 -f docker/docker-compose.yml up -d",
     "generate:back": "yarn --cwd ttis-back generate",
     "generate:front": "yarn --cwd ttis-front generate"
   },
@@ -19,6 +20,13 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "npm-run-all": "^4.1.5"
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.5"
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from 'react';
 const defaultColors = [
   0xffffff,
   0xffffff,
@@ -15,22 +15,16 @@ const defaultColors = [
   0x7f007f,
   0x007f7f,
 ];
-const getColorPattern = (v: number) => [
-  v > 3 ? 127 : 255,
-  v % 2 ? 63 : 0,
-  v % 4 > 1 ? 63 : 0,
-];
+const getColorPattern = (v: number) => [v > 3 ? 127 : 255, v % 2 ? 63 : 0, v % 4 > 1 ? 63 : 0];
 
 for (let j = 0; j < 3; j++) {
   for (let i = 0; i < 8; i++) {
     const colors = getColorPattern(i);
-    defaultColors.push(
-      colors[j] * 256 * 256 + colors[(j + 1) % 3] * 256 + colors[(j + 2) % 3]
-    );
+    defaultColors.push(colors[j] * 256 * 256 + colors[(j + 1) % 3] * 256 + colors[(j + 2) % 3]);
   }
 }
 function toHex(v: number) {
-  return ("00000" + v.toString(16)).substr(-6);
+  return ('00000' + v.toString(16)).substr(-6);
 }
 
 interface Props {
@@ -50,9 +44,9 @@ export const ColorPallet = ({ color, onChange }: Props) => {
   useEffect(() => {
     setColor(color);
   }, [color]);
-  useEffect(()=>{
+  useEffect(() => {
     updateColor();
-  },[input0,input1,input2])
+  }, [input0, input1, input2]);
 
   return (
     <>
@@ -123,12 +117,10 @@ export const ColorPallet = ({ color, onChange }: Props) => {
         {colors.map((color, index) => (
           <div
             key={index}
-            id={!index ? "select" : undefined}
-            onClick={(e) =>
-              onSelectColor(e.currentTarget as HTMLElement, index, color)
-            }
+            id={!index ? 'select' : undefined}
+            onClick={(e) => onSelectColor(e.currentTarget as HTMLElement, index, color)}
             className="box"
-            style={{ backgroundColor: "#" + toHex(color) }}
+            style={{ backgroundColor: '#' + toHex(color) }}
           ></div>
         ))}
       </div>
@@ -136,10 +128,8 @@ export const ColorPallet = ({ color, onChange }: Props) => {
     </>
   );
   function onSelectColor(node: HTMLElement, index: number, color: number) {
-    Array.from(node.parentNode!.querySelectorAll("#select")).forEach(
-      (node) => (node.id = "")
-    );
-    node.id = "select";
+    Array.from(node.parentNode!.querySelectorAll('#select')).forEach((node) => (node.id = ''));
+    node.id = 'select';
     This.index = index;
     setColor(color);
   }

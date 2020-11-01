@@ -1,11 +1,11 @@
-import { useRef, useEffect } from "react";
-import { getRGB, getRGBtoColor } from ".";
+import { useRef, useEffect } from 'react';
+import { getRGB, getRGBtoColor } from '.';
 
 interface Property {
   colorLevel: number;
   update?: boolean;
   color: number;
-  updateColor:number;
+  updateColor: number;
 }
 interface Props {
   color: number;
@@ -19,7 +19,7 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
   const This = useRef<Property>({
     colorLevel: 1,
     color: 0xffffff,
-    updateColor:-1,
+    updateColor: -1,
   }).current;
 
   useEffect(() => {
@@ -27,8 +27,7 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
   }, []);
   useEffect(() => {
     setColor(levelColor);
-    if(This.color === levelColor)
-      setColorLevel(1,false);
+    if (This.color === levelColor) setColorLevel(1, false);
   }, [levelColor]);
   return (
     <>
@@ -96,14 +95,9 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
     const { r, g, b } = getRGB(This.color);
     const canvasLevel = refLevel.current!;
     canvasLevel.height = canvasLevel.offsetHeight;
-    const ctxLevel = canvasLevel.getContext("2d");
+    const ctxLevel = canvasLevel.getContext('2d');
     if (!ctxLevel) return false;
-    const grad = ctxLevel.createLinearGradient(
-      0,
-      canvasLevel.offsetHeight,
-      0,
-      0
-    );
+    const grad = ctxLevel.createLinearGradient(0, canvasLevel.offsetHeight, 0, 0);
     grad.addColorStop(1, `rgb(${r * 4},${g * 4},${b * 4})`);
     grad.addColorStop(1 / 4, `rgb(${r},${g},${b})`);
     grad.addColorStop(0, `rgb(0,0,0)`);
@@ -112,13 +106,12 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
   }
   function setColorTarget() {
     const canvasTarget = refTarget.current!;
-    const ctx = canvasTarget.getContext("2d");
+    const ctx = canvasTarget.getContext('2d');
     if (!ctx) return;
     const rgb = getRGB(color);
-    ctx.fillStyle =
-      "rgb(" + (255 - rgb.r) + "," + (255 - rgb.g) + "," + (255 - rgb.b) + ")";
+    ctx.fillStyle = 'rgb(' + (255 - rgb.r) + ',' + (255 - rgb.g) + ',' + (255 - rgb.b) + ')';
     ctx.fillRect(0, 0, canvasTarget.width, canvasTarget.height);
-    ctx.fillStyle = "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")";
+    ctx.fillStyle = 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
     ctx.fillRect(2, 2, canvasTarget.width - 4, canvasTarget.height - 4);
   }
 
@@ -126,8 +119,7 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
     This.colorLevel = level;
     const length = refLevel.current!.offsetHeight;
     const pointer = refLevelPointer.current!;
-    pointer.style.top =
-      -pointer.offsetHeight + length - (length * level) / 4 + "px";
+    pointer.style.top = -pointer.offsetHeight + length - (length * level) / 4 + 'px';
 
     const { r, g, b } = getRGB(This.color);
     const color2 = getRGBtoColor({
@@ -138,23 +130,18 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
 
     if (color !== color2) {
       This.update = update;
-      if(update === false)
-        This.updateColor = color2;
+      if (update === false) This.updateColor = color2;
       onChange(color2);
     } else if (update !== false) This.update = true;
   }
   function onColorLevel(
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) {
-    if (
-      ("touches" in e && e.touches.length === 0) ||
-      ("buttons" in e && e.buttons == 0)
-    )
-      return;
-    const target = "touches" in e ? e.touches[0].target : e.target;
+    if (('touches' in e && e.touches.length === 0) || ('buttons' in e && e.buttons == 0)) return;
+    const target = 'touches' in e ? e.touches[0].target : e.target;
     if (!(target instanceof HTMLCanvasElement)) return;
     const rect = target.getBoundingClientRect();
-    const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
+    const mouseY = 'clientY' in e ? e.clientY - rect.top : e.touches[0].clientY;
     const length = refLevel.current!.offsetHeight / 2;
     const level = 2 - ((mouseY - length) / length) * 2;
     setColorLevel(level, false);
@@ -164,8 +151,7 @@ export const ColorLevel = ({ color, levelColor, onChange }: Props) => {
     if (This.update === false) {
       This.update = true;
     } else {
-      if(This.updateColor !== color)
-        This.color = color;
+      if (This.updateColor !== color) This.color = color;
       drawColorLevel();
     }
     setColorTarget();

@@ -1,27 +1,23 @@
-import { JSWindow } from "@jswf/react";
-import { AutoClose } from "@components/Footer";
-import imageLoginId from "./images/login_id.svg";
-import imageLoginPass from "./images/login_pass.svg";
-import { useMutation, useApolloClient } from "@apollo/client";
-import { QUERY_LOGIN } from "./graphql";
-import { useState } from "react";
-import axios from "axios";
-import { LoginMutation } from "@generated/graphql";
-import { CustomApolloClient } from "../../pages/_app";
+import { JSWindow } from '@jswf/react';
+import { AutoClose } from '@components/Footer';
+import imageLoginId from './images/login_id.svg';
+import imageLoginPass from './images/login_pass.svg';
+import { useMutation, useApolloClient } from '@apollo/client';
+import { QUERY_LOGIN } from './graphql';
+import { useState } from 'react';
+import axios from 'axios';
+import { LoginMutation } from '@generated/graphql';
+import { CustomApolloClient } from '../../pages/_app';
 export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
   const client = useApolloClient() as CustomApolloClient;
   const [login, { loading }] = useMutation<LoginMutation>(QUERY_LOGIN);
-  const [title, setTitle] = useState("Login");
+  const [title, setTitle] = useState('Login');
   const [name, setName] = useState(
-    (typeof window !== "undefined" && localStorage.getItem("lastUser")) || "admin"
+    (typeof window !== 'undefined' && localStorage.getItem('lastUser')) || 'admin'
   );
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   return (
-    <JSWindow
-      title={loading ? "Logging in" : title}
-      onUpdate={autoClose}
-      height={200}
-    >
+    <JSWindow title={loading ? 'Logging in' : title} onUpdate={autoClose} height={200}>
       <style jsx>{`
         .form {
           display: flex;
@@ -83,14 +79,14 @@ export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
                     if (data?.login) {
                       autoClose && autoClose();
                       client.setToken(data.login.token);
-                       axios.post("/api/token", {
-                         graphqlToken: data.login.token,
-                       });
+                      axios.post('/api/token', {
+                        graphqlToken: data.login.token,
+                      });
                       client.resetStore();
                     }
                   },
                 }).catch(() => {
-                  setTitle("Login Error");
+                  setTitle('Login Error');
                 });
               }}
             >
@@ -100,7 +96,7 @@ export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
               disabled={loading}
               onClick={() => {
                 axios
-                  .post("/api/logout", {
+                  .post('/api/logout', {
                     graphqlToken: client.getToken(),
                   })
                   .then(() => {

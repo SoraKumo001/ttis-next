@@ -1,5 +1,4 @@
-import { gql } from "@apollo/client";
-
+import { gql } from '@apollo/client';
 
 export const QUERY_USERS = gql`
   query Users {
@@ -43,12 +42,7 @@ export const MUTATION_CREATE_USER = gql`
   }
 `;
 export const MUTATION_UPDATE_USER = gql`
-  mutation updateUser(
-    $id: Int!
-    $name: String
-    $password: String
-    $info: String
-  ) {
+  mutation updateUser($id: Int!, $name: String, $password: String, $info: String) {
     updateUser(id: $id, name: $name, password: $password, info: $info) {
       id
       name

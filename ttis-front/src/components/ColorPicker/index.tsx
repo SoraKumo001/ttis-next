@@ -1,8 +1,8 @@
-import { JSWindow, WindowProps } from "@jswf/react";
-import { ColorPallet } from "./ColorPallet";
-import { useState, useEffect } from "react";
-import { ColorLevel } from "./ColorLevel";
-import { ColorCircle } from "./ColorCircle";
+import { JSWindow, WindowProps } from '@jswf/react';
+import { ColorPallet } from './ColorPallet';
+import { useState, useEffect } from 'react';
+import { ColorLevel } from './ColorLevel';
+import { ColorCircle } from './ColorCircle';
 
 export interface Props {
   onChange?: (color: number) => void;
@@ -12,15 +12,8 @@ export const getRGB = (color: number) => ({
   g: (color / 256) % 256,
   b: color % 256,
 });
-export const getRGBtoColor = ({
-  r,
-  g,
-  b,
-}: {
-  r: number;
-  g: number;
-  b: number;
-}) => Math.floor(r) * 256 * 256 + Math.floor(g) * 256 + Math.floor(b);
+export const getRGBtoColor = ({ r, g, b }: { r: number; g: number; b: number }) =>
+  Math.floor(r) * 256 * 256 + Math.floor(g) * 256 + Math.floor(b);
 
 export const ColorPickerView = (props: Props) => {
   const [color, setColor] = useState(0xffffff);
@@ -88,7 +81,7 @@ export const ColorPickerView = (props: Props) => {
 export const ColorPickerWindow = (props: Props & WindowProps) => {
   const { onChange } = props;
   return (
-    <JSWindow  title="ColorPicker" width={400} height={300} {...props}>
+    <JSWindow title="ColorPicker" width={400} height={300} {...props}>
       <ColorPickerView onChange={onChange} />
     </JSWindow>
   );

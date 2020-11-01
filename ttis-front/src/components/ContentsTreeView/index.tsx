@@ -1,16 +1,12 @@
-import { TreeView, TreeItem } from "@jswf/react";
-import { useQuery } from "@apollo/client";
-import { CONTENTS_TREE } from "./graphql";
-import { ContentsListQuery } from "../../generated/graphql";
-import { useRouter } from "next/router";
-import {
-  addRouterQuery,
-  setRouterPath,
-  getRoutePath,
-} from "../../libs/CustomRouter";
-import { useRef, useEffect, useMemo } from "react";
+import { TreeView, TreeItem } from '@jswf/react';
+import { useQuery } from '@apollo/client';
+import { CONTENTS_TREE } from './graphql';
+import { ContentsListQuery } from '../../generated/graphql';
+import { useRouter } from 'next/router';
+import { addRouterQuery, setRouterPath, getRoutePath } from '../../libs/CustomRouter';
+import { useMemo } from 'react';
 
-type ContentsItem = ContentsListQuery["contentsList"][0] & {
+type ContentsItem = ContentsListQuery['contentsList'][0] & {
   parent?: ContentsItem;
   children?: ContentsItem[];
 };
@@ -33,11 +29,7 @@ export const ContentsTreeView = () => {
           background-color: #ffeeee;
         }
       `}</style>
-      <TreeView
-        userSelect={false}
-        onItemClick={onClick}
-        onItemDoubleClick={onDoubleClick}
-      >
+      <TreeView userSelect={false} onItemClick={onClick} onItemDoubleClick={onDoubleClick}>
         {tree && createTreeItem(tree)}
       </TreeView>
     </>
@@ -45,7 +37,7 @@ export const ContentsTreeView = () => {
 
   function createTree(contentsList: ContentsItem[]) {
     if (!contentsList) return undefined;
-    const idMap = new Map<String, ContentsItem>();
+    const idMap = new Map<string, ContentsItem>();
     contentsList.forEach((contents) => {
       idMap.set(contents.id, { ...contents });
     });
@@ -59,9 +51,7 @@ export const ContentsTreeView = () => {
       }
     });
     idMap.forEach((c) => {
-      c.children?.sort((a, b) =>
-        a.page && !b.page ? -1 : a.priority - b.priority
-      );
+      c.children?.sort((a, b) => (a.page && !b.page ? -1 : a.priority - b.priority));
     });
     return idMap.get(contentsList[0].id);
   }
@@ -71,8 +61,8 @@ export const ContentsTreeView = () => {
         key={item.id}
         label={
           <div
-            className={`${item.page ? "page" : "item"} ${
-              item.visible === true ? "visible" : "hidden"
+            className={`${item.page ? 'page' : 'item'} ${
+              item.visible === true ? 'visible' : 'hidden'
             }`}
           >
             {item.title}
@@ -94,7 +84,7 @@ export const ContentsTreeView = () => {
         c = c.parent;
       }
       const id = c ? c.id : contents.id;
-      setRouterPath(router, `/page/${contents.id}/`,undefined, { id });
+      setRouterPath(router, `/page/${contents.id}/`, undefined, { id });
     }
   }
   function onDoubleClick(item: TreeItem) {

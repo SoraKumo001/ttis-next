@@ -1,24 +1,21 @@
-import React from "react";
-import NextApp, { AppContext, createUrl } from "next/app";
+import React from 'react';
+import NextApp, { AppContext, AppInitialProps, createUrl } from 'next/app';
 
 import {
   ApolloProvider,
   ApolloClient,
   InMemoryCache,
   NormalizedCacheObject,
-  ApolloLink
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
-import { getMarkupFromTree } from "@apollo/react-ssr";
-import {
-  initProps,
-  SessionType,
-  createSessionProps,
-} from "../libs/next-express-session";
-import { Header } from "@components/Header";
-import * as nextRouter from "next/router";
-import { Footer } from "@components/Footer";
-import { createUploadLink, UploadLinkOptions } from "apollo-upload-client";
+  ApolloLink,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { getMarkupFromTree } from '@apollo/react-ssr';
+import { initProps, SessionType, createSessionProps } from '../libs/next-express-session';
+import { Header } from '@components/Header';
+import * as nextRouter from 'next/router';
+import { Footer } from '@components/Footer';
+import { createUploadLink, UploadLinkOptions } from 'apollo-upload-client';
+import { NextRouter } from 'next/router';
 
 export type NextWebVitalsMetrics = {
   id: string;
@@ -28,20 +25,19 @@ export type NextWebVitalsMetrics = {
   value: number;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function reportWebVitals(metric: NextWebVitalsMetrics) {
   //console.log(metric);
 }
 
 const IS_BROWSER = !!process.browser;
 const IS_DOCKER =
-  process.env.NODE_ENV === "production" &&
-  process.platform !== "win32" &&
-  !IS_BROWSER;
+  process.env.NODE_ENV === 'production' && process.platform !== 'win32' && !IS_BROWSER;
 const URI_ENDPOINT = IS_BROWSER
-  ? "/graphql/"
+  ? '/graphql/'
   : IS_DOCKER
-  ? "http://ttis-nginx/graphql/"
-  : "http://localhost/graphql/";
+  ? 'http://ttis-nginx/graphql/'
+  : 'http://localhost/graphql/';
 // セッション情報内からクライアントへ送りたくないデータを指定
 const SessionFilter: string[] = [];
 
@@ -53,10 +49,10 @@ export const createAuthLink = (options: UploadLinkOptions) => {
   let bearerToken: string;
   const link = (createUploadLink(options) as unknown) as ApolloLink;
   const apolloLink = setContext((_, { headers }) => ({
-    headers: { ...headers, authorization: `bearer ${bearerToken || ""}` },
+    headers: { ...headers, authorization: `bearer ${bearerToken || ''}` },
   })).concat(link) as AuthLink;
   apolloLink.setToken = (token) => {
-    bearerToken = token || "";
+    bearerToken = token || '';
   };
   apolloLink.getToken = () => {
     return bearerToken;
@@ -99,8 +95,7 @@ let ssrClient: CustomApolloClient;
 export default class App extends NextApp<{ session: SessionType }> {
   static async getInitialProps({ ctx, Component, router }: AppContext) {
     //セッション情報の初期化(SPA時にはundefined)
-    const session = (ctx?.req as undefined | { session?: SessionType })
-      ?.session;
+    const session = (ctx?.req as undefined | { session?: SessionType })?.session;
     const graphqlToken = session?.graphqlToken as string | undefined;
     ssrClient = new CustomApolloClient(graphqlToken);
 
@@ -108,15 +103,14 @@ export default class App extends NextApp<{ session: SessionType }> {
       ...ctx,
       session,
     };
-    const pageProps =
-      Component.getInitialProps && (await Component.getInitialProps(context));
+    const pageProps = Component.getInitialProps && (await Component.getInitialProps(context));
 
     const sessionProps = createSessionProps(session, SessionFilter);
     //SSR用GraphQLデータキャッシュの作成
     if (!IS_BROWSER) {
       //getMarkupFromTreeの中ではuseRouterが使えないので強制フック
       const ssrRouter = nextRouter.makePublicRouterInstance(router);
-      (nextRouter as any).useRouter = () => {
+      (nextRouter as { useRouter: () => NextRouter }).useRouter = () => {
         return ssrRouter;
       };
       //仮コンポーネントでキャッシュを作る
@@ -131,9 +125,7 @@ export default class App extends NextApp<{ session: SessionType }> {
             />
           ),
         }).catch(() => {}));
-      const newToken = ssrClient.extract()["$ROOT_QUERY.currentUser"]?.[
-        "token"
-      ];
+      const newToken = ssrClient.extract()['$ROOT_QUERY.currentUser']?.['token'];
       if (newToken) {
         session!.graphqlToken = newToken;
       }
@@ -149,14 +141,11 @@ export default class App extends NextApp<{ session: SessionType }> {
     };
   }
   client: CustomApolloClient;
-  constructor(props: any) {
+  constructor(props: AppContext & AppInitialProps & { session: SessionType }) {
     super(props);
     this.client =
       ssrClient ||
-      new CustomApolloClient(
-        props.session?.graphqlToken as string,
-        props.pageProps.apolloCache
-      );
+      new CustomApolloClient(props.session?.graphqlToken as string, props.pageProps.apolloCache);
   }
   render() {
     const { router, Component, pageProps } = this.props;
@@ -178,7 +167,7 @@ export default class App extends NextApp<{ session: SessionType }> {
             flex-direction: column;
             height: 100%;
             width: 100%;
-            animation: fadeIn 0.5s normal;
+            animation: fadeIn 0.1s normal;
           }
           .body {
             position: relative;

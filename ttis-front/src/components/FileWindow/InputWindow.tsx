@@ -1,5 +1,5 @@
-import { JSWindow, WindowState } from "@jswf/react";
-import { useEffect, useRef } from "react";
+import { JSWindow, WindowState } from '@jswf/react';
+import { useEffect, useRef } from 'react';
 
 interface Props {
   title: string;
@@ -8,12 +8,7 @@ interface Props {
   defaultValue?: string;
 }
 
-export const InputWindow = ({
-  title,
-  onClose,
-  onEnter,
-  defaultValue,
-}: Props) => {
+export const InputWindow = ({ title, onClose, onEnter, defaultValue }: Props) => {
   const refInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     refInput.current!.focus();

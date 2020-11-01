@@ -1,6 +1,6 @@
-import { useRef, useEffect } from "react";
-import { getRGBtoColor, getRGB } from ".";
-import ResizeObserver from "react-resize-observer";
+import { useRef, useEffect } from 'react';
+import { getRGBtoColor, getRGB } from '.';
+import ResizeObserver from 'react-resize-observer';
 
 interface Property {
   triangleSize: number;
@@ -63,20 +63,13 @@ export const ColorCircle = ({ color, onChange }: Props) => {
       </div>
     </>
   );
-  function onCircle(
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) {
-    if (
-      ("touches" in e && e.touches.length === 0) ||
-      ("buttons" in e && e.buttons == 0)
-    )
-      return;
+  function onCircle(e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) {
+    if (('touches' in e && e.touches.length === 0) || ('buttons' in e && e.buttons == 0)) return;
     if (!e.target) return;
     const trianglePoinst = This.trianglePoint;
     const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const mouseX =
-      "clientX" in e ? e.clientX - rect.left : e.touches[0].clientX;
-    const mouseY = "clientY" in e ? e.clientY - rect.top : e.touches[0].clientY;
+    const mouseX = 'clientX' in e ? e.clientX - rect.left : e.touches[0].clientX;
+    const mouseY = 'clientY' in e ? e.clientY - rect.top : e.touches[0].clientY;
 
     const node = refCircle.current!;
     const centerX = node.offsetWidth / 2;
@@ -90,8 +83,8 @@ export const ColorCircle = ({ color, onChange }: Props) => {
     const my = centerY + y * length;
 
     const pointer = refPointer.current!;
-    pointer.style.left = mx - pointer.offsetWidth / 2 + "px";
-    pointer.style.top = my - pointer.offsetHeight / 2 + "px";
+    pointer.style.left = mx - pointer.offsetWidth / 2 + 'px';
+    pointer.style.top = my - pointer.offsetHeight / 2 + 'px';
     const r = getColor(mx, my, trianglePoinst[0].x, trianglePoinst[0].y);
     const g = getColor(mx, my, trianglePoinst[1].x, trianglePoinst[1].y);
     const b = getColor(mx, my, trianglePoinst[2].x, trianglePoinst[2].y);
@@ -100,15 +93,15 @@ export const ColorCircle = ({ color, onChange }: Props) => {
   function drawCircle() {
     const triangleCanvas = refCircle.current!;
     //クライアントサイズの取得
-    let width = triangleCanvas.offsetWidth;
-    let height = triangleCanvas.offsetHeight;
+    const width = triangleCanvas.offsetWidth;
+    const height = triangleCanvas.offsetHeight;
     triangleCanvas.width = width;
     triangleCanvas.height = height;
 
-    let centerX = width / 2;
-    let centerY = height / 2;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
-    const ctx = triangleCanvas.getContext("2d");
+    const ctx = triangleCanvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
 
@@ -134,11 +127,11 @@ export const ColorCircle = ({ color, onChange }: Props) => {
     ];
     This.trianglePoint = trianglePoint;
     const color = [
-      ["RGBA(255,0,0,255)", "RGBA(0,0,0,255)"],
-      ["RGBA(0,255,0,255)", "RGBA(0,0,0,255)"],
-      ["RGBA(0,0,255,255)", "RGBA(0,0,0,255)"],
+      ['RGBA(255,0,0,255)', 'RGBA(0,0,0,255)'],
+      ['RGBA(0,255,0,255)', 'RGBA(0,0,0,255)'],
+      ['RGBA(0,0,255,255)', 'RGBA(0,0,0,255)'],
     ];
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 3; i++) {
       const i0 = i % 3;
       const i1 = (i + 1) % 3;
@@ -154,21 +147,14 @@ export const ColorCircle = ({ color, onChange }: Props) => {
       ctx.fillStyle = grad;
 
       ctx.beginPath();
-      ctx.arc(
-        centerX,
-        centerY,
-        r,
-        (0 * Math.PI) / 180,
-        (360 * Math.PI) / 180,
-        false
-      );
+      ctx.arc(centerX, centerY, r, (0 * Math.PI) / 180, (360 * Math.PI) / 180, false);
       ctx.closePath();
       /* 三角形を塗りつぶす */
       ctx.fill();
     }
   }
   function getColor(px: number, py: number, cx: number, cy: number) {
-    let value = Math.round(
+    const value = Math.round(
       (1 -
         Math.sqrt(Math.pow(px - cx, 2) + Math.pow(py - cy, 2)) /
           ((This.triangleSize * Math.sqrt(3)) / 2)) *
@@ -187,18 +173,10 @@ export const ColorCircle = ({ color, onChange }: Props) => {
     const g2 = !length ? 0 : g / length;
     const b2 = !length ? 0 : b / length;
     const p = This.trianglePoint;
-    const x =
-      ((p[0].x - centerX) * r2 +
-        (p[1].x - centerX) * g2 +
-        (p[2].x - centerX) * b2) /
-      1;
-    const y =
-      ((p[0].y - centerY) * r2 +
-        (p[1].y - centerY) * g2 +
-        (p[2].y - centerY) * b2) /
-      1;
-    pointer.style.left = centerX + x - pointer.offsetWidth / 2 + "px";
-    pointer.style.top = centerY + y - pointer.offsetHeight / 2 + "px";
-    onChange(color)
+    const x = ((p[0].x - centerX) * r2 + (p[1].x - centerX) * g2 + (p[2].x - centerX) * b2) / 1;
+    const y = ((p[0].y - centerY) * r2 + (p[1].y - centerY) * g2 + (p[2].y - centerY) * b2) / 1;
+    pointer.style.left = centerX + x - pointer.offsetWidth / 2 + 'px';
+    pointer.style.top = centerY + y - pointer.offsetHeight / 2 + 'px';
+    onChange(color);
   }
 };

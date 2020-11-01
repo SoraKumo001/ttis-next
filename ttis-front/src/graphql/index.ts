@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const FRAGMENT_CONTENTS = gql`
   fragment FragmentContents on Contents {

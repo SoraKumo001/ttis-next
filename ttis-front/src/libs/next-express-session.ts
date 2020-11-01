@@ -1,7 +1,5 @@
-import expressSession from "express-session";
-import { NextPageContext, NextComponentType } from "next";
-import Express from "express";
-import App from "next/app";
+import { NextPageContext, NextComponentType } from 'next';
+import App from 'next/app';
 
 /**
  *Sessionデータタイプ
@@ -48,13 +46,10 @@ let sessionProps: SessionType;
  * @param {string[]} [filters]
  * @returns
  */
-export const createSessionProps = (
-  session?: SessionType,
-  filters?: string[]
-) => {
+export const createSessionProps = (session?: SessionType, filters?: string[]) => {
   if (!session) return undefined;
   const result: SessionType = {};
-  const f = ["cookie"];
+  const f = ['cookie'];
   if (filters) f.push(...filters);
   for (const [key, value] of Object.entries(session))
     if (f.indexOf(key) === -1) result[key] = value;
@@ -67,7 +62,7 @@ export const createSessionProps = (
  * @param {App} app
  */
 export const initProps = (app: App) => {
-  const { Component, pageProps, session } = app.props as App["props"] & {
+  const { Component, pageProps, session } = app.props as App['props'] & {
     session?: SessionType;
   };
   if (session) sessionProps = session;
@@ -75,6 +70,6 @@ export const initProps = (app: App) => {
   Component.defaultProps = {
     ...Component.defaultProps,
     ...pageProps,
-    session: sessionProps
+    session: sessionProps,
   };
 };

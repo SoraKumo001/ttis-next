@@ -1,11 +1,8 @@
-import { NextRouter } from "next/router";
-import Url from "url";
-import { ParsedUrlQueryInput } from "querystring";
+import { NextRouter } from 'next/router';
+import Url from 'url';
+import { ParsedUrlQueryInput } from 'querystring';
 
-export const addRouterQuery = (
-  router: NextRouter,
-  params: { [key: string]: string }
-) => {
+export const addRouterQuery = (router: NextRouter, params: { [key: string]: string }) => {
   const url = Url.parse(router.asPath, true);
   return router.push(router.pathname, {
     pathname: url.pathname,
@@ -41,5 +38,5 @@ export const setRouterPath = (
 
 export const getRoutePath = (router: NextRouter) => {
   const url = Url.parse(router.asPath);
-  return url.pathname?.split("/").filter((s) => s.length) || [];
+  return url.pathname?.split('/').filter((s) => s.length) || [];
 };

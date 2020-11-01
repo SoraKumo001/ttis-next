@@ -1,5 +1,4 @@
-import { gql } from "@apollo/client";
-
+import { gql } from '@apollo/client';
 
 export const CONTENTS_TREE = gql`
   query contentsList {

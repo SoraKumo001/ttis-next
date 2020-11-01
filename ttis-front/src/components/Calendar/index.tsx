@@ -1,7 +1,7 @@
-import { JSWindow } from "@jswf/react";
-import { useState } from "react";
+import { JSWindow } from '@jswf/react';
+import { useState } from 'react';
 
-const weekStr = ["日", "月", "火", "水", "木", "金", "土"];
+const weekStr = ['日', '月', '火', '水', '木', '金', '土'];
 
 interface Props {
   date?: Date;
@@ -85,38 +85,26 @@ export const CalendarView = ({ date, onDate }: Props) => {
           <div className="period">
             <div className="year">
               <button
-                onClick={() =>
-                  setNowDate(
-                    new Date(nowDate.setFullYear(nowDate.getFullYear() - 1))
-                  )
-                }
+                onClick={() => setNowDate(new Date(nowDate.setFullYear(nowDate.getFullYear() - 1)))}
               >
                 ←
               </button>
               <div>{nowDate.getFullYear()}年</div>
               <button
-                onClick={() =>
-                  setNowDate(
-                    new Date(nowDate.setFullYear(nowDate.getFullYear() + 1))
-                  )
-                }
+                onClick={() => setNowDate(new Date(nowDate.setFullYear(nowDate.getFullYear() + 1)))}
               >
                 →
               </button>
             </div>
             <div className="month">
               <button
-                onClick={() =>
-                  setNowDate(new Date(nowDate.setMonth(nowDate.getMonth() - 1)))
-                }
+                onClick={() => setNowDate(new Date(nowDate.setMonth(nowDate.getMonth() - 1)))}
               >
                 ←
               </button>
               <div>{nowDate.getMonth() + 1}月</div>
               <button
-                onClick={() =>
-                  setNowDate(new Date(nowDate.setMonth(nowDate.getMonth() + 1)))
-                }
+                onClick={() => setNowDate(new Date(nowDate.setMonth(nowDate.getMonth() + 1)))}
               >
                 →
               </button>
@@ -132,11 +120,7 @@ export const CalendarView = ({ date, onDate }: Props) => {
             </div>
             <div className="days">
               {days.map((day) => (
-                <div
-                  className="day"
-                  key={day}
-                  onClick={() => onDate && onDate(new Date(day))}
-                >
+                <div className="day" key={day} onClick={() => onDate && onDate(new Date(day))}>
                   {new Date(day).getDate()}
                 </div>
               ))}

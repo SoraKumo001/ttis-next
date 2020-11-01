@@ -4,6 +4,7 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Field(_ => Int)
   @PrimaryGeneratedColumn() //自動番号
   id!: number;

@@ -1,6 +1,6 @@
-import { SplitView, WindowState } from "@jswf/react";
-import { useRef, useEffect, useState, FC } from "react";
-import { ColorSettingWindow } from "./ColorWindow";
+import { SplitView, WindowState } from '@jswf/react';
+import { useRef, useEffect, useState, FC } from 'react';
+import { ColorSettingWindow } from './ColorWindow';
 
 export class TimerProc {
   private proc: () => void;
@@ -125,11 +125,7 @@ export const HtmlEditableView: FC<Props> = ({ defaultValue, onChange }) => {
         </div>
         <div className="split">
           <SplitView>
-            <textarea
-              ref={refTextArea}
-              className="textView"
-              defaultValue={defaultValue}
-            />
+            <textarea ref={refTextArea} className="textView" defaultValue={defaultValue} />
 
             <div
               ref={refHtmlArea}
@@ -148,18 +144,14 @@ export const HtmlEditableView: FC<Props> = ({ defaultValue, onChange }) => {
       {textColor && (
         <ColorSettingWindow
           title="Text Color"
-          onUpdate={(p) =>
-            p.realWindowState === WindowState.HIDE && setTextColor(false)
-          }
+          onUpdate={(p) => p.realWindowState === WindowState.HIDE && setTextColor(false)}
           onChange={onTextColor}
         />
       )}
       {backColor && (
         <ColorSettingWindow
           title="Background Color"
-          onUpdate={(p) =>
-            p.realWindowState === WindowState.HIDE && setBackColor(false)
-          }
+          onUpdate={(p) => p.realWindowState === WindowState.HIDE && setBackColor(false)}
           onChange={onBackColor}
         />
       )}
@@ -171,54 +163,54 @@ export const HtmlEditableView: FC<Props> = ({ defaultValue, onChange }) => {
     refTextArea.current!.value = value;
   }
   function onIndentation() {
-    insertTag("div", { marginLeft: "4ex" });
+    insertTag('div', { marginLeft: '4ex' });
   }
   function onTextColor(color: number) {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("foreColor", false, color.toString(16));
+    document.execCommand('foreColor', false, color.toString(16));
     getSelection()?.removeAllRanges();
     This.htmlProc.call();
   }
   function onBackColor(color: number) {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("backColor", false, color.toString(16));
+    document.execCommand('backColor', false, color.toString(16));
     getSelection()?.removeAllRanges();
     This.htmlProc.call();
   }
   function onBold() {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("bold");
+    document.execCommand('bold');
     This.htmlProc.call();
   }
   function onItalic() {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("italic");
+    document.execCommand('italic');
     This.htmlProc.call();
   }
   function onUnder() {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("underline");
+    document.execCommand('underline');
     This.htmlProc.call();
   }
   function onStrike() {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
-    document.execCommand("strikeThrough");
+    document.execCommand('strikeThrough');
     This.htmlProc.call();
   }
 
   function onDiv() {
-    insertTag("div");
+    insertTag('div');
   }
   function onP() {
-    insertTag("p");
+    insertTag('p');
   }
-  function insertTag(tag: string, style?: Partial<HTMLElement["style"]>) {
+  function insertTag(tag: string, style?: Partial<HTMLElement['style']>) {
     const htmlArea = refHtmlArea.current!;
     htmlArea.focus();
     const sel = getSelection();

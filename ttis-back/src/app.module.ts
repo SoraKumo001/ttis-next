@@ -5,7 +5,6 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DBModule } from './db.module';
 import { FilesModule } from './files/files.module';
-import { GraphQLUpload } from 'graphql-upload';
 
 @Module({
   imports: [

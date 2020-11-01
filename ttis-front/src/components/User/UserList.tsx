@@ -1,20 +1,13 @@
-import {
-  JSWindow,
-  ListView,
-  ListHeaders,
-  ListHeader,
-  ListItem,
-  ListRow,
-} from "@jswf/react";
-import { AutoClose, createAutoClose } from "@components/Footer";
-import { useRouter } from "next/router";
-import { UserEdit } from "./UserEdit";
+import { JSWindow, ListView, ListHeaders, ListHeader, ListItem, ListRow } from '@jswf/react';
+import { AutoClose, createAutoClose } from '@components/Footer';
+import { useRouter } from 'next/router';
+import { UserEdit } from './UserEdit';
 
-import { useQuery } from "@apollo/client";
-import React, { useRef, useState } from "react";
-import { QUERY_USERS } from "./graphql";
-import { UsersQuery } from "../../generated/graphql";
-import { UserDel } from "./UserDel";
+import { useQuery } from '@apollo/client';
+import React, { useRef, useState } from 'react';
+import { QUERY_USERS } from './graphql';
+import { UsersQuery } from '../../generated/graphql';
+import { UserDel } from './UserDel';
 
 export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
   const router = useRouter();
@@ -27,7 +20,7 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
       height={400}
       title="ユーザリスト"
       onUpdate={autoClose}
-      clientStyle={{ display: "flex", flexDirection: "column" }}
+      clientStyle={{ display: 'flex', flexDirection: 'column' }}
     >
       <ListView ref={listView}>
         <ListHeaders>
@@ -60,11 +53,7 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
           onClick={() => {
             const list = listView.current;
             if (list)
-              setIds(
-                list
-                  .getSelectItems()
-                  .map((index) => list.getItemValue(index) as number)
-              );
+              setIds(list.getSelectItems().map((index) => list.getItemValue(index) as number));
 
             router.push({
               pathname: router.pathname,
@@ -75,11 +64,9 @@ export const UserList = ({ autoClose }: { autoClose?: AutoClose }) => {
           削除
         </button>
       </div>
-      {router.query.add !== undefined && (
-        <UserEdit autoClose={createAutoClose(router, "add")} />
-      )}
+      {router.query.add !== undefined && <UserEdit autoClose={createAutoClose(router, 'add')} />}
       {router.query.del !== undefined && (
-        <UserDel autoClose={createAutoClose(router, "del")} ids={ids} />
+        <UserDel autoClose={createAutoClose(router, 'del')} ids={ids} />
       )}
     </JSWindow>
   );

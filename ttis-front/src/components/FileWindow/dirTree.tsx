@@ -1,10 +1,10 @@
-import { useQuery, useApolloClient } from "@apollo/client";
-import { TreeView, TreeItem } from "@jswf/react";
-import { QUERY_DIR, CREATE_DIR, RENAME_FILE } from "./graphql";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { DirTreeQuery } from "@generated/graphql";
+import { useQuery } from '@apollo/client';
+import { TreeView, TreeItem } from '@jswf/react';
+import { QUERY_DIR } from './graphql';
+import { useMemo, useRef, useEffect } from 'react';
+import { DirTreeQuery } from '@generated/graphql';
 
-type DirItem = NonNullable<DirTreeQuery["dirTree"]>[0] & {
+type DirItem = NonNullable<DirTreeQuery['dirTree']>[0] & {
   parent?: DirItem;
   children?: DirItem[];
 };
@@ -74,24 +74,20 @@ export const DirTreeView = ({
           if (id !== dirId) onSelect?.(id);
         }}
         onItemDrop={(e, item) => {
-          const data = e.dataTransfer.getData("text/plain");
+          const data = e.dataTransfer.getData('text/plain');
           onItemDrop(item.getValue() as string, data);
         }}
         onItemDragStart={(e, item) => {
           const id = item.getValue();
           const value = { type: dragString, id };
-          e.dataTransfer.setData("text/plain", JSON.stringify(value));
+          e.dataTransfer.setData('text/plain', JSON.stringify(value));
         }}
       >
         {createTreeItem(treeMap?.get(data?.dirTree?.[0]?.id as string))}
       </TreeView>
       <div className="panel">
         <button onClick={() => dirId && onDirCreate?.(dirId)}>Create</button>
-        <button
-          onClick={() =>
-            dirId && onFileRename?.(dirId, treeMap?.get(dirId)?.name as string)
-          }
-        >
+        <button onClick={() => dirId && onFileRename?.(dirId, treeMap?.get(dirId)?.name as string)}>
           Rename
         </button>
         <button onClick={() => dirId && onFileDelete?.(dirId)}>Delete</button>
@@ -101,7 +97,7 @@ export const DirTreeView = ({
 
   function createTree(list: DirItem[] | null | undefined) {
     if (!list) return undefined;
-    const idMap = new Map<String, DirItem>();
+    const idMap = new Map<string, DirItem>();
     list.forEach((contents) => {
       idMap.set(contents.id, { ...contents });
     });

@@ -1,16 +1,16 @@
-import { JSWindow } from "@jswf/react";
-import { AutoCloseProps } from "@components/Footer";
-import imageLoginId from "./images/login_id.svg";
-import imageLoginPass from "./images/login_pass.svg";
-import { useMutation } from "@apollo/client";
-import { useState } from "react";
-import { QUERY_USERS, MUTATION_CREATE_USER } from "./graphql";
-import { UsersQuery } from "@generated/graphql";
+import { JSWindow } from '@jswf/react';
+import { AutoCloseProps } from '@components/Footer';
+import imageLoginId from './images/login_id.svg';
+import imageLoginPass from './images/login_pass.svg';
+import { useMutation } from '@apollo/client';
+import { useState } from 'react';
+import { QUERY_USERS, MUTATION_CREATE_USER } from './graphql';
+import { UsersQuery } from '@generated/graphql';
 
 export const UserEdit = ({ autoClose }: AutoCloseProps) => {
   const [createUser] = useMutation(MUTATION_CREATE_USER);
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   return (
     <JSWindow title="UserEdit" onUpdate={autoClose}>
       <style jsx>{`
@@ -64,13 +64,13 @@ export const UserEdit = ({ autoClose }: AutoCloseProps) => {
                 variables: { name, password },
                 update: (cache, { data }) => {
                   const result = cache.readQuery<UsersQuery>({ query: QUERY_USERS });
-                  if(result && result.users)
-                  cache.writeQuery({
-                    query: QUERY_USERS,
-                    data: { users: [...result.users, data.user] },
-                  });
+                  if (result && result.users)
+                    cache.writeQuery({
+                      query: QUERY_USERS,
+                      data: { users: [...result.users, data.user] },
+                    });
                 },
-              }).then((result) => {
+              }).then(() => {
                 autoClose();
               });
             }}

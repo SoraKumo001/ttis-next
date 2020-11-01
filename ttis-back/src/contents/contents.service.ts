@@ -4,7 +4,7 @@ import { Contents } from './contents';
 import { ExtendRepository } from '@libs/ExtendRepository';
 import { Repository } from 'typeorm';
 import { GraphQLFeald as GraphQLField } from '@libs/graphQLTools';
-
+import * as cluster from 'cluster';
 export type VECTOR_TYPE = 'CHILD_FIRST' | 'CHILD_LAST' | 'BEFORE' | 'NEXT';
 
 @Injectable()
@@ -78,6 +78,8 @@ export class ContentsService implements OnModuleInit {
     page?: boolean;
     select?: GraphQLField;
   } = {}) {
+    console.log("ID",cluster.worker.id);
+
     const { expRep } = this;
     const rootWhere: { [key: string]: unknown } = {};
     if (id) rootWhere['id'] = id;

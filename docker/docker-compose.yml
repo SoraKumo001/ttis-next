@@ -1,16 +1,16 @@
 version: "3.7"
 services:
-  nginx:
-    container_name: ttis-nginx
-    image: ttis-nginx
-    build: 
-      context: "."
-      dockerfile: "./Dockerfile_nginx"   
-    ports:
-      - "127.0.0.1:8080:80"
-    volumes:
-      - socket-vol:/var/run/socks
-    restart: always
+  # nginx:
+  #   container_name: ttis-nginx
+  #   image: ttis-nginx
+  #   build: 
+  #     context: "."
+  #     dockerfile: "./Dockerfile_nginx"   
+  #   ports:
+  #     - "127.0.0.1:8080:80"
+  #   volumes:
+  #     - socket-vol:/var/run/socks
+  #   restart: always
   redis:
     container_name: ttis-redis
     image: ttis-redis

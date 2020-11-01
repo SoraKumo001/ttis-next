@@ -1,5 +1,4 @@
-import { JSWindow, WindowState } from "@jswf/react";
-import { useEffect, useRef } from "react";
+import { JSWindow, WindowState } from '@jswf/react';
 
 interface Props {
   title: string;
@@ -9,12 +8,7 @@ interface Props {
   defaultValue?: string;
 }
 
-export const VericationWindow = ({
-  title,
-  message,
-  onClose,
-  onEnter,
-}: Props) => {
+export const VericationWindow = ({ title, message, onClose, onEnter }: Props) => {
   return (
     <div className="root">
       <style jsx>{`

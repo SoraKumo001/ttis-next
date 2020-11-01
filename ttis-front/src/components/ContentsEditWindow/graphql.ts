@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { FRAGMENT_CONTENTS } from "src/graphql";
+import { gql } from '@apollo/client';
+import { FRAGMENT_CONTENTS } from 'src/graphql';
 
 export const QUERY_CONTENTS = gql`
   ${FRAGMENT_CONTENTS}

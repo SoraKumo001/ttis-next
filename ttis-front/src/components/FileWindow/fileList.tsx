@@ -1,28 +1,22 @@
-import {
-  ListItem,
-  ListRow,
-  ListView,
-  ListHeaders,
-  ListHeader,
-} from "@jswf/react";
-import { useApolloClient, useQuery } from "@apollo/client";
+import { ListItem, ListRow, ListView, ListHeaders, ListHeader } from '@jswf/react';
+import { useApolloClient, useQuery } from '@apollo/client';
 import {
   DirFilesQuery,
   DirFilesQueryVariables,
   Files,
   UploadFileMutation,
   UploadFileMutationVariables,
-} from "../../generated/graphql";
-import { QUERY_FILES, UPLOAD_FILE } from "./graphql";
-import React, { useMemo } from "react";
-import { useRef } from "react";
+} from '../../generated/graphql';
+import { QUERY_FILES, UPLOAD_FILE } from './graphql';
+import React, { useMemo } from 'react';
+import { useRef } from 'react';
 
 interface Props {
   dirId: string;
   dragString: string;
   onSelect?: (id: string) => void;
   onFileRename: (id: string, name: string) => void;
-  onFileDelete: (id: string|string[]) => void;
+  onFileDelete: (id: string | string[]) => void;
 }
 
 export const FileListView = ({
@@ -34,15 +28,12 @@ export const FileListView = ({
 }: Props) => {
   const client = useApolloClient();
   const listView = useRef<ListView>(null);
-  const { data } = useQuery<DirFilesQuery, DirFilesQueryVariables>(
-    QUERY_FILES,
-    {
-      variables: { id: dirId },
-      skip: !dirId,
-    }
-  );
+  const { data } = useQuery<DirFilesQuery, DirFilesQueryVariables>(QUERY_FILES, {
+    variables: { id: dirId },
+    skip: !dirId,
+  });
   const fileMap = useMemo(() => {
-    const fileMap = new Map<String, Files>();
+    const fileMap = new Map<string, Files>();
     data?.dirFiles?.forEach((file) => {
       fileMap.set(file.id, file);
     });
@@ -91,7 +82,7 @@ export const FileListView = ({
                 client.query<DirFilesQuery, DirFilesQueryVariables>({
                   query: QUERY_FILES,
                   variables: { id: dirId },
-                  fetchPolicy: "network-only",
+                  fetchPolicy: 'network-only',
                 });
               },
             });
@@ -115,7 +106,7 @@ export const FileListView = ({
           {data?.dirFiles?.map((file) => (
             <ListRow key={file.id} value={file.id}>
               <ListItem>
-                <div className={file.kind === 0 ? "dir" : ""}>{file.name}</div>
+                <div className={file.kind === 0 ? 'dir' : ''}>{file.name}</div>
               </ListItem>
               <ListItem>{file.size}</ListItem>
               <ListItem>{file.updateAt}</ListItem>
@@ -138,8 +129,8 @@ export const FileListView = ({
           <button
             onClick={() => {
               const values = listView.current?.getSelectValues() as string[];
-               if (values?.length) {
-                const ids = values.map(index=>fileMap.get(index)?.id as string);
+              if (values?.length) {
+                const ids = values.map((index) => fileMap.get(index)?.id as string);
                 onFileDelete(ids);
               }
             }}

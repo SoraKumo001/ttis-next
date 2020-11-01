@@ -1,16 +1,16 @@
-import { useRouter, NextRouter } from "next/router";
-import { UserList } from "../User/UserList";
-import { WindowState, WindowInfo } from "@jswf/react";
-import { UserLogin } from "@components/User/UserLogin";
-import { useQuery } from "@apollo/client";
-import Link from "next/link";
-import imgLoginId from "../../images/login_id.svg";
-import { CurrentUserQuery } from "@generated/graphql";
-import { QUERY_CURRENT_USER } from "@components/User/graphql";
-import { removeRouterQuery } from "@libs/CustomRouter";
-import { getRouterQuery } from "../../libs/CustomRouter";
-import React from "react";
-import { FileWindow } from "@components/FileWindow";
+import { useRouter, NextRouter } from 'next/router';
+import { UserList } from '../User/UserList';
+import { WindowState, WindowInfo } from '@jswf/react';
+import { UserLogin } from '@components/User/UserLogin';
+import { useQuery } from '@apollo/client';
+import Link from 'next/link';
+import imgLoginId from '../../images/login_id.svg';
+import { CurrentUserQuery } from '@generated/graphql';
+import { QUERY_CURRENT_USER } from '@components/User/graphql';
+import { removeRouterQuery } from '@libs/CustomRouter';
+import { getRouterQuery } from '../../libs/CustomRouter';
+import React from 'react';
+import { FileWindow } from '@components/FileWindow';
 
 export const createAutoClose = (router: NextRouter, queryKey: string) => {
   {
@@ -27,9 +27,7 @@ export interface AutoCloseProps {
 }
 
 export const Footer = () => {
-  const { data, error, loading } = useQuery<CurrentUserQuery>(
-    QUERY_CURRENT_USER
-  );
+  const { data } = useQuery<CurrentUserQuery>(QUERY_CURRENT_USER);
   const user = data?.currentUser?.user;
   const router = useRouter();
   const { userList, login, file } = getRouterQuery(router);
@@ -62,8 +60,7 @@ export const Footer = () => {
           cursor: pointer;
         }
         .button:active {
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-            0 2px 2px rgba(0, 0, 0, 0.19);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 2px rgba(0, 0, 0, 0.19);
           border-bottom: none;
         }
         .button img {
@@ -71,7 +68,7 @@ export const Footer = () => {
         }
       `}</style>
       <div className="root">
-        <Link href={router.pathname + "?login"} as="?login">
+        <Link href={router.pathname + '?login'} as="?login">
           <div className="button">
             <img src={imgLoginId} />
           </div>
@@ -79,24 +76,18 @@ export const Footer = () => {
         {user && user.name && (
           <>
             <div className="UserInfo">{user.name}</div>
-            <Link href={router.pathname + "?userList"} as="?userList">
+            <Link href={router.pathname + '?userList'} as="?userList">
               <div className="button">UserEdit</div>
             </Link>
           </>
         )}
-        <Link href={router.pathname + "?file"} as="?file">
+        <Link href={router.pathname + '?file'} as="?file">
           <div className="button">FileEdit</div>
         </Link>
       </div>
-      {userList !== undefined && (
-        <UserList autoClose={createAutoClose(router, "userList")} />
-      )}
-      {login !== undefined && (
-        <UserLogin autoClose={createAutoClose(router, "login")} />
-      )}
-      {file !== undefined && (
-        <FileWindow autoClose={createAutoClose(router, "file")} />
-      )}
+      {userList !== undefined && <UserList autoClose={createAutoClose(router, 'userList')} />}
+      {login !== undefined && <UserLogin autoClose={createAutoClose(router, 'login')} />}
+      {file !== undefined && <FileWindow autoClose={createAutoClose(router, 'file')} />}
     </>
   );
 };

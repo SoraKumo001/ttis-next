@@ -1,13 +1,13 @@
-import { useRouter } from "next/router";
-import { getRoutePath, addRouterQuery } from "../../libs/CustomRouter";
-import { useQuery } from "@apollo/client";
-import { QUERY_CONTENTS_PAGE } from "./graphql";
-import dateFormat from "dateformat";
+import { useRouter } from 'next/router';
+import { getRoutePath, addRouterQuery } from '../../libs/CustomRouter';
+import { useQuery } from '@apollo/client';
+import { QUERY_CONTENTS_PAGE } from './graphql';
+import dateFormat from 'dateformat';
 import {
   ContentsPageQuery,
   FragmentContentsFragment,
   ContentsPageQueryVariables,
-} from "../../generated/graphql";
+} from '../../generated/graphql';
 
 type ContentsItem = FragmentContentsFragment & {
   children?: ContentsItem[];
@@ -15,7 +15,7 @@ type ContentsItem = FragmentContentsFragment & {
 
 function createTree(contentsList?: ContentsItem[]) {
   if (!contentsList || !contentsList.length) return undefined;
-  const idMap = new Map<String, ContentsItem>();
+  const idMap = new Map<string, ContentsItem>();
   contentsList.forEach((contents) => {
     idMap.set(contents.id, { ...contents });
   });
@@ -32,13 +32,10 @@ function createTree(contentsList?: ContentsItem[]) {
 
 export const ContentsView = () => {
   const router = useRouter();
-  const id = (router.query["id"] as string) || getRoutePath(router)[1];
-  const { data } = useQuery<ContentsPageQuery, ContentsPageQueryVariables>(
-    QUERY_CONTENTS_PAGE,
-    {
-      variables: { id },
-    }
-  );
+  const id = (router.query['id'] as string) || getRoutePath(router)[1];
+  const { data } = useQuery<ContentsPageQuery, ContentsPageQueryVariables>(QUERY_CONTENTS_PAGE, {
+    variables: { id },
+  });
   const contents = data && createTree(data.contentsList);
   return (
     <>
@@ -62,8 +59,8 @@ export const ContentsView = () => {
       <div key={contents.id}>
         <style jsx>
           {`
-            .contents{
-              animation: fadeIn 0.5s normal;
+            .contents {
+              animation: fadeIn 0.1s normal;
             }
             .body {
               margin-left: 1em;
@@ -87,7 +84,7 @@ export const ContentsView = () => {
               0% {
                 opacity: 0;
               }
-  
+
               100% {
                 opacity: 1;
               }
@@ -97,7 +94,7 @@ export const ContentsView = () => {
         <div className="contents">
           <div
             className="title"
-            id={"t" + contents.title_type}
+            id={'t' + contents.title_type}
             onDoubleClick={(e) => {
               e.stopPropagation();
               if (contents) addRouterQuery(router, { edit: contents.id });
@@ -105,18 +102,14 @@ export const ContentsView = () => {
           >
             {contents.title}
           </div>
-          <div className="date">
-            {dateFormat(contents.updateAt, "yyyy年mm月dd日 HH時MM分ss秒")}
-          </div>
+          <div className="date">{dateFormat(contents.updateAt, 'yyyy年mm月dd日 HH時MM分ss秒')}</div>
           <div className="body">
             <div
               dangerouslySetInnerHTML={{
                 __html: contents.value!,
               }}
             />
-            <div className="child">
-              {contents.children?.map((item) => drawContents(item))}
-            </div>
+            <div className="child">{contents.children?.map((item) => drawContents(item))}</div>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export class UserService implements OnModuleInit {
       });
     });
   }
-  async setUser(id?: number, name?: string, password?: string, info?: object) {
+  async setUser(id?: number, name?: string, password?: string, info?: unknown) {
     const { rep } = this;
     if (!id) {
       if (name && password) {

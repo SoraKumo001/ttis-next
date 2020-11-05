@@ -7,7 +7,7 @@ import { QUERY_LOGIN } from './graphql';
 import { useState } from 'react';
 import axios from 'axios';
 import { LoginMutation } from '@generated/graphql';
-import { CustomApolloClient } from '../../pages/_app';
+import { CustomApolloClient } from "../../libs/CustomApolloClient";
 export const UserLogin = ({ autoClose }: { autoClose?: AutoClose }) => {
   const client = useApolloClient() as CustomApolloClient;
   const [login, { loading }] = useMutation<LoginMutation>(QUERY_LOGIN);

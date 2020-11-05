@@ -1,21 +1,13 @@
 import React from 'react';
 import NextApp, { AppContext, AppInitialProps, createUrl } from 'next/app';
-
-import {
-  ApolloProvider,
-  ApolloClient,
-  InMemoryCache,
-  NormalizedCacheObject,
-  ApolloLink,
-} from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloProvider } from '@apollo/client';
 import { getMarkupFromTree } from '@apollo/react-ssr';
-import { initProps, SessionType, createSessionProps } from '../libs/next-express-session';
-import { Header } from '@components/Header';
 import * as nextRouter from 'next/router';
-import { Footer } from '@components/Footer';
-import { createUploadLink, UploadLinkOptions } from 'apollo-upload-client';
 import { NextRouter } from 'next/router';
+import { Header } from '@components/Header';
+import { Footer } from '@components/Footer';
+import { CustomApolloClient } from '../libs/CustomApolloClient';
+import { initProps, SessionType, createSessionProps } from '../libs/next-express-session';
 
 export type NextWebVitalsMetrics = {
   id: string;
@@ -41,48 +33,6 @@ const URI_ENDPOINT = IS_BROWSER
 // セッション情報内からクライアントへ送りたくないデータを指定
 const SessionFilter: string[] = [];
 
-export interface AuthLink extends ApolloLink {
-  setToken: (token?: string) => void;
-  getToken: () => string;
-}
-export const createAuthLink = (options: UploadLinkOptions) => {
-  let bearerToken: string;
-  const link = (createUploadLink(options) as unknown) as ApolloLink;
-  const apolloLink = setContext((_, { headers }) => ({
-    headers: { ...headers, authorization: `bearer ${bearerToken || ''}` },
-  })).concat(link) as AuthLink;
-  apolloLink.setToken = (token) => {
-    bearerToken = token || '';
-  };
-  apolloLink.getToken = () => {
-    return bearerToken;
-  };
-  return apolloLink;
-};
-
-export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
-  // static port: number=3000;
-  link: AuthLink;
-  constructor(token?: string | null, cache: NormalizedCacheObject = {}) {
-    const link: AuthLink = createAuthLink({
-      fetch,
-      uri: URI_ENDPOINT,
-    });
-    super({ link, cache: new InMemoryCache().restore(cache) });
-    this.link = link;
-    if (token) link.setToken(token);
-  }
-  setToken(token?: string) {
-    this.link.setToken(token);
-  }
-  getToken() {
-    return this.link.getToken();
-  }
-  // static setPort(port: number) {
-  //   CustomApolloClient.port = port;
-  // }
-}
-
 export interface PagesProps {
   url?: ReturnType<typeof createUrl>;
   graphqlToken?: string;
@@ -97,7 +47,7 @@ export default class App extends NextApp<{ session: SessionType }> {
     //セッション情報の初期化(SPA時にはundefined)
     const session = (ctx?.req as undefined | { session?: SessionType })?.session;
     const graphqlToken = session?.graphqlToken as string | undefined;
-    ssrClient = new CustomApolloClient(graphqlToken);
+    ssrClient = new CustomApolloClient(URI_ENDPOINT, graphqlToken);
 
     const context = {
       ...ctx,
@@ -145,7 +95,11 @@ export default class App extends NextApp<{ session: SessionType }> {
     super(props);
     this.client =
       ssrClient ||
-      new CustomApolloClient(props.session?.graphqlToken as string, props.pageProps.apolloCache);
+      new CustomApolloClient(
+        URI_ENDPOINT,
+        props.session?.graphqlToken as string,
+        props.pageProps.apolloCache
+      );
   }
   render() {
     const { router, Component, pageProps } = this.props;

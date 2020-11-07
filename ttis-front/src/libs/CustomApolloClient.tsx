@@ -1,9 +1,9 @@
-import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, InMemoryCache, NormalizedCacheObject, UriFunction } from '@apollo/client';
 import { AuthLink, createAuthLink } from './AuthLink';
 
 export class CustomApolloClient extends ApolloClient<NormalizedCacheObject> {
   link: AuthLink;
-  constructor(uri: string, token?: string | null, cache: NormalizedCacheObject = {}) {
+  constructor(uri: string | UriFunction, token?: string | null, cache: NormalizedCacheObject = {}) {
     const link: AuthLink = createAuthLink({
       fetch,
       uri,

@@ -61,10 +61,12 @@ export const createSessionProps = (session?: SessionType, filters?: string[]) =>
  *
  * @param {App} app
  */
-export const initProps = (app: App) => {
-  const { Component, pageProps, session } = app.props as App['props'] & {
+export const initProps = (
+  props: App['props'] & {
     session?: SessionType;
-  };
+  }
+) => {
+  const { Component, pageProps, session } = props;
   if (session) sessionProps = session;
 
   Component.defaultProps = {

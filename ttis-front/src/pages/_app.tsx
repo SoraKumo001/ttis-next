@@ -8,6 +8,8 @@ import { Header } from '@components/Header';
 import { Footer } from '@components/Footer';
 import { CustomApolloClient } from '../libs/CustomApolloClient';
 import { initProps, SessionType, createSessionProps } from '../libs/next-express-session';
+import './global.css';
+import styles from './_app.module.css';
 
 export type NextWebVitalsMetrics = {
   id: string;
@@ -19,7 +21,7 @@ export type NextWebVitalsMetrics = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function reportWebVitals(metric: NextWebVitalsMetrics) {
-  //console.log(metric);
+  console.log(metric);
 }
 
 const IS_BROWSER = !!process.browser;
@@ -106,49 +108,17 @@ export default class App extends NextApp<{ session: SessionType }> {
     const client = this.client;
     initProps(this);
     return (
-      <>
-        <style jsx global>{`
-          html,
-          body {
-            margin: 0;
-            height: 100%;
-          }
-        `}</style>
-        <style jsx>{`
-          .root {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            animation: fadeIn 0.1s normal;
-          }
-          .body {
-            position: relative;
-            flex: 1;
-          }
-          @keyframes fadeIn {
-            0% {
-              opacity: 0;
-            }
-
-            100% {
-              opacity: 1;
-            }
-          }
-        `}</style>
-        {client && (
-          <ApolloProvider client={client}>
-            <div className="root">
-              <Header {...pageProps} />
-              <div className="body">
-                <Component {...pageProps} url={createUrl(router)} />
-              </div>
-              <Footer {...pageProps} />
+      client && (
+        <ApolloProvider client={client}>
+          <div className={styles.root}>
+            <Header {...pageProps} />
+            <div className={styles.body}>
+              <Component {...pageProps} url={createUrl(router)} />
             </div>
-          </ApolloProvider>
-        )}
-      </>
+            <Footer {...pageProps} />
+          </div>
+        </ApolloProvider>
+      )
     );
   }
 }

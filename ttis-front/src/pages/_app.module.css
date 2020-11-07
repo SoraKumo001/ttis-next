@@ -1,0 +1,21 @@
+.root {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  animation: fadeIn 0.1s normal;
+}
+.body {
+  position: relative;
+  flex: 1;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

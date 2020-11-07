@@ -15,13 +15,8 @@ module.exports = {
       rules: [
         ...config.module.rules,
         {
-          test: /\.(png|jpg|gif|svg)$/,
-          use: {
-            loader: "url-loader",
-            options: {
-              limit: 100000
-            }
-          }
+          test: /\.(jpg|png|svg|gif)$/,
+          type: "asset/inline"
         }
       ]
     }

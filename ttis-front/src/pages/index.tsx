@@ -27,7 +27,7 @@ const MainView = () => {
   );
 };
 
-export default () => {
+const Index = () => {
   return (
     <>
       <MainView />
@@ -35,3 +35,5 @@ export default () => {
     </>
   );
 };
+
+export default Index;

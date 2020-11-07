@@ -110,5 +110,4 @@ App.getInitialProps = async ({ ctx, Component, router }: AppContext) => {
     session: sessionProps,
   };
 };
-
 export default App;

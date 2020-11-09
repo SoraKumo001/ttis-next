@@ -1,17 +1,17 @@
 version: "3.7"
 services:
-  nginx:
-    container_name: ttis-nginx
-    image: ttis-nginx
+  ttis-caddy:
+    container_name: ttis-caddy
+    image: ttis-caddy
     build: 
       context: "."
-      dockerfile: "./Dockerfile_nginx"   
+      dockerfile: "./Dockerfile_caddy"   
     ports:
       - "127.0.0.1:8080:80"
     volumes:
       - socket-vol:/var/run/socks
     restart: always
-  redis:
+  ttis-redis:
     container_name: ttis-redis
     image: ttis-redis
     build: 
@@ -21,7 +21,7 @@ services:
       - socket-vol:/data
       - socket-vol:/var/run/socks
     restart: always
-  postgres:
+  ttis-postgres:
     container_name: ttis-postgresql
     image: postgres:alpine
     environment:
@@ -41,7 +41,7 @@ services:
       context: "../ttis-back"
       dockerfile: "../docker/Dockerfile_back"
     depends_on:
-      - "postgres"
+      - ttis-postgres
     volumes:
       - socket-vol:/var/run/socks
     restart: always
@@ -52,7 +52,7 @@ services:
       context: "../ttis-front"
       dockerfile: "../docker/Dockerfile_front"
     depends_on:
-      - "redis"
+      - ttis-redis
     volumes:
       - /var/share/nginx:/var/share/nginx
       - socket-vol:/var/run/socks

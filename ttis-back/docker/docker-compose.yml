@@ -12,13 +12,13 @@ services:
       - socket-vol:/var/run/postgresql
     ports:
       - 5432:5432
-  nginx:
-    container_name: ttis-nginx-dev
-    image: nginx:alpine
+  caddy:
+    container_name: ttis-caddy-dev
+    image: caddy:alpine
     ports:
       - 80:80
     volumes:
-      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./etc/caddy/Caddyfile:/etc/caddy/Caddyfile
   redis:
     container_name: ttis-redis-dev
     image: "redis:alpine"

@@ -1,0 +1,18 @@
+{
+    experimental_http3
+}
+(default) {
+    file_server
+    push
+    encode zstd gzip
+}
+
+:80 {
+    import default
+    reverse_proxy host.docker.internal:3001 {
+
+    }
+    handle /graphql/* {
+      reverse_proxy host.docker.internal:3000
+    }
+}

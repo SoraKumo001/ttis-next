@@ -1,0 +1,16 @@
+{
+    experimental_http3
+}
+(default) {
+    file_server
+    push
+    encode zstd gzip
+}
+
+:80 {
+    import default
+    reverse_proxy unix//var/run/socks/node-front.sock
+    handle /graphql/* {
+      reverse_proxy unix//var/run/socks/node-back.sock
+    }
+}

@@ -21,7 +21,7 @@ export type NextWebVitalsMetrics = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function reportWebVitals(metric: NextWebVitalsMetrics) {
-  console.log(metric);
+  // console.log(metric);
 }
 
 const IS_BROWSER = !!process.browser;
@@ -30,7 +30,7 @@ const IS_DOCKER =
 const URI_ENDPOINT = IS_BROWSER
   ? '/graphql/'
   : IS_DOCKER
-  ? 'http://ttis-nginx/graphql/'
+  ? 'http://ttis-caddy/graphql/'
   : 'http://localhost/graphql/';
 // セッション情報内からクライアントへ送りたくないデータを指定
 const SessionFilter: string[] = [];

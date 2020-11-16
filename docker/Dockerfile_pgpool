@@ -1,0 +1,3 @@
+FROM bitnami/pgpool
+USER root
+CMD ["/opt/bitnami/scripts/pgpool/run.sh"]

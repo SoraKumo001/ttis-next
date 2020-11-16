@@ -11,6 +11,7 @@ services:
     volumes:
       - socket-vol:/var/run/socks
     restart: always
+
   ttis-redis:
     container_name: ttis-redis
     image: ttis-redis
@@ -18,22 +19,64 @@ services:
       context: "."
       dockerfile: "./Dockerfile_redis"      
     volumes:
-      - socket-vol:/data
+      - redis-vol:/data
       - socket-vol:/var/run/socks
     restart: always
+
   ttis-postgres:
-    container_name: ttis-postgresql
-    image: postgres:alpine
+    container_name: ttis-postgres
+    image: bitnami/postgresql:13
     environment:
-      POSTGRES_DB: ttis
-      POSTGRES_USER: ttis
-      POSTGRES_PASSWORD: test
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_MASTER_HOST=${DB_HOST}
+      - POSTGRESQL_USERNAME=ttis
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_MASTER_PORT_NUMBER=${DB_PORT}
+      - POSTGRESQL_PGHBA_REMOVE_FILTERS=local
+      - ALLOW_EMPTY_PASSWORD=yes
+    command: >
+      sh -c "
+      echo local all all md5 >> /opt/bitnami/postgresql/conf/pg_hba.conf;
+      /opt/bitnami/scripts/postgresql/run.sh"
     volumes:
-      - postgresql-vol:/var/lib/postgresql/data
-      - socket-vol:/var/run/postgresql
-    # ports:
-    #   - 5432:5432
+      # - postgres-vol:/bitnami/postgresql
+      - postgres-socket-vol:/tmp
     restart: always
+
+  ttis-pgpool:
+    container_name: ttis-pgpool
+    build: 
+      context: .
+      dockerfile: ./Dockerfile_pgpool
+    depends_on:
+      - ttis-postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:${DB_HOST}:${DB_PORT},1:/slave
+      - PGPOOL_SR_CHECK_USER=ttis
+      - PGPOOL_SR_CHECK_PASSWORD=${DB_PASSWORD}
+      - PGPOOL_POSTGRES_USERNAME=ttis
+      - PGPOOL_POSTGRES_PASSWORD=${DB_PASSWORD}
+      - PGPOOL_ADMIN_USERNAME=ttis
+      - PGPOOL_ADMIN_PASSWORD=${DB_PASSWORD}
+      - PGPOOL_ENABLE_STATEMENT_LOAD_BALANCING=yes
+      - PGPOOL_NUM_INIT_CHILDREN=10
+      - PGPOOL_MAX_POOL=32
+    command: >
+      sh -c "
+      chmod 777 /tmp/socket;
+      sed -i \"s/^socket_dir = .*/socket_dir = '\/tmp\/socket'/\" /opt/bitnami/pgpool/conf/pgpool.conf;
+      sed -i 's/^backend_weight0 = 1/backend_weight0 = 0/' /opt/bitnami/pgpool/conf/pgpool.conf;
+      sed -i \"s/^database_redirect_preference_list = ''/database_redirect_preference_list = '.*:standby'/\" /opt/bitnami/pgpool/conf/pgpool.conf;
+      /opt/bitnami/scripts/pgpool/run.sh"
+    volumes:
+      - postgres-socket-vol:/slave
+      - socket-vol:/tmp/socket
+    restart: always
+
   ttis-back:
     image: ttis-back
     container_name: ttis-back
@@ -41,10 +84,11 @@ services:
       context: "../ttis-back"
       dockerfile: "../docker/Dockerfile_back"
     depends_on:
-      - ttis-postgres
+      - ttis-pgpool
     volumes:
       - socket-vol:/var/run/socks
     restart: always
+
   ttis-front:
     image: ttis-front
     container_name: ttis-front
@@ -58,7 +102,10 @@ services:
       - socket-vol:/var/run/socks
     command: sh -c "cp -rf .next/static /var/share/nginx && yarn start" 
     restart: always
+
 volumes:
   socket-vol:
-  postgresql-vol:
+  # postgres-vol:
+  postgres-socket-vol:
+  pgpool-socket-vol:
   redis-vol:

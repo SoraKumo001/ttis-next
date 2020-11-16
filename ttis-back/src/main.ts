@@ -4,14 +4,15 @@ import * as os from 'os';
 import * as cluster from 'cluster';
 import * as fs from 'fs';
 
+const dev = process.env.NODE_ENV !== 'production';
 const socket = process.platform !== 'win32';
 const sock_path = '/var/run/socks/node-back.sock';
 const port_number = 3000;
 
 async function bootstrap() {
-  const clusterSize = os.cpus().length;
+  const clusterSize = Math.min(os.cpus().length,4);
 
-  if (cluster.isMaster) {
+  if (cluster.isMaster && !dev) {
     try {
       fs.unlinkSync(sock_path);
     } catch (error) {}
@@ -29,14 +30,21 @@ async function bootstrap() {
     });
 
     if (socket) {
+      if(!cluster.worker){
+        try {
+          fs.unlinkSync(sock_path);
+        } catch (error) {}
+      }
       app.listen(sock_path, () => {
         fs.chmodSync(sock_path, '666');
-        console.log(`(BACK:${cluster.worker.id}) unix:${sock_path}`);
+        console.log(`(BACK:${cluster.worker?.id || 0}) unix:${sock_path}`);
       });
     } else {
       app.listen(port_number, () => {
         console.log(
-          `(BACK:${cluster.worker.id}) http://localhost:${port_number}/graphql`,
+          `(BACK:${
+            cluster.worker?.id || 0
+          }) http://localhost:${port_number}/graphql`,
         );
       });
     }

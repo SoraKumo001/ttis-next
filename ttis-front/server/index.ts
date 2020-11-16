@@ -18,7 +18,7 @@ const port_number = 3001;
 const sock_path = '/var/run/socks/node-front.sock';
 const redis_path = '/var/run/socks/redis.sock';
 
-const clusterSize = os.cpus().length;
+const clusterSize = Math.min(os.cpus().length,4);
 
 if (cluster.isMaster && !dev) {
   try {
@@ -65,6 +65,11 @@ if (cluster.isMaster && !dev) {
     });
 
     if (socket) {
+      if(!cluster.worker){
+        try {
+          fs.unlinkSync(sock_path);
+        } catch (error) {}
+      }
       server
         .listen(sock_path)
         .on('listening', () => {

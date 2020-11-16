@@ -3,8 +3,9 @@
   "scripts": {
     "start:dev": "yarn --cwd ttis-back start:docker && npm-run-all -p start:dev:*",
     "start:prod": "yarn --cwd ttis-back start:docker && npm-run-all -p start:prod:*",
-    "deploy": "docker-compose -f docker/docker-compose.yml build --parallel && docker save ttis-redis ttis-front ttis-back | docker --tls -H test.croud.jp load && docker-compose --env-file .env-deploy -f docker/docker-compose.yml up -d",
+    "deploy": "docker-compose -f docker/docker-compose.yml build --parallel --compress && docker save ttis-redis ttis-front ttis-back | docker --tls -H test.croud.jp load && docker-compose --env-file .env-deploy -f docker/docker-compose.yml up -d",
     "deploy:log": "docker --tls -H test.croud.jp logs -f ttis-back",
+    "deploy:log:pgpool": "docker --tls -H test.croud.jp logs -f ttis-pgpool",
     "test": "yarn --cwd ttis-back test",
     "test:snapshot": "yarn --cwd ttis-back test:snapshot",
     "generate": "npm-run-all -p generate:*",

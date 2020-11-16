@@ -30,4 +30,4 @@ volumes:
   postgresql-vol:
   redis-vol:
   socket-vol:
-    driver: local
+  

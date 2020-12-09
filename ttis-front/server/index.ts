@@ -1,4 +1,4 @@
-import expressSession from 'express-session';
+import expressSession, { Store } from 'express-session';
 import redis from 'redis';
 import redisStore from 'connect-redis';
 import express from 'express';
@@ -33,11 +33,11 @@ if (cluster.isMaster && !dev) {
     secret: 'secret',
     resave: false,
     saveUninitialized: false,
-    store: new (redisStore(expressSession))({
+    store: new (redisStore(expressSession as any))({
       client: socket
         ? redis.createClient(redis_path).on('error', (err) => console.error(err))
         : redis.createClient(),
-    }),
+    }) as Store,
   });
 
   app.prepare().then(async () => {

@@ -1,9 +1,14 @@
-FROM node:alpine
+FROM node:alpine as build
 WORKDIR /app
 COPY package.json .
 COPY yarn.lock .
 RUN yarn && yarn cache clean
 COPY . .
 RUN yarn build
+RUN yarn cache clean
+
+FROM node:alpine
+WORKDIR /app
+COPY --from=build /app /app
 EXPOSE 80
 CMD ["yarn","start"]

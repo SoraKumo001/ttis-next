@@ -28,7 +28,7 @@ export class UserService implements OnModuleInit {
         return rep.save({
           name,
           password: getSHA256(password),
-          info: info && JSON.stringify(info),
+          info: info ? JSON.stringify(info) : "{}",
         });
       }
     } else {

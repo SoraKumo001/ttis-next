@@ -1,18 +1,18 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { FilesService } from './files.service';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 
 @Controller('files')
 export class FilesController {
   constructor(private readonly service: FilesService) {}
 
   @Get(':id')
-  async getTest(@Param('id') id: string, @Res() res: Response) {
+  async getTest(@Param('id') id: string, @Res() res: FastifyReply) {
     const { service } = this;
     const file = await service.getFile(id);
     if (!file) {
       res.status(404);
-      res.end('not found');
+      res.raw.end('not found');
       return;
     }
     let httpDisposition = 'inline;';
@@ -45,13 +45,13 @@ export class FilesController {
           break;
       }
     }
-    res.contentType(contentType);
+   // res.contentt.contentType(contentType);
     res.header('Content-length', (file.size as number).toString());
-    res.header('Last-Modified', (new Date(file.date)).toUTCString());
+    res.header('Last-Modified', new Date(file.date).toUTCString());
     res.header(
       'Content-Disposition',
       `${httpDisposition} filename*=utf-8'jp'${encodeURI(fileName)}`,
     );
-    res.end(file.value, 'binary');
+    res.raw.end(file.value, 'binary');
   }
 }

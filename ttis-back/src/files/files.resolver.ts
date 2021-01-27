@@ -3,10 +3,10 @@ import { FilesService } from './files.service';
 import { JwtAuthGuard, CurrentUser } from 'src/auth/auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { User } from '@graphql/types';
-import { GraphQLUpload } from 'apollo-server-express';
 
 import { Files } from './files';
 import { FileUpload } from 'graphql-upload';
+import { GraphQLUpload } from 'apollo-server-fastify';
 
 @Resolver('Files')
 export class FilesResolver {
@@ -21,10 +21,7 @@ export class FilesResolver {
   }
   @UseGuards(JwtAuthGuard)
   @Query(() => [Files], { nullable: true })
-  async dirFiles(
-    @CurrentUser() user: User,
-    @Args('id', { type: () => ID }) id: string,
-  ) {
+  async dirFiles(@CurrentUser() user: User, @Args('id', { type: () => ID }) id: string) {
     if (!user) return null;
     const { service } = this;
     return service.getFileList(id);
@@ -57,10 +54,7 @@ export class FilesResolver {
     nullable: true,
     description: '複数ファイルの削除',
   })
-  async deleteFile(
-    @CurrentUser() user: User,
-    @Args('id', { type: () => ID }) id: string,
-  ) {
+  async deleteFile(@CurrentUser() user: User, @Args('id', { type: () => ID }) id: string) {
     if (!user) return null;
     const { service } = this;
     return service.deleteFile(id);
@@ -70,10 +64,7 @@ export class FilesResolver {
     nullable: true,
     description: '複数ファイルの削除',
   })
-  async deleteFiles(
-    @CurrentUser() user: User,
-    @Args('ids', { type: () => [ID] }) ids: string[],
-  ) {
+  async deleteFiles(@CurrentUser() user: User, @Args('ids', { type: () => [ID] }) ids: string[]) {
     if (!user) return null;
     const { service } = this;
     const result = ids.map((id) => service.deleteFile(id));

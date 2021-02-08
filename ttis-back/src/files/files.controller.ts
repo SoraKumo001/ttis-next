@@ -1,7 +1,6 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FastifyReply } from 'fastify';
-
 @Controller('files')
 export class FilesController {
   constructor(private readonly service: FilesService) {}
@@ -45,7 +44,7 @@ export class FilesController {
           break;
       }
     }
-   // res.contentt.contentType(contentType);
+    res.header('Content-type', contentType);
     res.header('Content-length', (file.size as number).toString());
     res.header('Last-Modified', new Date(file.date).toUTCString());
     res.header(

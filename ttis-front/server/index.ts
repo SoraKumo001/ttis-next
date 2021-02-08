@@ -18,7 +18,7 @@ const port_number = 3001;
 const sock_path = '/var/run/socks/node-front.sock';
 const redis_path = '/var/run/socks/redis.sock';
 
-const clusterSize = Math.min(os.cpus().length,4);
+const clusterSize = Math.min(os.cpus().length, 4);
 
 if (cluster.isMaster && !dev) {
   try {
@@ -65,7 +65,7 @@ if (cluster.isMaster && !dev) {
     });
 
     if (socket) {
-      if(!cluster.worker){
+      if (!cluster.worker) {
         try {
           fs.unlinkSync(sock_path);
         } catch (error) {}
@@ -74,7 +74,7 @@ if (cluster.isMaster && !dev) {
         .listen(sock_path)
         .on('listening', () => {
           fs.chmodSync(sock_path, '666');
-          console.log(`(FRONT:${cluster.worker?.id}) ${sock_path}`);
+          console.log(`(FRONT:${cluster.worker?.id || 0}) ${sock_path}`);
         })
         .on('error', (err) => {
           if (err) throw err;
@@ -83,7 +83,7 @@ if (cluster.isMaster && !dev) {
       server
         .listen(port_number)
         .on('listening', () => {
-          console.log(`(FRONT:${cluster.worker?.id}) http://localhost:${port_number}/`);
+          console.log(`(FRONT:${cluster.worker?.id || 0}) http://localhost:${port_number}/`);
         })
         .on('error', (err: unknown) => {
           if (err) throw err;

@@ -61,7 +61,7 @@
     "@nestjs/typeorm": "^7.1.5",
     "apollo-server-fastify": "^2.19.2",
     "cross-env": "^7.0.3",
-    "fastify": "^3.11.0",
+    "fastify": "^3.29.4",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.5.1",

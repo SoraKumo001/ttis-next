@@ -24,7 +24,7 @@
     "connect-redis": "^5.0.0",
     "cross-env": "^7.0.3",
     "dateformat": "^4.5.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.1",
     "extract-files": "^9.0.0",
     "graphql": "^15.5.0",
